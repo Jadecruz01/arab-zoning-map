@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Arab Zoning Map</title>
+<meta name="description" content="City of Arab, Alabama zoning, property and annexation map.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --navy:#0F3273; --navy-2:#1B4494; --gold:#F2C230; --gold-ink:#6B4E00;
+  --bg:#EEF1F7; --surface:#FFFFFF; --surface-2:#F5F7FB; --ink:#131C33; --ink-soft:#56627E; --ink-faint:#8490AA;
+  --line:#DCE2EE; --line-strong:#C3CCDD; --focus:#2F6BFF;
+  --ok:#1F8A5B; --ok-bg:#E3F4EC; --warn:#A86A00; --warn-bg:#FDF3DC; --bad:#B8322A; --bad-bg:#FBE6E4; --info:#2C63C9; --info-bg:#E4ECFB;
+  --shadow:0 1px 2px rgba(15,50,115,.08),0 8px 24px rgba(15,50,115,.12);
+  --map-bg:#E6EAF1; --grid:rgba(15,50,115,.07);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0A1222; --surface:#111C33; --surface-2:#16233F; --ink:#E6ECF7; --ink-soft:#A3B0CB; --ink-faint:#74819E;
+    --line:#233256; --line-strong:#2F4170; --gold-ink:#F2C230; --navy-2:#5B86E0;
+    --ok:#4CC08A; --ok-bg:#12322A; --warn:#F0B54A; --warn-bg:#352A12; --bad:#F07A70; --bad-bg:#3A1A1A; --info:#7FA6F2; --info-bg:#172A4D;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.45);
+    --map-bg:#1A2438; --grid:rgba(160,180,220,.07);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0A1222; --surface:#111C33; --surface-2:#16233F; --ink:#E6ECF7; --ink-soft:#A3B0CB; --ink-faint:#74819E;
+  --line:#233256; --line-strong:#2F4170; --gold-ink:#F2C230; --navy-2:#5B86E0;
+  --ok:#4CC08A; --ok-bg:#12322A; --warn:#F0B54A; --warn-bg:#352A12; --bad:#F07A70; --bad-bg:#3A1A1A; --info:#7FA6F2; --info-bg:#172A4D;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.45);
+  --map-bg:#1A2438; --grid:rgba(160,180,220,.07);
+}
+
+/* ---------- Leaflet core (inlined) ---------- */
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent}
+.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{user-select:none;-webkit-user-drag:none}
+.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}
+.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer,.leaflet-container .leaflet-tile{max-width:none!important;max-height:none!important;width:auto;padding:0}
+.leaflet-container.leaflet-touch-zoom{touch-action:pan-x pan-y}
+.leaflet-container.leaflet-touch-drag{touch-action:none;touch-action:pinch-zoom}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{touch-action:none}
+.leaflet-tile{filter:inherit;visibility:hidden}
+.leaflet-tile-loaded{visibility:inherit}
+.leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800;border:2px dotted var(--navy);background:rgba(255,255,255,.4)}
+.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
+.leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+.leaflet-right .leaflet-control{float:right}
+.leaflet-bottom .leaflet-control{margin-bottom:6px}.leaflet-right .leaflet-control{margin-right:6px}.leaflet-left .leaflet-control{margin-left:10px}
+.leaflet-fade-anim .leaflet-popup{opacity:0;transition:opacity .2s linear}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}
+.leaflet-zoom-animated{transform-origin:0 0}
+svg.leaflet-zoom-animated{will-change:transform}
+.leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{transition:none}
+.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}
+.leaflet-interactive{cursor:pointer}
+.leaflet-grab{cursor:grab}
+.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}
+.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive{cursor:grabbing}
+.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}
+.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive{pointer-events:auto}
+.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
+.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:10px}
+.leaflet-popup-content{margin:12px 16px;line-height:1.4;min-height:1px;font-size:13px}
+.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}
+.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;transform:rotate(45deg)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.leaflet-container a.leaflet-popup-close-button{position:absolute;top:2px;right:4px;border:none;text-align:center;width:24px;height:24px;font:18px/24px var(--sans);color:var(--ink-faint);text-decoration:none;background:transparent}
+.leaflet-tooltip{position:absolute;padding:0;white-space:nowrap;user-select:none;pointer-events:none}
+.leaflet-control-scale-line{border:2px solid var(--ink-soft);border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;box-sizing:border-box;background:color-mix(in srgb,var(--surface) 85%,transparent);color:var(--ink);font:11px var(--mono)}
+.leaflet-control-scale-line:not(:first-child){border-top:2px solid var(--ink-soft);border-bottom:none;margin-top:-2px}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--surface) 80%,transparent);margin:0;padding:1px 6px;font-size:10.5px;color:var(--ink-soft);border-radius:6px 0 0 0}
+.leaflet-control-attribution a{color:var(--navy-2)}
+.leaflet-control-attribution .credit{font-weight:600;color:var(--ink)}
+
+/* ---------- App ---------- */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.app{height:100%;display:flex;flex-direction:column}
+
+.topbar{flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:8px 16px;background:var(--navy);color:#fff;position:relative;z-index:1200}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;text-decoration:none;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.seal{flex:0 0 auto;width:34px;height:34px}
+.brand-text{display:flex;flex-direction:column;line-height:1.1;text-align:left}
+.brand-city{font:600 10.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.brand-name{font:700 17px var(--serif);white-space:nowrap}
+.search{flex:1 1 auto;max-width:560px;margin-inline:auto;position:relative}
+.search input{width:100%;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;padding:0 40px 0 40px;outline:none}
+.search input::placeholder{color:rgba(255,255,255,.7)}
+.search input:focus{background:#fff;color:#131C33;border-color:#fff}
+.search input:focus::placeholder{color:#8490AA}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.search .s-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;pointer-events:none;color:rgba(255,255,255,.8)}
+.search input:focus~.s-ico{color:#56627E}
+.search .s-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:0;background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center}
+.search input:focus~.s-clear{color:#56627E}
+.results{position:absolute;top:46px;left:0;right:0;background:var(--surface);color:var(--ink);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--line);max-height:min(60vh,420px);overflow:auto;padding:6px}
+.results .r{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+.results .r[aria-selected="true"],.results .r:hover{background:var(--surface-2)}
+.r-main{flex:1;min-width:0}
+.r-t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-s{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kchip{flex:0 0 auto;font:600 10px var(--sans);letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line)}
+.results .empty{padding:14px;color:var(--ink-soft);font-size:13px}
+.top-actions{display:flex;gap:8px;flex:0 0 auto}
+.tbtn{height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:13px;white-space:nowrap}
+.tbtn:hover{background:rgba(255,255,255,.1)}
+.tbtn.gold{background:var(--gold);color:#1A1400;border-color:var(--gold)}
+.tbtn svg{width:16px;height:16px}
+
+.stage{flex:1 1 auto;position:relative;min-height:0}
+#map{position:absolute;inset:0;background:var(--map-bg)}
+#map.no-tiles{background-color:var(--map-bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px}
+
+/* floating panel */
+.panel{position:absolute;z-index:1000;left:16px;top:16px;bottom:16px;width:380px;max-width:calc(100% - 32px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s ease}
+.panel.collapsed{transform:translateX(calc(-100% - 24px))}
+.panel-tabs{display:flex;gap:2px;padding:6px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.ptab{flex:1;height:34px;border:0;border-radius:8px;background:none;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.ptab[aria-selected="true"]{background:var(--surface-2);color:var(--ink)}
+.ptab .cnt{font:600 11px var(--mono);background:var(--gold);color:#1A1400;border-radius:999px;padding:0 6px}
+.pbody{flex:1 1 auto;overflow:auto;padding:16px}
+.handle{display:none}
+.collapse-btn{position:absolute;z-index:1001;top:16px;left:404px;width:28px;height:44px;border-radius:0 8px 8px 0;border:1px solid var(--line);border-left:0;background:var(--surface);box-shadow:var(--shadow);cursor:pointer;display:grid;place-items:center;color:var(--ink-soft);transition:left .25s ease}
+.collapse-btn.out{left:0}
+.collapse-btn svg{width:14px;height:14px;transition:transform .25s}
+.collapse-btn.out svg{transform:rotate(180deg)}
+
+h2.ph{font:700 20px/1.2 var(--serif);margin:0 0 4px;text-wrap:balance}
+.eyebrow{font:600 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 6px}
+.sub{color:var(--ink-soft);margin:0 0 14px;font-size:13px}
+.section{margin-top:18px}
+.section>h3{font:600 11px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 8px}
+.zone-badge{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2)}
+.zswatch{width:40px;height:40px;border-radius:8px;flex:0 0 auto;border:1px solid rgba(0,0,0,.15);display:grid;place-items:center;font:700 12px var(--mono);color:#131C33}
+.zone-badge b{display:block;font-size:15px}
+.zone-badge span{font-size:12.5px;color:var(--ink-soft)}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13px}
+dl.kv dt{color:var(--ink-soft)}
+dl.kv dd{margin:0;font-weight:500;text-align:right;overflow-wrap:anywhere}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.btn{height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;color:var(--ink);text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy-2)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1A1400}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.sm{height:28px;padding:0 9px;font-size:12px}
+.btn svg{width:15px;height:15px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.note{font-size:12.5px;color:var(--ink-soft);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.note.warn{background:var(--warn-bg);border-color:color-mix(in srgb,var(--warn) 30%,transparent);color:var(--ink)}
+.note.info{background:var(--info-bg);border-color:color-mix(in srgb,var(--info) 30%,transparent);color:var(--ink)}
+.empty-state{text-align:center;padding:26px 8px;color:var(--ink-soft)}
+.empty-state svg{width:44px;height:44px;color:var(--ink-faint);margin-bottom:8px}
+.tips{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:8px;text-align:left}
+.tips li{display:flex;gap:10px;align-items:flex-start;font-size:13px}
+.tips kbd{font:600 10.5px var(--mono);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px 6px;color:var(--ink)}
+
+/* status pill + tracker */
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 11.5px var(--sans);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.track{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:10px}
+.track .st{height:6px;border-radius:3px;background:var(--line)}
+.track .st.on{background:var(--c)}
+.track-l{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:9.5px;color:var(--ink-faint);margin-top:4px;line-height:1.2}
+.track-l span.on{color:var(--ink);font-weight:600}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface)}
+.alist{display:grid;gap:8px}
+.aitem{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:var(--surface);cursor:pointer}
+.aitem:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.aitem .t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.aitem b{font-size:13.5px}
+.aitem .m{font-size:12px;color:var(--ink-soft);margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip i{width:8px;height:8px;border-radius:50%}
+
+/* layers */
+.lrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.lrow:last-child{border-bottom:0}
+.lrow .ln{flex:1;min-width:0}
+.lrow .ln b{display:block;font-size:13.5px;font-weight:600}
+.lrow .ln span{font-size:12px;color:var(--ink-soft)}
+.switch{position:relative;width:38px;height:22px;flex:0 0 auto}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--line-strong);transition:background .15s;pointer-events:none}
+.switch span::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked+span{background:var(--navy-2)}
+.switch input:checked+span::after{transform:translateX(16px)}
+.switch input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
+.basemaps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.bm{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:6px 4px;cursor:pointer;font-size:11.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--ink-soft)}
+.bm .sw{width:100%;height:30px;border-radius:5px}
+.bm[aria-pressed="true"]{border-color:var(--navy-2);color:var(--ink);box-shadow:0 0 0 1px var(--navy-2) inset}
+.bm[disabled]{opacity:.45;cursor:not-allowed}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}
+.lg{display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 4px;border-radius:6px;border:0;background:none;text-align:left;cursor:pointer;color:var(--ink)}
+.lg:hover{background:var(--surface-2)}
+.lg[aria-pressed="false"]{opacity:.4}
+.lg .sq{width:18px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.18);flex:0 0 auto}
+.lg code{font:600 11px var(--mono);min-width:34px}
+.range{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-soft)}
+.range input{flex:1;accent-color:var(--navy-2)}
+
+/* rail */
+.rail{position:absolute;z-index:1000;right:16px;top:16px;display:flex;flex-direction:column;gap:8px}
+.rgroup{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.rbtn{width:40px;height:40px;border:0;background:none;cursor:pointer;display:grid;place-items:center;color:var(--ink);position:relative}
+.rbtn+.rbtn{border-top:1px solid var(--line)}
+.rbtn:hover{background:var(--surface-2)}
+.rbtn[aria-pressed="true"]{background:var(--navy);color:#fff}
+.rbtn svg{width:18px;height:18px}
+.rbtn .tip{position:absolute;right:48px;top:50%;transform:translateY(-50%);background:var(--ink);color:var(--surface);font-size:12px;font-weight:600;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s}
+.rbtn:hover .tip,.rbtn:focus-visible .tip{opacity:1}
+
+.toolbar{position:absolute;z-index:1001;left:calc(50% + 200px);transform:translateX(-50%);top:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:8px 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:calc(100% - 32px)}
+.toolbar .tv{font:600 15px var(--mono);font-variant-numeric:tabular-nums}
+.toolbar .tl{font-size:12px;color:var(--ink-soft)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);height:28px;padding:0 10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink-soft)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+
+.coords{position:absolute;z-index:999;right:16px;bottom:26px;background:color-mix(in srgb,var(--surface) 90%,transparent);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:11.5px var(--mono);color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.banner{position:absolute;z-index:999;left:412px;right:80px;bottom:24px;max-width:560px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;box-shadow:var(--shadow);padding:10px 36px 10px 12px;font-size:12.5px;color:var(--ink-soft)}
+.banner b{color:var(--ink)}
+.banner .x{position:absolute;right:6px;top:6px;width:24px;height:24px;border:0;background:none;cursor:pointer;color:var(--ink-faint);font-size:16px}
+.toast{position:fixed;z-index:3000;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+
+/* map labels */
+.plabel{font:600 10.5px var(--mono);color:#131C33;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
+.slabel{font:600 11px var(--sans);color:#56627E;letter-spacing:.02em;text-shadow:0 0 3px var(--map-bg),0 0 3px var(--map-bg)}
+.pin-ico{width:28px;height:36px}
+.vtx{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--navy-2)}
+
+/* admin */
+.admin{position:absolute;inset:0;z-index:1100;background:var(--bg);overflow:auto}
+.admin-in{max-width:1180px;margin:0 auto;padding-block:20px 40px;padding-inline:16px}
+.ahead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.ahead h1{font:700 26px/1.15 var(--serif);margin:0}
+.anav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+.anav button{border:0;background:none;padding:10px 14px;font-weight:600;font-size:13.5px;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.anav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.stat .l{font-size:12px;color:var(--ink-soft);font-weight:600}
+.stat .v{font:700 28px/1.1 var(--serif);margin-top:6px;font-variant-numeric:tabular-nums}
+.stat .s{font-size:12px;color:var(--ink-faint);margin-top:2px}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-top:16px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.box>h3{font:700 16px var(--serif);margin:0 0 12px}
+.pipeline{display:grid;gap:10px}
+.pipe{display:grid;grid-template-columns:230px 1fr 36px;align-items:center;gap:10px;font-size:13px}
+.pipe .bar{height:10px;border-radius:5px;background:var(--surface-2);overflow:hidden}
+.pipe .bar i{display:block;height:100%;border-radius:5px}
+.pipe .n{text-align:right;font:600 13px var(--mono)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.t{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+table.t th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);position:sticky;top:0}
+table.t td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+table.t td.act{white-space:nowrap;text-align:right}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:600;color:var(--ink-soft)}
+.field input,.field select,.field textarea{height:36px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:0 10px;width:100%}
+.field textarea{height:auto;min-height:70px;padding:8px 10px;resize:vertical}
+.field .hint{font-size:11.5px;color:var(--ink-faint)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgrid .full{grid-column:1/-1}
+.check{display:flex;gap:8px;align-items:center;font-size:13px}
+.geo-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.gt{border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:8px 4px;cursor:pointer;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink)}
+.gt svg{width:20px;height:20px}
+.gt[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.geo-sum{margin-top:8px;font-size:12.5px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font:12px/1.5 var(--mono);max-height:340px;margin:0}
+.inline-confirm{display:inline-flex;gap:6px;align-items:center;font-size:12px}
+.gate{max-width:440px;margin:10vh auto 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
+.gate h2{font:700 22px var(--serif);margin:0 0 6px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.drop{border:2px dashed var(--line-strong);border-radius:12px;padding:22px;text-align:center;color:var(--ink-soft);background:var(--surface-2)}
+.drop.over{border-color:var(--navy-2);background:var(--info-bg)}
+
+@media (max-width: 900px){
+  .grid2{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width: 720px){
+  /* one slim top row: seal · search · staff */
+  .topbar{flex-wrap:nowrap;gap:8px;padding:6px 10px;padding-top:calc(6px + env(safe-area-inset-top,0px))}
+  .brand-text{display:none}
+  .seal{width:32px;height:32px}
+  .search{flex:1 1 auto;max-width:none;min-width:0}
+  .search input{height:38px;padding:0 36px 0 36px}
+  .search .s-ico{left:12px}
+  .results{position:fixed;left:8px;right:8px;top:calc(52px + env(safe-area-inset-top,0px));max-height:60vh}
+  .tbtn .lbl{display:none}
+  .tbtn{padding:0;width:38px;justify-content:center}
+  input,select,textarea{font-size:16px!important}
+  /* bottom sheet: peek / half / full */
+  .panel{left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;height:48%;border-radius:16px 16px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px);transition:height .25s ease}
+  .panel.collapsed{transform:none}
+  .panel.sheet-peek{height:calc(96px + env(safe-area-inset-bottom,0px))}
+  .panel.sheet-peek .pbody{overflow:hidden}
+  .panel.sheet-half{height:48%}
+  .panel.sheet-full{height:calc(100% - 10px)}
+  .collapse-btn{display:none}
+  .handle{display:block;width:100%;height:22px;border:0;padding:0;background:none;cursor:pointer;flex:0 0 auto;position:relative}
+  .handle::after{content:"";position:absolute;left:50%;top:9px;width:40px;height:4px;margin-left:-20px;border-radius:2px;background:var(--line-strong)}
+  .panel-tabs{padding:0 6px 6px}
+  .ptab{height:32px;font-size:12.5px}
+  .pbody{padding:12px 14px}
+  h2.ph{font-size:18px}
+  .section{margin-top:14px}
+  .empty-state{padding:12px 4px}
+  .empty-state svg{display:none}
+  .tips{display:none}
+  .zone-badge{padding:10px}
+  .zswatch{width:34px;height:34px}
+  .rail{top:10px;right:10px;gap:6px}
+  .rbtn{width:38px;height:38px}
+  .rbtn .tip{display:none}
+  .coords{display:none}
+  .leaflet-control-scale{display:none}
+  .leaflet-bottom{bottom:var(--sheet-h,0px);transition:bottom .25s ease}
+  .banner{bottom:auto;top:10px;left:10px;right:58px;max-width:none;font-size:12px;padding:8px 30px 8px 10px}
+  .toolbar{top:10px;left:10px;right:58px;transform:none;max-width:none;justify-content:space-between}
+  .fgrid{grid-template-columns:1fr}
+  .geo-tools .gt{padding:8px 2px;font-size:11.5px}
+  /* staff dashboard */
+  .admin-in{padding-block:14px 32px;padding-inline:12px}
+  .ahead{margin-bottom:10px}
+  .ahead h1{font-size:22px}
+  .ahead .btnrow{width:100%}
+  .ahead .btnrow .btn{flex:1 1 auto;justify-content:center}
+  .stats{grid-template-columns:1fr 1fr;gap:8px}
+  .stat{padding:10px 12px}
+  .stat .v{font-size:22px}
+  .box{padding:12px}
+  .pipe{grid-template-columns:1fr 70px 26px;font-size:12px}
+  .filters .btn{flex:1 1 auto;justify-content:center}
+  .tablewrap{border:0;background:none;overflow:visible}
+  table.t{min-width:0}
+  table.t thead{display:none}
+  table.t,table.t tbody,table.t tr,table.t td{display:block;width:100%}
+  table.t tr{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  table.t td{border:0;padding:2px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
+  table.t td[data-l]::before{content:attr(data-l);color:var(--ink-soft);font-size:12px}
+  table.t td.first{display:block;padding-bottom:6px}
+  table.t td.act{justify-content:flex-end;padding-top:8px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <button class="brand" id="homeBtn" aria-label="Zoom to all of Arab">
+      <svg class="seal" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#F2C230"/><circle cx="20" cy="20" r="15.5" fill="#0F3273"/><path d="M20 9.5c-4.2 0-7.5 3.2-7.5 7.3 0 5.4 7.5 13.7 7.5 13.7s7.5-8.3 7.5-13.7c0-4.1-3.3-7.3-7.5-7.3z" fill="#F2C230"/><path d="M16.3 18.2l3.7-3.1 3.7 3.1v3.5h-2.4v-2.2h-2.6v2.2h-2.4z" fill="#0F3273"/></svg>
+      <span class="brand-text"><span class="brand-city">City of Arab, Alabama</span><span class="brand-name">Zoning &amp; Property Map</span></span>
+    </button>
+    <div class="search" role="search">
+      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search address, owner, PPIN or parcel #" aria-label="Search the map" aria-controls="results" aria-expanded="false" aria-autocomplete="list">
+      <svg class="s-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <button class="s-clear" id="qClear" aria-label="Clear search" hidden><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="results" id="results" role="listbox" hidden></div>
+    </div>
+    <div class="top-actions">
+      <button class="tbtn gold" id="adminBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg><span class="lbl">Staff</span></button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div id="map" aria-label="Map of Arab, Alabama"></div>
+
+    <aside class="panel" id="panel" aria-label="Map details">
+      <button class="handle" id="handle" aria-label="Expand or collapse panel"></button>
+      <div class="panel-tabs" role="tablist" id="ptabs">
+        <button class="ptab" role="tab" data-tab="property" aria-selected="true">Property</button>
+        <button class="ptab" role="tab" data-tab="layers" aria-selected="false">Layers</button>
+        <button class="ptab" role="tab" data-tab="annex" aria-selected="false">Annexations <span class="cnt" id="annexCnt" hidden>0</span></button>
+      </div>
+      <div class="pbody" id="pbody"></div>
+    </aside>
+    <button class="collapse-btn" id="collapseBtn" aria-label="Hide panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button>
+
+    <div class="rail" id="rail">
+      <div class="rgroup">
+        <button class="rbtn" id="zin" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span class="tip">Zoom in</span></button>
+        <button class="rbtn" id="zout" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"/></svg><span class="tip">Zoom out</span></button>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" id="tLocate" aria-label="My location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg><span class="tip">My location</span></button>
+        <button class="rbtn" id="tPin" aria-pressed="false" aria-label="Drop a pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.2 7-12.2A7 7 0 005 9.8C5 14.8 12 22 12 22z"/><circle cx="12" cy="9.8" r="2.6"/></svg><span class="tip">Drop a pin</span></button>
+        <button class="rbtn" id="tMeasure" aria-pressed="false" aria-label="Measure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg><span class="tip">Measure distance or area</span></button>
+        <button class="rbtn" id="tShare" aria-label="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg><span class="tip">Copy link to this view</span></button>
+      </div>
+    </div>
+
+    <div class="toolbar" id="toolbar" hidden></div>
+    <div class="coords" id="coords">34.31750, −86.49570</div>
+    <div class="banner" id="banner" hidden></div>
+    <section class="admin" id="admin" hidden aria-label="Staff dashboard"></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+"use strict";
+/* =====================================================================
+   SITE SETTINGS — edit these when the site goes live
+   ===================================================================== */
+const CONFIG = {
+  // Google Apps Script web-app URL (ends in /exec). Blank = preview storage.
+  SHEET_API: "",
+  // Shared write key that matches KEY in apps-script.gs. Replace with staff logins later.
+  SHEET_KEY: "",
+  REFRESH_SECONDS: 60,
+  CENTER: [34.3175, -86.4957],
+  ZOOM: 15,
+  // GeoJSON files committed next to index.html. Missing files fall back to sample data.
+  DATA_FILES: {
+    parcels: "data/parcels.geojson",
+    limits: "data/city-limits.geojson",
+    gas: "data/gas-lines.geojson",
+  },
+  PERMIT_SITE: "https://arabcitypermitchecker.starsonn.com/",
+};
+
+/* ---------------- Zoning districts (Ordinance 2016-3, colors from the current city map) ---------------- */
+const ZONES = {
+  "AG":  {name:"Agriculture", color:"#81A02A", desc:"Low-density homes alongside farm uses until more intensive development is warranted."},
+  "R-1": {name:"Low Density Residential", color:"#FFF0D1", desc:"Single-family homes; keeps commercial and industrial uses out of neighborhoods."},
+  "R-2": {name:"Medium Density Residential", color:"#F5F57A", desc:"Single-family homes, duplexes and small townhome groups."},
+  "R-3": {name:"High Density Residential", color:"#E69800", desc:"Apartments, townhomes, tri- and quadplexes plus some civic uses."},
+  "MHP": {name:"Manufactured Home Park", color:"#F57DB7", desc:"Locations for manufactured home parks with leased or rented spaces."},
+  "UM":  {name:"Urban Mix", color:"#00A884", desc:"Mixed residential and commercial uses between busy corridors and neighborhoods."},
+  "O-I": {name:"Office-Institutional", color:"#96D8FC", desc:"Offices, schools, healthcare, child care and places of worship."},
+  "NC":  {name:"Neighborhood Commercial", color:"#FECDC6", desc:"Small, walkable retail and services near neighborhoods."},
+  "GB":  {name:"General Business", color:"#FF8266", desc:"Higher-intensity retail, restaurants and shopping centers along arterials."},
+  "HD":  {name:"Historic Downtown", color:"#004DA8", desc:"Preserves historic downtown buildings with compatible shops and homes.", dark:true},
+  "M-1": {name:"Light Industrial", color:"#CEDCFD", desc:"Light industry and commercial uses that need separation from homes."},
+  "M-2": {name:"General Industrial", color:"#AA79CE", desc:"Intensive industry with rail, airport or highway access."},
+  "SD":  {name:"Special District", color:"#FFFFFF", desc:"Master-planned developments with mixed uses and shared open space.", hatch:true},
+  "POS": {name:"Public / Open Space", color:"#DDEBD1", desc:"Parks, greenways and public open space."},
+  "X":   {name:"Not zoned", color:"#FFFFFF", desc:"Right-of-way or land without a zoning designation."},
+};
+const ZONE_ALIAS = {"NB":"NC","OSP":"POS","OS":"POS"};
+const zoneOf = z => { z = String(z||"").trim().toUpperCase(); z = ZONE_ALIAS[z] || z; return ZONES[z] ? z : "X"; };
+
+/* ---------------- Annexation / property status ---------------- */
+const STATUSES = [
+  {key:"submitted",    label:"Application received",  short:"Received",  step:1, color:"#6B7AA1"},
+  {key:"review",       label:"Staff review",          short:"Review",    step:2, color:"#2C63C9"},
+  {key:"pc_scheduled", label:"Planning Commission hearing", short:"Hearing", step:3, color:"#C98A00"},
+  {key:"approved",     label:"Recommended by Planning Commission", short:"PC recommended", step:4, color:"#1F8A5B"},
+  {key:"council",      label:"City Council vote",     short:"Council",   step:5, color:"#7A4FB5"},
+  {key:"annexed",      label:"Approved by City Council", short:"Annexed", step:6, color:"#0F3273"},
+  {key:"denied",       label:"Denied",                short:"Denied",    step:0, color:"#B8322A"},
+  {key:"withdrawn",    label:"Withdrawn",             short:"Withdrawn", step:0, color:"#8490AA"},
+];
+const ST = Object.fromEntries(STATUSES.map(s=>[s.key,s]));
+const statusOf = k => ST[k] || ST.submitted;
+const KINDS = {annexation:"Annexation", rezoning:"Rezoning", city:"City property", other:"Other"};
+const STEP_LABELS = ["Received","Staff review","PC hearing","PC recommends","Council vote","Council approved"];
+const FINAL_STEP = STEP_LABELS.length;
+const isOpen = r => { const s=statusOf(r.status); return s.step>0 && s.step<FINAL_STEP; };
+
+/* ---------------- helpers ---------------- */
+const $ = (s,el=document)=>el.querySelector(s);
+const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtMoney = n => (n==null||n===""||isNaN(+n)) ? "—" : "$"+Math.round(+n).toLocaleString("en-US");
+const fmtNum = (n,d=2) => (n==null||n===""||isNaN(+n)) ? "—" : (+n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d});
+const fmtDate = d => { if(!d) return "—"; const x = new Date(d.length===10? d+"T12:00:00" : d); return isNaN(x) ? esc(d) : x.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); };
+const ago = iso => { if(!iso) return ""; const s=(Date.now()-new Date(iso))/1000; if(s<60) return "just now"; if(s<3600) return Math.floor(s/60)+" min ago"; if(s<86400) return Math.floor(s/3600)+" hr ago"; return fmtDate(iso); };
+const today = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const uid = () => "p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const lsGet = (k,d)=>{ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v);}catch(e){return d;} };
+const lsSet = (k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} };
+let toastT; function toast(msg,ms=2600){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,ms); }
+async function copyText(txt,label="Copied"){ try{ await navigator.clipboard.writeText(txt); toast(label); }catch(e){ const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){} ta.remove(); toast(ok?label:"Select and copy: "+txt,5000); } }
+const ICON = {
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.2 7-12.2A7 7 0 005 9.8C5 14.8 12 22 12 22z"/><circle cx="12" cy="9.8" r="2.6"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>',
+  nav:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-8-8 18-2-8z"/></svg>',
+  doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h6"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>',
+  parcel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5l9-2 7 5-2 11-10 2-4-7z"/><path d="M4 14l9-3 7-3"/></svg>',
+  dot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>',
+  draw:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 18l3-12 10 3-2 9z"/><circle cx="5" cy="18" r="1.6" fill="currentColor"/><circle cx="8" cy="6" r="1.6" fill="currentColor"/><circle cx="18" cy="9" r="1.6" fill="currentColor"/><circle cx="16" cy="18" r="1.6" fill="currentColor"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12M6 11l6 6 6-6M4 20h16"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V8M6 13l6-6 6 6M4 4h16"/></svg>',
+  sync:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 00-14.3-4.9L4 8M4 13a8 8 0 0014.3 4.9L20 16"/><path d="M4 3v5h5M20 21v-5h-5"/></svg>',
+};
+
+/* ---------------- capability bridge (Claude preview only) ---------------- */
+async function getCap(name){
+  for(let i=0;i<15 && !(window.claude && window.claude.use);i++) await new Promise(r=>setTimeout(r,100));
+  if(!(window.claude && window.claude.use)) return null;
+  try{ return await Promise.race([window.claude.use(name), new Promise(r=>setTimeout(()=>r(null),10000))]); }catch(e){ return null; }
+}
+async function saveFile(filename, text, mime="application/json"){
+  const dl = await getCap("downloads");
+  if(dl){ try{ await dl.save({filename, data:new Blob([text],{type:mime})}); toast("Saved "+filename); }catch(e){ toast(e && e.code==="declined" ? "Download cancelled" : "Couldn't save the file ("+(e&&e.code||"error")+")"); } return; }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:mime})); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500);
+}
+
+/* =====================================================================
+   SAMPLE DATA — shown only until real parcel files are loaded
+   ===================================================================== */
+const M_LAT = 110950, M_LNG = 111320*Math.cos(CONFIG.CENTER[0]*Math.PI/180);
+const xy = (x,y)=>[CONFIG.CENTER[1]+x/M_LNG, CONFIG.CENTER[0]+y/M_LAT]; // -> [lng,lat]
+const rect = (x1,y1,x2,y2)=>({type:"Polygon",coordinates:[[xy(x1,y1),xy(x2,y1),xy(x2,y2),xy(x1,y2),xy(x1,y1)]]});
+const ring = pts => ({type:"Polygon",coordinates:[[...pts.map(p=>xy(p[0],p[1])), xy(pts[0][0],pts[0][1])]]});
+function rng(seed){ return ()=>{ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }; }
+
+const BX=140, BY=115;
+const NS_STREETS = {"-3":"3rd St W","-2":"2nd St W","-1":"1st St W","0":"Main St","1":"1st St E","2":"2nd St E","3":"3rd St E","4":"4th St E","-4":"4th St W"};
+const EW_STREETS = {"-3":"3rd Ave S","-2":"2nd Ave S","-1":"1st Ave S","0":"Central Ave","1":"1st Ave N","2":"2nd Ave N","3":"3rd Ave N"};
+function sampleZone(c,r){
+  if((c===-1||c===0)&&(r===-1||r===0)) return "HD";
+  if(c===-1||c===0) return "GB";
+  if(c===1&&r===0) return "UM";
+  if(c===-2&&r===0) return "O-I";
+  if(c===1&&r===-1) return "NC";
+  if(c===1&&r===-2) return "R-3";
+  if(c===2&&r===1) return "POS";
+  if(c===-3&&r===-3) return "M-1";
+  if(c===2&&r===-3) return "MHP";
+  if(c===-3&&r===1) return "SD";
+  if(c===2&&r===2) return "AG";
+  return (Math.abs(c)>=2) ? "R-1" : "R-2";
+}
+function buildSampleParcels(){
+  const rand=rng(7), feats=[]; let n=0;
+  for(let c=-3;c<=2;c++) for(let r=-3;r<=2;r++){
+    const zone=sampleZone(c,r), x0=c*BX+10, x1=c*BX+BX-10, y0=r*BY+10, y1=r*BY+BY-10;
+    const per = zone==="POS"||zone==="AG"||zone==="M-1"||zone==="MHP"||zone==="SD" ? 1 : (zone==="GB"||zone==="HD"||zone==="O-I"||zone==="UM"||zone==="NC"||zone==="R-3") ? 3 : 4;
+    const halves = per===1 ? 1 : 2;
+    for(let h=0;h<halves;h++){
+      const ya = halves===1? y0 : (h===0? y0 : (y0+y1)/2), yb = halves===1? y1 : (h===0? (y0+y1)/2 : y1);
+      const fronting = h===0 ? EW_STREETS[String(r)] : EW_STREETS[String(r+1)];
+      for(let i=0;i<per;i++){
+        n++;
+        const xa = x0+(x1-x0)*i/per, xb = x0+(x1-x0)*(i+1)/per;
+        const cx=(xa+xb)/2, side = cx<0?"W":"E";
+        const num = 100*Math.max(1,Math.abs(c)+(cx<0?0:1)) + Math.round(Math.abs(cx)%140/10)*2 + (h===0?1:0);
+        const street = per===1 ? (EW_STREETS[String(r)]||"Central Ave") : (fronting||"Central Ave");
+        const area = Math.abs(xb-xa)*Math.abs(yb-ya); // m²
+        const acres = area/4046.86;
+        const val = Math.round((zone==="GB"||zone==="HD"?260000:zone==="R-1"?185000:zone==="M-1"?420000:150000)*(0.7+rand()*0.7)/100)*100;
+        feats.push({type:"Feature",geometry:rect(xa,ya,xb,yb),properties:{
+          ZONE:zone, PARCELNUMB:"SAMPLE-"+String(1300+n), PROPPIN:String(90000+n),
+          OWNER:"Sample Owner "+String.fromCharCode(65+(n%26))+(n>26?Math.floor(n/26):""),
+          PROPADDR:num+" "+street, MAILADDR:"PO Box "+(1000+n)+", Arab, AL 35016",
+          PROPVALUE:val, ACREAGE:+acres.toFixed(2), AREA:+(area*10.7639).toFixed(0), CITYLIMIT:"IN", COUNTY:"MARSHALL", SAMPLE:true }});
+      }
+    }
+  }
+  return {type:"FeatureCollection",features:feats};
+}
+function buildSampleLimits(){
+  return {type:"FeatureCollection",features:[{type:"Feature",properties:{NAME:"Arab city limits (sample)",SAMPLE:true},geometry:ring([[-560,-470],[440,-470],[440,-120],[560,-120],[560,390],[-120,390],[-120,330],[-560,330]])}]};
+}
+function buildSampleStreets(){
+  const f=[];
+  for(let c=-4;c<=3;c++){ const x=c*BX; f.push({type:"Feature",properties:{name:NS_STREETS[String(c)]||"",main:c===0},geometry:{type:"LineString",coordinates:[xy(x,-470),xy(x,390)]}}); }
+  for(let r=-3;r<=3;r++){ const y=r*BY; f.push({type:"Feature",properties:{name:EW_STREETS[String(r)]||"",main:r===0},geometry:{type:"LineString",coordinates:[xy(-600,y),xy(600,y)]}}); }
+  return {type:"FeatureCollection",features:f};
+}
+function buildSampleGas(){
+  return {type:"FeatureCollection",features:[
+    {type:"Feature",properties:{NAME:"Gas main (sample)"},geometry:{type:"LineString",coordinates:[xy(-6,-460),xy(-6,380)]}},
+    {type:"Feature",properties:{NAME:"Gas main (sample)"},geometry:{type:"LineString",coordinates:[xy(-560,6),xy(560,6)]}},
+    {type:"Feature",properties:{NAME:"Gas service (sample)"},geometry:{type:"LineString",coordinates:[xy(-146,6),xy(-146,-230)]}},
+  ]};
+}
+/* Sample annexation rows — used only when no Google Sheet or preview database is connected. */
+function sampleProperties(){
+  const g = o=>JSON.stringify(o);
+  const now = new Date().toISOString();
+  return [
+    {id:"sample-a1",kind:"annexation",name:"Hillcrest tract",address:"Sample — 2100 Hillcrest Rd",ppin:"",parcel_number:"",owner:"Sample Applicant 1",acreage:"4.6",current_zone:"",requested_zone:"R-1",status:"pc_scheduled",application_no:"ANX-2026-014",submitted_date:"2026-08-18",pc_date:"2026-10-06",decision_date:"",ordinance_no:"",notes:"Petition signed by 100% of owners.",public:"Y",geometry:g(ring([[600,0],[820,-20],[840,210],[620,230]])),source:"sample",updated_at:now},
+    {id:"sample-a2",kind:"annexation",name:"Brindlee Ln lots",address:"Sample — 400 Brindlee Ln",ppin:"",parcel_number:"",owner:"Sample Applicant 2",acreage:"2.1",current_zone:"",requested_zone:"R-2",status:"council",application_no:"ANX-2026-011",submitted_date:"2026-07-02",pc_date:"2026-09-01",pc_vote:"Recommended approval, 5–0",council_date:"2026-10-13",council_vote:"",decision_date:"",ordinance_no:"",notes:"On the October 13 City Council agenda.",public:"Y",geometry:g(ring([[-780,-320],[-600,-320],[-600,-140],[-780,-140]])),source:"sample",updated_at:now},
+    {id:"sample-a3",kind:"annexation",name:"North Ridge parcel",address:"Sample — 55 Ridge Rd",ppin:"",parcel_number:"",owner:"Sample Applicant 3",acreage:"9.8",current_zone:"",requested_zone:"GB",status:"submitted",application_no:"ANX-2026-017",submitted_date:"2026-09-19",pc_date:"",decision_date:"",ordinance_no:"",notes:"Came in through the online permit site.",public:"Y",geometry:g(ring([[-110,410],[160,410],[190,590],[-80,600]])),source:"permit-site",updated_at:now},
+    {id:"sample-a4",kind:"annexation",name:"Guntersville Rd frontage",address:"Sample — 3300 Guntersville Rd",ppin:"",parcel_number:"",owner:"Sample Applicant 4",acreage:"1.2",current_zone:"",requested_zone:"NC",status:"review",application_no:"ANX-2026-016",submitted_date:"2026-09-08",pc_date:"",decision_date:"",ordinance_no:"",notes:"",public:"Y",geometry:g({type:"Point",coordinates:xy(700,-360)}),source:"permit-site",updated_at:now},
+    {id:"sample-a5",kind:"annexation",name:"Shoal Creek addition",address:"Sample — 900 Shoal Creek Trl",ppin:"",parcel_number:"",owner:"Sample Applicant 5",acreage:"6.3",current_zone:"R-1",requested_zone:"R-1",status:"annexed",application_no:"ANX-2026-004",submitted_date:"2026-03-11",pc_date:"2026-05-05",pc_vote:"Recommended approval, 6–0",council_date:"2026-06-15",council_vote:"Approved 5–0",decision_date:"2026-06-15",ordinance_no:"2026-12",notes:"Adopted by council.",public:"Y",geometry:g(ring([[-560,340],[-300,340],[-300,480],[-560,480]])),source:"sample",updated_at:now},
+  ];
+}
+
+/* =====================================================================
+   DATA STORE — Google Sheet (live site) · preview database · this browser
+   ===================================================================== */
+function getCfg(){ return Object.assign({}, CONFIG, lsGet("arabmap.cfg",{})); }
+const Store = {
+  mode:"loading", rows:[], listeners:new Set(), lastSync:null, error:"", db:null, timer:null,
+  on(fn){ this.listeners.add(fn); },
+  emit(){ this.listeners.forEach(f=>{ try{ f(this.rows); }catch(e){ console.error(e); } }); },
+  async init(){
+    clearInterval(this.timer);
+    const cfg=getCfg(); this.error="";
+    if(cfg.SHEET_API){
+      try{ this.mode="sheet"; await this.pullSheet();
+        this.timer=setInterval(()=>this.pullSheet().catch(()=>{}), Math.max(15,+cfg.REFRESH_SECONDS||60)*1000);
+        return;
+      }catch(e){ this.error="Couldn't reach the Google Sheet: "+e.message; }
+    }
+    const db = await getCap("db");
+    if(db){
+      this.db=db; this.mode="db";
+      await new Promise(res=>{
+        let first=true;
+        db.collection("properties").onSnapshot(s=>{
+          this.rows=s.docs.map(d=>Object.assign({},d.data(),{id:d.id})); this.lastSync=new Date().toISOString(); this.emit();
+          if(first){ first=false; res(); }
+        }, err=>{ this.error="Preview database: "+(err&&err.code||"error"); toast(this.error); if(first){first=false;res();} });
+        setTimeout(res,8000);
+      });
+      return;
+    }
+    this.mode="local"; this.rows=lsGet("arabmap.rows",null) || sampleProperties(); this.lastSync=new Date().toISOString(); this.emit();
+  },
+  async pullSheet(){
+    const cfg=getCfg();
+    const u = cfg.SHEET_API + (cfg.SHEET_API.includes("?")?"&":"?") + "action=list" + (Admin.unlocked && cfg.SHEET_KEY ? "&key="+encodeURIComponent(cfg.SHEET_KEY) : "");
+    const r = await fetch(u,{cache:"no-store"}); if(!r.ok) throw new Error("HTTP "+r.status);
+    const j = await r.json(); if(!j.ok) throw new Error(j.error||"bad response");
+    this.rows = (j.rows||[]).map(x=>Object.assign({},x,{id:String(x.id||uid())})); this.lastSync=new Date().toISOString(); this.emit();
+  },
+  async post(body){
+    const cfg=getCfg();
+    const r = await fetch(cfg.SHEET_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({key:cfg.SHEET_KEY},body))});
+    const j = await r.json(); if(!j.ok) throw new Error(j.error||"The sheet refused the change");
+    return j;
+  },
+  async upsert(row){
+    row = Object.assign({}, row, {updated_at:new Date().toISOString(), updated_by: row.updated_by || "staff"});
+    if(this.mode==="sheet"){ await this.post({action:"upsert",row}); await this.pullSheet(); }
+    else if(this.mode==="db"){ const {id,...data}=row; await this.db.doc("properties/"+id).set(data); }
+    else { const i=this.rows.findIndex(r=>r.id===row.id); if(i>=0) this.rows[i]=row; else this.rows.push(row); lsSet("arabmap.rows",this.rows); this.emit(); }
+  },
+  async remove(id){
+    if(this.mode==="sheet"){ await this.post({action:"delete",id}); await this.pullSheet(); }
+    else if(this.mode==="db"){ await this.db.doc("properties/"+id).delete(); }
+    else { this.rows=this.rows.filter(r=>r.id!==id); lsSet("arabmap.rows",this.rows); this.emit(); }
+  },
+  label(){ return {sheet:"Live from Google Sheet", db:"Preview database (shared)", local:"Sample data in this browser", loading:"Connecting…"}[this.mode]; },
+};
+const visibleRows = () => Store.rows.filter(r => Admin.unlocked || String(r.public||"Y").toUpperCase()!=="N");
+const geomOf = r => { try{ return typeof r.geometry==="string" ? (r.geometry? JSON.parse(r.geometry):null) : r.geometry; }catch(e){ return null; } };
+
+/* =====================================================================
+   MAP
+   ===================================================================== */
+const map = L.map("map",{zoomControl:false, attributionControl:true, minZoom:11, maxZoom:20, zoomSnap:0.5, preferCanvas:false}).setView(CONFIG.CENTER, CONFIG.ZOOM);
+L.control.scale({imperial:true,metric:false,position:"bottomleft"}).addTo(map);
+map.attributionControl.setPrefix('<span class="credit">Designed by Jade Cruz</span> · <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+map.createPane("limitsPane").style.zIndex=410;
+map.createPane("parcelPane").style.zIndex=420;
+map.createPane("floodPane").style.zIndex=415;
+map.createPane("propPane").style.zIndex=450;
+map.createPane("toolPane").style.zIndex=480;
+const parcelRenderer = L.canvas({padding:0.4, pane:"parcelPane", tolerance:2});
+
+const BASEMAPS = {
+  light:{label:"Light", sw:"linear-gradient(135deg,#f3f3f1,#dfe3e8)", make:()=>L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:20,maxNativeZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'})},
+  streets:{label:"Streets", sw:"linear-gradient(135deg,#f2efe9,#aad3df 60%,#f7c77d)", make:()=>L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:20,maxNativeZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'})},
+  aerial:{label:"Aerial", sw:"linear-gradient(135deg,#3d5a36,#6e7d5a 50%,#a39b86)", make:()=>L.layerGroup([
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:19,attribution:"Imagery &copy; Esri, Maxar, Earthstar Geographics"}),
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:19,opacity:.9}),
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:19})])},
+  topo:{label:"Topo", sw:"repeating-radial-gradient(circle at 30% 60%,#e9e4d4 0 4px,#c9b98f 4px 5px)", make:()=>L.tileLayer("https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:16,attribution:"USGS The National Map"})},
+};
+const State = {
+  basemap: lsGet("arabmap.basemap","light"), tilesOk:null,
+  layers: Object.assign({zoning:true, parcels:true, labels:true, limits:true, annex:true, flood:false, gas:false}, lsGet("arabmap.layers",{})),
+  zoneOn: Object.fromEntries(Object.keys(ZONES).map(z=>[z,true])),
+  opacity: lsGet("arabmap.opacity",0.6),
+  tab:"property", selected:null, mode:null, annexFilter:"open",
+  sample:{parcels:true,limits:true,gas:true},
+};
+let baseLayer=null, tileOk=0, tileErr=0;
+function setBasemap(key){
+  if(!BASEMAPS[key]) key="light";
+  if(baseLayer) map.removeLayer(baseLayer);
+  State.basemap=key; lsSet("arabmap.basemap",key);
+  baseLayer = BASEMAPS[key].make();
+  const hook = l => { if(l.on) { l.on("tileload",()=>{ tileOk++; if(State.tilesOk!==true){ State.tilesOk=true; onTilesDecided(); } }); l.on("tileerror",()=>{ tileErr++; if(tileOk===0 && tileErr>=4 && State.tilesOk!==false){ State.tilesOk=false; onTilesDecided(); } }); } };
+  if(baseLayer.eachLayer) baseLayer.eachLayer(hook); else hook(baseLayer);
+  baseLayer.addTo(map);
+  if(State.tab==="layers") renderPanel();
+}
+function onTilesDecided(){
+  $("#map").classList.toggle("no-tiles", State.tilesOk===false);
+  if(State.tilesOk===false){
+    if(baseLayer){ map.removeLayer(baseLayer); }
+    streetsLayer.addTo(map); streetLabels.addTo(map);
+    showBanner('<b>Preview mode.</b> This preview can\'t load outside map imagery, so it shows a plain street grid and sample parcels. On the live site you get light, street, aerial and topo maps, FEMA flood zones and the real parcel layer.');
+  } else { map.removeLayer(streetsLayer); map.removeLayer(streetLabels); }
+  restyleParcels();
+  if(State.tab==="layers") renderPanel();
+}
+function showBanner(html){ const b=$("#banner"); if(lsGet("arabmap.bannerClosed",false)) return; b.innerHTML=html+'<button class="x" aria-label="Dismiss">×</button>'; b.hidden=false; $(".x",b).onclick=()=>{ b.hidden=true; lsSet("arabmap.bannerClosed",true); }; }
+
+/* sample street grid (preview only) */
+const streetsLayer = L.geoJSON(buildSampleStreets(),{interactive:false,style:f=>({color:"#FFFFFF",weight:f.properties.main?11:8,opacity:1,lineCap:"butt"}),
+  onEachFeature:(f,l)=>{}});
+const streetLabels = L.layerGroup();
+(function(){ const d=buildSampleStreets(); d.features.forEach(f=>{ const c=f.geometry.coordinates, vertical=Math.abs(c[0][0]-c[1][0])<1e-9; const pos = vertical ? [CONFIG.CENTER[0]+(-400)/M_LAT, c[0][0]] : [c[0][1], CONFIG.CENTER[1]+(-520)/M_LNG];
+  if(f.properties.name) streetLabels.addLayer(L.marker(pos,{interactive:false,icon:L.divIcon({className:"",html:'<div class="slabel" style="transform:translate(-50%,-50%)'+(vertical?' rotate(-90deg)':'')+';white-space:nowrap">'+esc(f.properties.name)+'</div>',iconSize:[0,0]})})); }); })();
+
+/* FEMA flood zones (live site) */
+const floodLayer = L.tileLayer.wms("https://hazards.fema.gov/arcgis/services/public/NFHL/MapServer/WMSServer",{layers:"28",format:"image/png",transparent:true,opacity:.55,pane:"floodPane",attribution:"FEMA NFHL"});
+floodLayer.on("tileerror",()=>{ if(State.layers.flood && !floodLayer._warned){ floodLayer._warned=true; toast("FEMA flood zones aren't available right now"); } });
+
+/* parcels */
+let parcelData=null, parcelLayer=null, labelLayer=L.layerGroup(), limitsLayer=null, gasLayer=null, gasData=null, limitsData=null;
+const P = f => { const p=f.properties||{}; const g=k=>p[k]??p[k.toLowerCase()]??""; return {
+  zone:zoneOf(g("ZONE")||g("ZONING")), ppin:String(g("PROPPIN")||g("PPIN")||""), parcel:String(g("PARCELNUMB")||g("PARCEL")||g("PIN")||""),
+  owner:String(g("OWNER")||""), address:String(g("PROPADDR")||g("ADDRESS")||"").replace(/^0\s+/,""), mail:String(g("MAILADDR")||[g("MAILADD1"),g("MAILADD2"),g("MAILADD3")].filter(Boolean).join(", ")||""),
+  value:g("PROPVALUE"), acres:g("ACREAGE")||g("CALCACRES")||g("DEEDEDARE"), sqft:g("AREA"), limit:String(g("CITYLIMIT")||""), county:String(g("COUNTY")||""), sample:!!p.SAMPLE }; };
+function parcelStyle(f){
+  const z=f._z || (f._z=P(f).zone), zd=ZONES[z], on = State.layers.zoning && State.zoneOn[z];
+  const sel = State.selected && State.selected.kind==="parcel" && State.selected.feature===f;
+  return {renderer:parcelRenderer, pane:"parcelPane",
+    color: sel ? "#F2C230" : (State.layers.parcels ? (State.tilesOk===false?"#6E7A94":"#3A4660") : "transparent"),
+    weight: sel ? 3.5 : (map.getZoom()>=17 ? 1 : .6), opacity: sel?1:.85,
+    fillColor: zd.color, fillOpacity: on ? State.opacity : 0};
+}
+function buildParcelLayer(){
+  if(parcelLayer) map.removeLayer(parcelLayer);
+  parcelLayer = L.geoJSON(parcelData,{style:parcelStyle, renderer:parcelRenderer, pane:"parcelPane",
+    onEachFeature:(f,l)=>{ l.on("click",e=>{ if(State.mode && State.mode!=="pick") return; e.originalEvent._handled=true; if(State.mode==="pick"){ Admin.captureParcel(f); return; } selectParcel(f,false); }); }}).addTo(map);
+  buildLabels(); buildIndex();
+}
+function buildLabels(){
+  labelLayer.clearLayers();
+  if(!State.layers.labels || map.getZoom()<17 || !parcelLayer) return;
+  const b=map.getBounds().pad(.1); let n=0;
+  parcelLayer.eachLayer(l=>{ if(n>400) return; const c=l.getBounds().getCenter(); if(!b.contains(c)) return; const p=P(l.feature); const num=(p.address.match(/^\d+/)||[""])[0]; if(!num) return; n++;
+    labelLayer.addLayer(L.marker(c,{interactive:false,icon:L.divIcon({className:"",html:'<div class="plabel" style="transform:translate(-50%,-50%)">'+esc(num)+'</div>',iconSize:[0,0]})})); });
+}
+map.on("zoomend moveend",()=>{ buildLabels(); if(parcelLayer && map._lastZ!==map.getZoom()){ map._lastZ=map.getZoom(); parcelLayer.setStyle(parcelStyle);} });
+labelLayer.addTo(map);
+
+function restyleParcels(){ if(parcelLayer) parcelLayer.setStyle(parcelStyle); }
+function buildLimits(){
+  if(limitsLayer) map.removeLayer(limitsLayer);
+  limitsLayer = L.geoJSON(limitsData,{pane:"limitsPane",interactive:false,style:{color:"#0F3273",weight:3,dashArray:"10 6",fill:false,opacity:.9}});
+  if(State.layers.limits) limitsLayer.addTo(map);
+}
+function buildGas(){
+  if(gasLayer) map.removeLayer(gasLayer);
+  gasLayer = L.geoJSON(gasData,{pane:"limitsPane",interactive:false,style:{color:"#E0442E",weight:2.5,dashArray:"2 5",opacity:.95}});
+  if(State.layers.gas) gasLayer.addTo(map);
+}
+async function tryFetchJSON(url){ try{ const r=await fetch(url,{cache:"no-cache"}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
+async function idbGet(key){ return new Promise(res=>{ try{ const o=indexedDB.open("arabmap",1); o.onupgradeneeded=()=>o.result.createObjectStore("kv"); o.onsuccess=()=>{ try{ const tx=o.result.transaction("kv","readonly").objectStore("kv").get(key); tx.onsuccess=()=>res(tx.result||null); tx.onerror=()=>res(null);}catch(e){res(null);} }; o.onerror=()=>res(null); }catch(e){ res(null); } }); }
+async function idbSet(key,val){ return new Promise(res=>{ try{ const o=indexedDB.open("arabmap",1); o.onupgradeneeded=()=>o.result.createObjectStore("kv"); o.onsuccess=()=>{ try{ const tx=o.result.transaction("kv","readwrite"); tx.objectStore("kv").put(val,key); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false);}catch(e){res(false);} }; o.onerror=()=>res(false); }catch(e){ res(false); } }); }
+async function loadMapData(){
+  const [pf,lf,gf,pi,li,gi] = await Promise.all([tryFetchJSON(CONFIG.DATA_FILES.parcels),tryFetchJSON(CONFIG.DATA_FILES.limits),tryFetchJSON(CONFIG.DATA_FILES.gas), idbGet("parcels"), idbGet("limits"), idbGet("gas")]);
+  parcelData = pi || pf || buildSampleParcels(); State.sample.parcels = !(pi||pf);
+  limitsData = li || lf || buildSampleLimits(); State.sample.limits = !(li||lf);
+  gasData = gi || gf || buildSampleGas(); State.sample.gas = !(gi||gf);
+  State.sourceNote = {parcels: pi?"imported in this browser":pf?CONFIG.DATA_FILES.parcels:"sample", limits: li?"imported in this browser":lf?CONFIG.DATA_FILES.limits:"sample", gas: gi?"imported in this browser":gf?CONFIG.DATA_FILES.gas:"sample"};
+  buildParcelLayer(); buildLimits(); buildGas();
+}
+
+/* properties / annexations layer */
+const propLayer = L.layerGroup().addTo(map);
+function renderPropLayer(){
+  propLayer.clearLayers();
+  if(!State.layers.annex) return;
+  visibleRows().forEach(r=>{
+    const g=geomOf(r); if(!g) return; const s=statusOf(r.status);
+    const sel = State.selected && State.selected.kind==="prop" && State.selected.id===r.id;
+    let lyr;
+    if(g.type==="Point"){
+      lyr = L.circleMarker([g.coordinates[1],g.coordinates[0]],{pane:"propPane",radius:sel?11:8,color:"#fff",weight:2.5,fillColor:s.color,fillOpacity:1});
+    } else {
+      lyr = L.geoJSON(g,{pane:"propPane",style:{color:sel?"#F2C230":s.color,weight:sel?4:2.5,dashArray:r.status==="annexed"?null:"7 5",fillColor:s.color,fillOpacity:.22}});
+    }
+    lyr.on("click",e=>{ if(State.mode && State.mode!=="pick") return; if(e.originalEvent) e.originalEvent._handled=true; selectProp(r.id,false); L.DomEvent.stop(e); });
+    lyr.bindTooltip('<div style="background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 9px;box-shadow:var(--shadow);font:12px var(--sans)"><b>'+esc(r.name||r.address||"Property")+'</b><br><span style="color:'+s.color+';font-weight:600">'+esc(s.label)+'</span></div>',{sticky:true,direction:"top",offset:[0,-8],opacity:1});
+    propLayer.addLayer(lyr);
+  });
+}
+
+/* =====================================================================
+   SEARCH
+   ===================================================================== */
+let INDEX=[];
+function buildIndex(){
+  INDEX=[];
+  if(parcelLayer) parcelLayer.eachLayer(l=>{ const p=P(l.feature); const f=l.feature;
+    if(p.address) INDEX.push({k:"Address",t:p.address,s:(p.owner||"")+" · "+p.zone,ref:{kind:"parcel",feature:f},key:p.address.toLowerCase()});
+    if(p.owner) INDEX.push({k:"Owner",t:p.owner,s:p.address+" · "+p.zone,ref:{kind:"parcel",feature:f},key:p.owner.toLowerCase()});
+    if(p.ppin) INDEX.push({k:"PPIN",t:p.ppin,s:p.address,ref:{kind:"parcel",feature:f},key:p.ppin.toLowerCase()});
+    if(p.parcel) INDEX.push({k:"Parcel #",t:p.parcel,s:p.address,ref:{kind:"parcel",feature:f},key:p.parcel.toLowerCase().replace(/[^a-z0-9]/g,"")});
+  });
+  visibleRows().forEach(r=>{ const lbl=r.name||r.address; if(!lbl) return; INDEX.push({k:KINDS[r.kind]||"Property",t:lbl,s:[r.address,r.application_no,statusOf(r.status).label].filter(Boolean).join(" · "),ref:{kind:"prop",id:r.id},key:[r.name,r.address,r.application_no,r.owner].join(" ").toLowerCase()}); });
+}
+function searchLocal(q){
+  q=q.trim().toLowerCase(); if(q.length<2) return [];
+  const qn=q.replace(/[^a-z0-9]/g,""), words=q.split(/\s+/).filter(Boolean);
+  const out=[];
+  for(const it of INDEX){
+    let s=0; const key=it.key;
+    if(it.k==="Parcel #"){ if(qn.length>=3 && key.includes(qn)) s = key.startsWith(qn)?90:60; }
+    else if(key.startsWith(q)) s=100; else if(words.every(w=>key.includes(w))) s=70-key.indexOf(words[0])/100;
+    if(s) out.push([s,it]);
+  }
+  out.sort((a,b)=>b[0]-a[0] || a[1].t.localeCompare(b[1].t,undefined,{numeric:true}));
+  return out.slice(0,30).map(x=>x[1]);
+}
+let placeCtl=null;
+async function searchPlaces(q){
+  if(State.tilesOk===false || q.trim().length<3) return [];
+  try{ placeCtl && placeCtl.abort(); placeCtl=new AbortController();
+    const u="https://nominatim.openstreetmap.org/search?format=json&limit=5&bounded=1&viewbox=-86.62,34.40,-86.38,34.24&q="+encodeURIComponent(q);
+    const r=await fetch(u,{signal:placeCtl.signal,headers:{"Accept-Language":"en"}}); if(!r.ok) return [];
+    const j=await r.json(); return j.map(p=>({k:"Place",t:p.display_name.split(",")[0],s:p.display_name.split(",").slice(1,3).join(","),ref:{kind:"latlng",lat:+p.lat,lng:+p.lon}}));
+  }catch(e){ return []; }
+}
+const qEl=$("#q"), resEl=$("#results"); let resItems=[], resIdx=-1, qT;
+function showResults(items,q){
+  resItems=items; resIdx=items.length?0:-1;
+  if(!q){ resEl.hidden=true; qEl.setAttribute("aria-expanded","false"); return; }
+  resEl.innerHTML = items.length ? items.map((it,i)=>'<button class="r" role="option" id="r'+i+'" aria-selected="'+(i===resIdx)+'" data-i="'+i+'"><span class="kchip">'+esc(it.k)+'</span><span class="r-main"><div class="r-t">'+esc(it.t)+'</div><div class="r-s">'+esc(it.s||"")+'</div></span></button>').join("")
+    : '<div class="empty">No matches for “'+esc(q)+'”. Try a street number and name, an owner\'s last name, or a PPIN.</div>';
+  resEl.hidden=false; qEl.setAttribute("aria-expanded","true");
+}
+qEl.addEventListener("input",()=>{ const q=qEl.value; $("#qClear").hidden=!q; clearTimeout(qT); const loc=searchLocal(q); showResults(loc,q);
+  qT=setTimeout(async()=>{ if(qEl.value!==q) return; const pl=await searchPlaces(q); if(pl.length && qEl.value===q) showResults(loc.concat(pl),q); },450); });
+qEl.addEventListener("keydown",e=>{
+  if(resEl.hidden) return;
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); if(!resItems.length) return; resIdx=(resIdx+(e.key==="ArrowDown"?1:-1)+resItems.length)%resItems.length; $$(".r",resEl).forEach((b,i)=>b.setAttribute("aria-selected",i===resIdx)); $("#r"+resIdx)?.scrollIntoView({block:"nearest"}); }
+  else if(e.key==="Enter"){ e.preventDefault(); if(resIdx>=0) pickResult(resItems[resIdx]); }
+  else if(e.key==="Escape"){ resEl.hidden=true; }
+});
+resEl.addEventListener("click",e=>{ const b=e.target.closest(".r"); if(b) pickResult(resItems[+b.dataset.i]); });
+document.addEventListener("click",e=>{ if(!e.target.closest(".search")) resEl.hidden=true; });
+$("#qClear").onclick=()=>{ qEl.value=""; $("#qClear").hidden=true; resEl.hidden=true; qEl.focus(); };
+function pickResult(it){
+  if(!it) return; resEl.hidden=true; qEl.blur(); qEl.value=it.t; $("#qClear").hidden=false;
+  if(it.ref.kind==="parcel") selectParcel(it.ref.feature,true);
+  else if(it.ref.kind==="prop") selectProp(it.ref.id,true);
+  else { flyPoint(L.latLng(it.ref.lat,it.ref.lng),18); dropPin(L.latLng(it.ref.lat,it.ref.lng)); }
+}
+
+/* =====================================================================
+   SELECTION + PANEL
+   ===================================================================== */
+const selHalo = L.layerGroup().addTo(map);
+function selectParcel(f,fly){
+  State.selected={kind:"parcel",feature:f}; restyleParcels(); renderPropLayer();
+  if(fly){ const b=L.geoJSON(f).getBounds(); map.flyToBounds(b,Object.assign({maxZoom:18},fitPad())); }
+  setHash("p-"+(P(f).ppin||P(f).parcel));
+  openTab("property");
+}
+function selectProp(id,fly){
+  const r=Store.rows.find(x=>x.id===id); if(!r) return;
+  State.selected={kind:"prop",id}; restyleParcels(); renderPropLayer();
+  const g=geomOf(r);
+  if(fly && g){ if(g.type==="Point") flyPoint(L.latLng(g.coordinates[1],g.coordinates[0]),17); else map.flyToBounds(L.geoJSON(g).getBounds(),Object.assign({maxZoom:18},fitPad())); }
+  setHash("a-"+id);
+  openTab("property");
+}
+function clearSelection(){ State.selected=null; restyleParcels(); renderPropLayer(); setHash(""); if(State.tab==="property") renderPanel(); }
+function panelPad(){ return window.innerWidth>720 && !$("#panel").classList.contains("collapsed") ? [420,60] : [40,40]; }
+function setHash(h){ try{ history.replaceState(null,"",h?"#"+h:location.pathname+location.search); }catch(e){} }
+function openTab(t){ if(Admin.form && State.tab==="property" && t!=="property") Admin.syncFormFromDom(); State.tab=t; $$(".ptab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t)); setPanelOpen(true); renderPanel(); }
+$("#ptabs").addEventListener("click",e=>{ const b=e.target.closest(".ptab"); if(b) openTab(b.dataset.tab); });
+const isMobile = () => window.innerWidth<=720;
+function setSheet(st){ const p=$("#panel"); p.classList.remove("sheet-peek","sheet-half","sheet-full"); p.classList.add("sheet-"+st); State.sheet=st; const sh=$("#stage").clientHeight; document.documentElement.style.setProperty("--sheet-h", Math.round(st==="peek"?96:st==="half"?sh*0.48:sh-10)+"px"); $("#handle").setAttribute("aria-label",st==="full"?"Shrink panel":"Expand panel"); }
+function sheetHeight(){ return isMobile() ? $("#panel").getBoundingClientRect().height : 0; }
+function fitPad(){ if(isMobile()){ const h=({peek:96,half:window.innerHeight*0.48,full:window.innerHeight*0.48})[State.sheet||"half"]; return {paddingTopLeft:[24,24],paddingBottomRight:[24,Math.round(h)+24]}; } return {paddingTopLeft:panelPad(),paddingBottomRight:[60,60]}; }
+function flyPoint(ll,z){ const pad=fitPad(); const dx=(pad.paddingTopLeft[0]-pad.paddingBottomRight[0])/2, dy=(pad.paddingTopLeft[1]-pad.paddingBottomRight[1])/2; const c=map.unproject(map.project(ll,z).subtract([dx,dy]),z); map.flyTo(c,z); }
+function setPanelOpen(open){ if(isMobile()){ setSheet(open ? (State.sheet==="full"?"full":"half") : "peek"); return; } $("#panel").classList.toggle("collapsed",!open); $("#collapseBtn").classList.toggle("out",!open); $("#collapseBtn").setAttribute("aria-label",open?"Hide panel":"Show panel"); }
+$("#collapseBtn").onclick=()=>setPanelOpen($("#panel").classList.contains("collapsed"));
+$("#handle").onclick=()=>setSheet(({peek:"half",half:"full",full:"peek"})[State.sheet||"half"]);
+
+function matchRowForParcel(p){ return visibleRows().find(r => (p.ppin && String(r.ppin)===p.ppin) || (p.parcel && String(r.parcel_number)===p.parcel)); }
+function trackerHTML(r){
+  const s=statusOf(r.status);
+  if(!s.step) return '<div class="note" style="margin-top:10px"><span class="dot" style="background:'+s.color+'"></span>'+esc(s.label)+(r.decision_date?' on '+fmtDate(r.decision_date):'')+'</div>';
+  return '<div class="track" style="--c:'+s.color+'">'+STEP_LABELS.map((_,i)=>'<div class="st'+(i<s.step?' on':'')+'"></div>').join("")+'</div><div class="track-l">'+STEP_LABELS.map((l,i)=>'<span class="'+(i===s.step-1?'on':'')+'">'+l+'</span>').join("")+'</div>';
+}
+function pillHTML(k){ const s=statusOf(k); return '<span class="pill" style="color:'+s.color+';background:color-mix(in srgb,'+s.color+' 13%,transparent)"><i></i>'+esc(s.label)+'</span>'; }
+function zoneBadge(z){ const d=ZONES[z]; return '<div class="zone-badge"><div class="zswatch" style="background:'+d.color+(d.dark?';color:#fff':'')+'">'+esc(z)+'</div><div><b>'+esc(d.name)+'</b><span>'+esc(d.desc)+'</span></div></div>'; }
+function gmaps(lat,lng){ return "https://www.google.com/maps/search/?api=1&query="+lat.toFixed(6)+","+lng.toFixed(6); }
+
+function renderPanel(){
+  const el=$("#pbody");
+  $("#annexCnt").textContent = visibleRows().filter(r=>r.kind==="annexation" && isOpen(r)).length;
+  $("#annexCnt").hidden = !+$("#annexCnt").textContent;
+  if(Admin.form && State.tab==="property"){ el.innerHTML=Admin.formHTML(); Admin.bindForm(); return; }
+  if(State.tab==="layers") return renderLayersTab(el);
+  if(State.tab==="annex") return renderAnnexTab(el);
+  const s=State.selected;
+  if(!s){
+    el.innerHTML='<div class="empty-state">'+ICON.parcel+'<h2 class="ph">Find a property</h2><p class="sub">Tap any parcel on the map, or search above, to see its zoning, owner, acreage and any pending annexation.</p>'+
+      '<ul class="tips"><li><kbd>Search</kbd><span>Address, owner name, PPIN or parcel number. Results appear as you type.</span></li><li><kbd>Layers</kbd><span>Switch to aerial or topo, show flood zones, or hide zoning districts.</span></li><li><kbd>Measure</kbd><span>Tap the ruler to measure a frontage in feet or a lot in acres.</span></li></ul>'+
+      (State.sample.parcels?'<p class="note warn" style="margin-top:16px;text-align:left"><b>Sample parcels.</b> The owners, addresses and values shown are placeholders until the city\'s parcel file is loaded.</p>':'')+'</div>';
+    return;
+  }
+  if(s.kind==="parcel"){
+    const p=P(s.feature), c=L.geoJSON(s.feature).getBounds().getCenter(), row=matchRowForParcel(p);
+    el.innerHTML = '<p class="eyebrow">Parcel'+(p.sample?' · sample':'')+'</p><h2 class="ph">'+esc(p.address||"No address on file")+'</h2><p class="sub">'+esc(p.owner||"Owner not listed")+'</p>'+
+      zoneBadge(p.zone)+
+      (row?'<div class="section"><h3>'+esc(KINDS[row.kind]||"Property")+' on file</h3><div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center">'+pillHTML(row.status)+'<span class="mono" style="font-size:12px;color:var(--ink-soft)">'+esc(row.application_no||"")+'</span></div>'+trackerHTML(row)+'<button class="btn sm" style="margin-top:10px" data-open-prop="'+esc(row.id)+'">View details</button></div></div>':'')+
+      '<div class="section"><h3>Parcel record</h3><dl class="kv">'+
+        '<dt>PPIN</dt><dd class="mono">'+esc(p.ppin||"—")+'</dd>'+
+        '<dt>Parcel number</dt><dd class="mono">'+esc(p.parcel||"—")+'</dd>'+
+        '<dt>Acreage</dt><dd class="mono">'+fmtNum(p.acres)+' ac</dd>'+
+        (p.sqft?'<dt>Area</dt><dd class="mono">'+fmtNum(p.sqft,0)+' sq ft</dd>':'')+
+        '<dt>Assessed value</dt><dd class="mono">'+fmtMoney(p.value)+'</dd>'+
+        '<dt>City limits</dt><dd>'+(p.limit? (p.limit.toUpperCase()==="IN"?"Inside":"Outside"):"—")+'</dd>'+
+        '<dt>Mailing address</dt><dd>'+esc(p.mail||"—")+'</dd>'+
+        '<dt>Coordinates</dt><dd class="mono">'+c.lat.toFixed(5)+', '+c.lng.toFixed(5)+'</dd>'+
+      '</dl></div>'+
+      '<div class="section btnrow"><button class="btn" id="bShare">'+ICON.link+'Copy link</button><a class="btn" target="_blank" rel="noopener" href="'+gmaps(c.lat,c.lng)+'">'+ICON.nav+'Directions</a></div>'+
+      (Admin.unlocked?'<div class="section"><button class="btn gold" id="bAddFrom">'+ICON.plus+'Add to map as a property</button></div>':'')+
+      '<p class="sub" style="margin-top:16px;font-size:11.5px">Parcel lines are approximate and are not a survey. Confirm zoning with the Building Department before you buy or build.</p>';
+    $("#bShare").onclick=()=>copyText(location.href,"Link copied");
+    const af=$("#bAddFrom"); if(af) af.onclick=()=>Admin.startAdd({fromParcel:s.feature});
+  } else {
+    const r=Store.rows.find(x=>x.id===s.id); if(!r){ State.selected=null; return renderPanel(); }
+    const g=geomOf(r); const c = g ? (g.type==="Point"? L.latLng(g.coordinates[1],g.coordinates[0]) : L.geoJSON(g).getBounds().getCenter()) : null;
+    el.innerHTML='<p class="eyebrow">'+esc(KINDS[r.kind]||"Property")+(r.source==="permit-site"?' · from permit site':'')+'</p><h2 class="ph">'+esc(r.name||r.address||"Property")+'</h2><p class="sub">'+esc(r.address||"")+'</p>'+
+      '<div class="card">'+pillHTML(r.status)+trackerHTML(r)+'</div>'+
+      '<div class="section"><h3>Details</h3><dl class="kv">'+
+        (r.application_no?'<dt>Application</dt><dd class="mono">'+esc(r.application_no)+'</dd>':'')+
+        '<dt>Submitted</dt><dd>'+fmtDate(r.submitted_date)+'</dd>'+
+        '<dt>Planning Commission hearing</dt><dd>'+fmtDate(r.pc_date)+'</dd>'+
+        (r.pc_vote?'<dt>PC recommendation</dt><dd>'+esc(r.pc_vote)+'</dd>':'')+
+        '<dt>City Council meeting</dt><dd>'+fmtDate(r.council_date)+'</dd>'+
+        (r.council_vote?'<dt>Council vote</dt><dd>'+esc(r.council_vote)+'</dd>':'')+
+        (r.decision_date?'<dt>Final decision</dt><dd>'+fmtDate(r.decision_date)+'</dd>':'')+
+        (r.ordinance_no?'<dt>Ordinance</dt><dd class="mono">'+esc(r.ordinance_no)+'</dd>':'')+
+        '<dt>Acreage</dt><dd class="mono">'+fmtNum(r.acreage)+' ac</dd>'+
+        (r.current_zone?'<dt>Current zoning</dt><dd>'+esc(zoneOf(r.current_zone))+' · '+esc(ZONES[zoneOf(r.current_zone)].name)+'</dd>':'')+
+        (r.requested_zone?'<dt>Requested zoning</dt><dd>'+esc(zoneOf(r.requested_zone))+' · '+esc(ZONES[zoneOf(r.requested_zone)].name)+'</dd>':'')+
+        (r.ppin?'<dt>PPIN</dt><dd class="mono">'+esc(r.ppin)+'</dd>':'')+
+        (r.parcel_number?'<dt>Parcel number</dt><dd class="mono">'+esc(r.parcel_number)+'</dd>':'')+
+        (Admin.unlocked && r.owner?'<dt>Owner / applicant</dt><dd>'+esc(r.owner)+'</dd>':'')+
+      '</dl></div>'+
+      (r.notes?'<div class="section"><h3>Notes</h3><p style="margin:0;font-size:13px">'+esc(r.notes)+'</p></div>':'')+
+      '<div class="section btnrow"><button class="btn" id="bShare">'+ICON.link+'Copy link</button>'+(c?'<a class="btn" target="_blank" rel="noopener" href="'+gmaps(c.lat,c.lng)+'">'+ICON.nav+'Directions</a>':'')+
+      (Admin.unlocked?'<button class="btn gold" id="bEdit">'+ICON.edit+'Edit</button>':'')+'</div>'+
+      '<p class="sub" style="margin-top:14px;font-size:11.5px">Updated '+esc(ago(r.updated_at))+'. Status comes from the Building Department\'s tracking sheet.</p>';
+    $("#bShare").onclick=()=>copyText(location.href,"Link copied");
+    const be=$("#bEdit"); if(be) be.onclick=()=>Admin.startEdit(r.id);
+  }
+  $$("[data-open-prop]",el).forEach(b=>b.onclick=()=>selectProp(b.dataset.openProp,true));
+}
+
+function renderLayersTab(el){
+  const tl = State.tilesOk===false;
+  const counts={}; if(parcelLayer) parcelLayer.eachLayer(l=>{ const z=P(l.feature).zone; counts[z]=(counts[z]||0)+1; });
+  const zkeys=Object.keys(ZONES).filter(z=>counts[z]);
+  const L1=(id,name,desc,on,dis)=>'<div class="lrow"><div class="ln"><b>'+name+'</b><span>'+desc+'</span></div><label class="switch"><input type="checkbox" data-layer="'+id+'" '+(on?'checked':'')+(dis?' disabled':'')+' aria-label="'+name+'"><span></span></label></div>';
+  el.innerHTML='<p class="eyebrow">Map</p><h2 class="ph">Layers</h2>'+
+    '<div class="section"><h3>Base map</h3><div class="basemaps">'+Object.entries(BASEMAPS).map(([k,b])=>'<button class="bm" data-bm="'+k+'" aria-pressed="'+(!tl&&State.basemap===k)+'"'+(tl?' disabled':'')+'><span class="sw" style="background:'+b.sw+'"></span>'+b.label+'</button>').join("")+'</div>'+(tl?'<p class="sub" style="margin:8px 0 0;font-size:12px">Base maps load on the live site.</p>':'')+'</div>'+
+    '<div class="section"><h3>Overlays</h3>'+
+      L1("zoning","Zoning districts","Color each parcel by its district",State.layers.zoning)+
+      L1("parcels","Parcel lines","Property boundaries"+(State.sample.parcels?" (sample)":""),State.layers.parcels)+
+      L1("labels","House numbers","Shown when zoomed in close",State.layers.labels)+
+      L1("annex","Annexations & tracked properties","Live from the city's tracking sheet",State.layers.annex)+
+      L1("limits","City limits","Arab corporate boundary"+(State.sample.limits?" (sample)":""),State.layers.limits)+
+      L1("flood","FEMA flood zones","Special flood hazard areas (A, AE, X)"+(tl?" · live site only":""),State.layers.flood,tl)+
+      L1("gas","Gas lines","City gas utility"+(State.sample.gas?" (sample)":""),State.layers.gas)+
+    '</div>'+
+    '<div class="section"><h3>Zoning fill</h3><div class="range"><span>Light</span><input type="range" id="op" min="0.15" max="0.95" step="0.05" value="'+State.opacity+'" aria-label="Zoning fill opacity"><span>Solid</span></div></div>'+
+    '<div class="section"><h3>Zoning districts · tap to hide</h3><div class="legend">'+zkeys.map(z=>'<button class="lg" data-z="'+z+'" aria-pressed="'+State.zoneOn[z]+'" title="'+esc(ZONES[z].desc)+'"><span class="sq" style="background:'+ZONES[z].color+'"></span><code>'+z+'</code><span>'+esc(ZONES[z].name)+'</span></button>').join("")+'</div></div>'+
+    '<div class="section"><h3>Annexation status</h3><div class="legend">'+STATUSES.map(s=>'<div class="lg" style="cursor:default"><span class="sq" style="background:color-mix(in srgb,'+s.color+' 30%,transparent);border:2px '+(s.key==="annexed"?"solid":"dashed")+' '+s.color+'"></span><span>'+esc(s.label)+'</span></div>').join("")+'</div></div>';
+  $$("[data-layer]",el).forEach(i=>i.onchange=()=>setLayer(i.dataset.layer,i.checked));
+  $$("[data-bm]",el).forEach(b=>b.onclick=()=>setBasemap(b.dataset.bm));
+  $$("[data-z]",el).forEach(b=>b.onclick=()=>{ const z=b.dataset.z; State.zoneOn[z]=!State.zoneOn[z]; b.setAttribute("aria-pressed",State.zoneOn[z]); restyleParcels(); });
+  $("#op",el).oninput=e=>{ State.opacity=+e.target.value; lsSet("arabmap.opacity",State.opacity); restyleParcels(); };
+}
+function setLayer(id,on){
+  State.layers[id]=on; lsSet("arabmap.layers",State.layers);
+  if(id==="zoning"||id==="parcels") restyleParcels();
+  if(id==="labels") buildLabels();
+  if(id==="annex") renderPropLayer();
+  if(id==="limits") on? limitsLayer.addTo(map) : map.removeLayer(limitsLayer);
+  if(id==="gas") on? gasLayer.addTo(map) : map.removeLayer(gasLayer);
+  if(id==="flood") on? floodLayer.addTo(map) : map.removeLayer(floodLayer);
+}
+
+function renderAnnexTab(el){
+  const f=State.annexFilter;
+  let rows=visibleRows().filter(r=>r.kind==="annexation"||!r.kind);
+  const open=isOpen;
+  if(f==="open") rows=rows.filter(open); else if(f==="done") rows=rows.filter(r=>!open(r));
+  rows.sort((a,b)=>String(b.submitted_date||"").localeCompare(String(a.submitted_date||"")));
+  el.innerHTML='<p class="eyebrow">'+esc(Store.label())+(Store.lastSync?' · '+esc(ago(Store.lastSync)):'')+'</p><h2 class="ph">Annexation requests</h2><p class="sub">Every annexation petition the Building Department is tracking, from application through the Planning Commission recommendation to the City Council vote.</p>'+
+    '<div class="chips" style="margin-bottom:12px">'+[["open","In progress"],["done","Decided"],["all","All"]].map(([k,l])=>'<button class="chip" data-f="'+k+'" aria-pressed="'+(f===k)+'">'+l+'</button>').join("")+'</div>'+
+    (Store.mode==="loading"?'<p class="sub">Loading…</p>': rows.length ? '<div class="alist">'+rows.map(r=>'<button class="aitem" data-id="'+esc(r.id)+'"><div class="t"><b>'+esc(r.name||r.address)+'</b>'+pillHTML(r.status)+'</div><div class="m">'+esc([r.application_no, r.acreage?fmtNum(r.acreage)+" ac":"", r.requested_zone?"to "+zoneOf(r.requested_zone):""].filter(Boolean).join(" · "))+'</div>'+trackerHTML(r)+'</button>').join("")+'</div>'
+      : '<div class="empty-state"><p class="sub">Nothing here right now.</p></div>');
+  $$("[data-f]",el).forEach(b=>b.onclick=()=>{ State.annexFilter=b.dataset.f; renderAnnexTab(el); });
+  $$(".aitem",el).forEach(b=>b.onclick=()=>selectProp(b.dataset.id,true));
+}
+
+/* =====================================================================
+   TOOLS: pin, measure, locate, share
+   ===================================================================== */
+const toolLayer = L.layerGroup().addTo(map);
+let pinMarker=null;
+const pinIcon = L.divIcon({className:"",iconSize:[28,36],iconAnchor:[14,35],popupAnchor:[0,-32],html:'<svg class="pin-ico" viewBox="0 0 28 36"><path d="M14 35s12-11.7 12-20.5A12 12 0 002 14.5C2 23.3 14 35 14 35z" fill="#B8322A" stroke="#fff" stroke-width="2"/><circle cx="14" cy="14" r="4.5" fill="#fff"/></svg>'});
+function parcelAt(ll){
+  let hit=null; if(!parcelLayer) return null;
+  parcelLayer.eachLayer(l=>{ if(hit) return; if(!l.getBounds().contains(ll)) return; if(pointInGeom(ll,l.feature.geometry)) hit=l.feature; });
+  return hit;
+}
+function pointInRing(x,y,r){ let ins=false; for(let i=0,j=r.length-1;i<r.length;j=i++){ const xi=r[i][0],yi=r[i][1],xj=r[j][0],yj=r[j][1]; if(((yi>y)!==(yj>y)) && (x<(xj-xi)*(y-yi)/(yj-yi)+xi)) ins=!ins; } return ins; }
+function pointInGeom(ll,g){ const x=ll.lng,y=ll.lat; const polys = g.type==="Polygon"?[g.coordinates]:g.type==="MultiPolygon"?g.coordinates:[]; return polys.some(p=>pointInRing(x,y,p[0]) && !p.slice(1).some(h=>pointInRing(x,y,h))); }
+function dropPin(ll){
+  if(pinMarker) toolLayer.removeLayer(pinMarker);
+  const f=parcelAt(ll), p=f?P(f):null;
+  pinMarker=L.marker(ll,{icon:pinIcon,pane:"toolPane"}).addTo(toolLayer);
+  const html='<div style="min-width:200px"><div class="eyebrow" style="margin:0 0 4px">Dropped pin</div><div class="mono" style="font-size:13px;font-weight:600">'+ll.lat.toFixed(6)+', '+ll.lng.toFixed(6)+'</div>'+
+    (p?'<div style="margin-top:6px;font-size:12.5px">'+esc(p.address||"Parcel")+' · <b>'+esc(p.zone)+'</b> '+esc(ZONES[p.zone].name)+'</div>':'<div style="margin-top:6px;font-size:12.5px;color:var(--ink-soft)">No parcel at this spot</div>')+
+    '<div class="btnrow" style="margin-top:10px"><button class="btn sm" id="pinCopy">Copy coordinates</button>'+(p?'<button class="btn sm primary" id="pinOpen">Open parcel</button>':'')+'<button class="btn sm ghost" id="pinDel">Remove</button></div></div>';
+  pinMarker.bindPopup(html,{closeButton:true}).openPopup();
+  pinMarker.on("popupopen",bindPin); bindPin();
+  function bindPin(){ setTimeout(()=>{ const a=$("#pinCopy"); if(a) a.onclick=()=>copyText(ll.lat.toFixed(6)+", "+ll.lng.toFixed(6),"Coordinates copied"); const b=$("#pinOpen"); if(b) b.onclick=()=>{ map.closePopup(); selectParcel(f,false); }; const d=$("#pinDel"); if(d) d.onclick=()=>{ toolLayer.removeLayer(pinMarker); pinMarker=null; }; },0); }
+}
+function setMode(m){
+  State.mode = (State.mode===m && (m==="pin"||m==="measure")) ? null : m;
+  if(!State.mode && Admin.form) State.mode="form";
+  $("#tPin").setAttribute("aria-pressed",State.mode==="pin");
+  $("#tMeasure").setAttribute("aria-pressed",State.mode==="measure");
+  map.getContainer().classList.toggle("leaflet-crosshair",!!State.mode && State.mode!=="form");
+  if(State.mode!=="measure") Measure.stop();
+  if(State.mode==="form"){ hideToolbar(); return; }
+  if(isMobile() && (State.mode==="measure"||State.mode==="pin")) setSheet("peek");
+  if(State.mode==="measure") Measure.start();
+  else if(State.mode==="pin"){ showToolbar('<span class="tl">Tap the map to drop a pin</span><button class="btn sm" id="tbDone">Done</button>'); $("#tbDone").onclick=()=>setMode(null); }
+  else if(!State.mode) hideToolbar();
+}
+function showToolbar(h){ const t=$("#toolbar"); t.innerHTML=h; t.hidden=false; }
+function hideToolbar(){ $("#toolbar").hidden=true; }
+$("#tPin").onclick=()=>{ Admin.cancelGeo(); setMode("pin"); };
+$("#tMeasure").onclick=()=>{ Admin.cancelGeo(); setMode("measure"); };
+$("#zin").onclick=()=>map.zoomIn(); $("#zout").onclick=()=>map.zoomOut();
+$("#homeBtn").onclick=()=>{ const b = limitsLayer ? limitsLayer.getBounds() : null; b && b.isValid() ? map.flyToBounds(b,fitPad()) : map.flyTo(CONFIG.CENTER,CONFIG.ZOOM); };
+$("#tShare").onclick=()=>copyText(location.href,"Link copied");
+$("#tLocate").onclick=()=>{
+  if(!navigator.geolocation){ toast("Location isn't available on this device"); return; }
+  toast("Finding your location…");
+  navigator.geolocation.getCurrentPosition(p=>{ const ll=L.latLng(p.coords.latitude,p.coords.longitude); flyPoint(ll,18); L.circle(ll,{radius:p.coords.accuracy,color:"#2F6BFF",weight:1,fillOpacity:.1,pane:"toolPane"}).addTo(toolLayer); L.circleMarker(ll,{radius:7,color:"#fff",weight:3,fillColor:"#2F6BFF",fillOpacity:1,pane:"toolPane"}).addTo(toolLayer); },
+    ()=>toast("Location was blocked. Allow location access in your browser and try again."),{enableHighAccuracy:true,timeout:10000});
+};
+
+function geoArea(lls){ const R=6378137; let a=0; const n=lls.length; if(n<3) return 0; for(let i=0;i<n;i++){ const p1=lls[i],p2=lls[(i+1)%n]; a+=(p2.lng-p1.lng)*Math.PI/180*(2+Math.sin(p1.lat*Math.PI/180)+Math.sin(p2.lat*Math.PI/180)); } return Math.abs(a*R*R/2); }
+const fmtFeet = m => { const ft=m*3.28084; return ft>=5280 ? (ft/5280).toFixed(2)+" mi" : Math.round(ft).toLocaleString()+" ft"; };
+const fmtArea = m2 => { const ac=m2/4046.86; return ac>=0.5 ? ac.toFixed(2)+" acres" : Math.round(m2*10.7639).toLocaleString()+" sq ft"; };
+const Measure = {
+  pts:[], kind:"distance", line:null, verts:L.layerGroup(),
+  start(){ this.pts=[]; this.verts.addTo(toolLayer); this.draw(); },
+  stop(){ this.pts=[]; if(this.line){ toolLayer.removeLayer(this.line); this.line=null; } this.verts.clearLayers(); if(!State.mode) hideToolbar(); },
+  add(ll){ this.pts.push(ll); this.draw(); },
+  draw(){
+    if(this.line) toolLayer.removeLayer(this.line);
+    this.verts.clearLayers();
+    const opts={color:"#B8322A",weight:3,dashArray:"6 5",pane:"toolPane",interactive:false};
+    if(this.pts.length) this.line = (this.kind==="area" && this.pts.length>2 ? L.polygon(this.pts,Object.assign({fillOpacity:.15,fillColor:"#B8322A"},opts)) : L.polyline(this.pts,opts)).addTo(toolLayer);
+    this.pts.forEach(p=>this.verts.addLayer(L.circleMarker(p,{radius:4,color:"#B8322A",weight:2,fillColor:"#fff",fillOpacity:1,pane:"toolPane",interactive:false})));
+    let d=0; for(let i=1;i<this.pts.length;i++) d+=map.distance(this.pts[i-1],this.pts[i]);
+    if(this.kind==="area" && this.pts.length>2) d+=map.distance(this.pts[this.pts.length-1],this.pts[0]);
+    const val = this.kind==="area" ? (this.pts.length>2? fmtArea(geoArea(this.pts)) : "—") : (this.pts.length>1? fmtFeet(d) : "—");
+    showToolbar('<div class="seg"><button data-k="distance" aria-pressed="'+(this.kind==="distance")+'">Distance</button><button data-k="area" aria-pressed="'+(this.kind==="area")+'">Area</button></div>'+
+      '<div><div class="tv">'+val+'</div><div class="tl">'+(this.kind==="area"&&this.pts.length>2?"Perimeter "+fmtFeet(d):"Tap the map to add points")+'</div></div>'+
+      '<button class="btn sm" id="mUndo"'+(this.pts.length?'':' disabled')+'>Undo</button><button class="btn sm" id="mClear"'+(this.pts.length?'':' disabled')+'>Clear</button><button class="btn sm primary" id="mDone">Done</button>');
+    $$("#toolbar [data-k]").forEach(b=>b.onclick=()=>{ this.kind=b.dataset.k; this.draw(); });
+    $("#mUndo").onclick=()=>{ this.pts.pop(); this.draw(); };
+    $("#mClear").onclick=()=>{ this.pts=[]; this.draw(); };
+    $("#mDone").onclick=()=>setMode(null);
+  },
+};
+
+map.on("click",e=>{
+  if(e.originalEvent && e.originalEvent._handled) return;
+  if(State.mode==="pin"){ dropPin(e.latlng); return; }
+  if(State.mode==="measure"){ Measure.add(e.latlng); return; }
+  if(State.mode==="point"||State.mode==="draw"){ Admin.mapClick(e.latlng); return; }
+  if(State.mode==="pick") return;
+  if(State.selected) clearSelection();
+});
+map.on("mousemove",e=>{ $("#coords").textContent=e.latlng.lat.toFixed(5)+", "+e.latlng.lng.toFixed(5).replace("-","−"); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && State.mode && !Admin.form){ setMode(null); } });
+
+/* =====================================================================
+   STAFF DASHBOARD
+   ===================================================================== */
+const Admin = {
+  unlocked: (()=>{ try{ return sessionStorage.getItem("arabmap.staff")==="1"; }catch(e){ return false; } })(),
+  tab:"overview", form:null, geoLayer:L.layerGroup().addTo(map), drawPts:[], confirmDel:null, q:"", fstatus:"all",
+  open(){ $("#admin").hidden=false; this.render(); },
+  close(){ $("#admin").hidden=true; setTimeout(()=>map.invalidateSize(),50); },
+  unlock(){ this.unlocked=true; try{ sessionStorage.setItem("arabmap.staff","1"); }catch(e){} $("#adminBtn .lbl").textContent="Dashboard"; Store.mode==="sheet" && Store.pullSheet().catch(()=>{}); buildIndex(); this.render(); },
+  lock(){ this.unlocked=false; try{ sessionStorage.removeItem("arabmap.staff"); }catch(e){} $("#adminBtn .lbl").textContent="Staff"; this.close(); renderPropLayer(); buildIndex(); renderPanel(); },
+  render(){
+    const el=$("#admin");
+    if(!this.unlocked){
+      el.innerHTML='<div class="admin-in"><div class="gate"><p class="eyebrow">Building Department</p><h2>Staff dashboard</h2><p class="sub">Staff sign-in will go here once logins are set up. Until then this preview opens without a password, so don\'t share the staff link publicly yet.</p><div class="btnrow"><button class="btn primary" id="gOpen">Open dashboard</button><button class="btn" id="gBack">Back to map</button></div></div></div>';
+      $("#gOpen").onclick=()=>this.unlock(); $("#gBack").onclick=()=>this.close(); return;
+    }
+    const tabs=[["overview","Overview"],["properties","Properties"],["parcels","Parcel data"],["feed","Google Sheet feed"]];
+    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1></div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button><button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button><button class="btn ghost" id="aLock">Sign out</button></div></div>'+
+      '<nav class="anav" role="tablist">'+tabs.map(([k,l])=>'<button role="tab" data-at="'+k+'" aria-selected="'+(this.tab===k)+'">'+l+'</button>').join("")+'</nav><div id="abody"></div></div>';
+    $("#aMap").onclick=()=>this.close(); $("#aAdd").onclick=()=>this.startAdd({}); $("#aLock").onclick=()=>this.lock();
+    $$("[data-at]",el).forEach(b=>b.onclick=()=>{ this.tab=b.dataset.at; this.render(); });
+    const body=$("#abody");
+    ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body)})[this.tab]();
+  },
+  rOverview(b){
+    const rows=Store.rows, ann=rows.filter(r=>r.kind==="annexation");
+    const open=ann.filter(isOpen);
+    const acres=open.reduce((a,r)=>a+(+r.acreage||0),0);
+    const upcoming=(field,stat)=>ann.filter(r=>stat.includes(r.status) && r[field] && new Date(r[field]+"T23:59:00")>=new Date()).sort((a,b)=>a[field].localeCompare(b[field]));
+    const hearings=upcoming("pc_date",["submitted","review","pc_scheduled"]);
+    const councils=upcoming("council_date",["approved","council"]);
+    const awaiting=ann.filter(r=>r.status==="approved"||r.status==="council").length;
+    const max=Math.max(1,...STATUSES.map(s=>ann.filter(r=>r.status===s.key).length));
+    const recent=[...rows].sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||""))).slice(0,6);
+    b.innerHTML='<div class="stats">'+
+      '<div class="stat"><div class="l">Annexations in progress</div><div class="v">'+open.length+'</div><div class="s">'+fmtNum(acres,1)+' acres pending</div></div>'+
+      '<div class="stat"><div class="l">Next PC hearing</div><div class="v" style="font-size:22px">'+(hearings[0]?fmtDate(hearings[0].pc_date):"None set")+'</div><div class="s">'+(hearings[0]?hearings.filter(h=>h.pc_date===hearings[0].pc_date).length+" on the agenda":"Add a hearing date to a request")+'</div></div>'+
+      '<div class="stat"><div class="l">Next City Council vote</div><div class="v" style="font-size:22px">'+(councils[0]?fmtDate(councils[0].council_date):"None set")+'</div><div class="s">'+awaiting+' recommended by PC, awaiting council</div></div>'+
+      '<div class="stat"><div class="l">Properties on the map</div><div class="v">'+rows.length+'</div><div class="s">'+rows.filter(r=>String(r.public||"Y").toUpperCase()==="N").length+' hidden from the public</div></div>'+
+    '</div><div class="grid2"><div class="box"><h3>Annexation pipeline</h3><div class="pipeline">'+STATUSES.map(s=>{const n=ann.filter(r=>r.status===s.key).length; return '<div class="pipe"><span><span class="dot" style="background:'+s.color+'"></span>'+esc(s.label)+'</span><div class="bar"><i style="width:'+(n/max*100)+'%;background:'+s.color+'"></i></div><span class="n">'+n+'</span></div>';}).join("")+'</div></div>'+
+      '<div class="box"><h3>Recent changes</h3>'+(recent.length?'<div class="alist">'+recent.map(r=>'<button class="aitem" data-go="'+esc(r.id)+'"><div class="t"><b>'+esc(r.name||r.address)+'</b>'+pillHTML(r.status)+'</div><div class="m">'+esc((r.source==="permit-site"?"Permit site":"Staff")+" · "+ago(r.updated_at))+'</div></button>').join("")+'</div>':'<p class="sub">No properties yet.</p>')+'</div></div>'+
+      (Store.error?'<p class="note warn" style="margin-top:16px">'+esc(Store.error)+'</p>':'');
+    $$("[data-go]",b).forEach(x=>x.onclick=()=>{ this.close(); selectProp(x.dataset.go,true); });
+  },
+  rProps(b){
+    const q=this.q.toLowerCase();
+    let rows=[...Store.rows].filter(r=>(this.fstatus==="all"||r.status===this.fstatus) && (!q || [r.name,r.address,r.application_no,r.owner,r.ppin,r.parcel_number].join(" ").toLowerCase().includes(q)));
+    rows.sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")));
+    b.innerHTML='<div class="filters"><div class="field" style="flex:1;min-width:200px"><input id="pq" type="search" placeholder="Filter by name, address, application #, owner" value="'+esc(this.q)+'" aria-label="Filter properties"></div>'+
+      '<div class="field"><select id="pfs" aria-label="Status filter"><option value="all">All statuses</option>'+STATUSES.map(s=>'<option value="'+s.key+'"'+(this.fstatus===s.key?' selected':'')+'>'+esc(s.label)+'</option>').join("")+'</select></div>'+
+      '<button class="btn" id="pExp">'+ICON.down+'Export CSV</button><button class="btn gold" id="pAdd">'+ICON.plus+'Add property</button></div>'+
+      '<div class="tablewrap"><table class="t"><thead><tr><th>Property</th><th>Type</th><th>Status</th><th>Application</th><th>PC hearing</th><th>Acres</th><th>Public</th><th>Updated</th><th></th></tr></thead><tbody>'+
+      (rows.length?rows.map(r=>'<tr><td class="first"><b>'+esc(r.name||"—")+'</b><div style="font-size:12px;color:var(--ink-soft)">'+esc(r.address||"")+'</div></td><td data-l="Type">'+esc(KINDS[r.kind]||"—")+'</td><td data-l="Status">'+pillHTML(r.status)+'</td><td data-l="Application" class="mono">'+esc(r.application_no||"—")+'</td><td data-l="PC hearing">'+fmtDate(r.pc_date)+'</td><td data-l="Acres" class="mono">'+fmtNum(r.acreage,1)+'</td><td data-l="Public">'+(String(r.public||"Y").toUpperCase()==="N"?"Hidden":"Yes")+'</td><td data-l="Updated" style="font-size:12px;color:var(--ink-soft)">'+esc(ago(r.updated_at))+'</td><td class="act">'+
+        (this.confirmDel===r.id?'<span class="inline-confirm">Delete? <button class="btn sm danger" data-del-yes="'+esc(r.id)+'">Delete</button><button class="btn sm" data-del-no>Keep</button></span>':
+        '<button class="btn sm ghost" data-show="'+esc(r.id)+'">Map</button><button class="btn sm" data-edit="'+esc(r.id)+'">Edit</button><button class="btn sm ghost danger" data-del="'+esc(r.id)+'" aria-label="Delete">✕</button>')+'</td></tr>').join("")
+        :'<tr><td colspan="9" style="text-align:center;color:var(--ink-soft);padding:24px">No properties match.</td></tr>')+
+      '</tbody></table></div>';
+    const pq=$("#pq",b); pq.oninput=()=>{ this.q=pq.value; const pos=pq.selectionStart; this.rProps(b); const n=$("#pq",b); n.focus(); n.setSelectionRange(pos,pos); };
+    $("#pfs",b).onchange=e=>{ this.fstatus=e.target.value; this.rProps(b); };
+    $("#pAdd",b).onclick=()=>this.startAdd({});
+    $("#pExp",b).onclick=()=>saveFile("arab-map-properties.csv",toCSV(Store.rows),"text/csv");
+    $$("[data-show]",b).forEach(x=>x.onclick=()=>{ this.close(); selectProp(x.dataset.show,true); });
+    $$("[data-edit]",b).forEach(x=>x.onclick=()=>this.startEdit(x.dataset.edit));
+    $$("[data-del]",b).forEach(x=>x.onclick=()=>{ this.confirmDel=x.dataset.del; this.rProps(b); });
+    $$("[data-del-no]",b).forEach(x=>x.onclick=()=>{ this.confirmDel=null; this.rProps(b); });
+    $$("[data-del-yes]",b).forEach(x=>x.onclick=async()=>{ try{ await Store.remove(x.dataset.delYes); toast("Property deleted"); }catch(e){ toast("Couldn't delete: "+e.message,4000); } this.confirmDel=null; this.rProps(b); });
+  },
+  rParcels(b){
+    const src=State.sourceNote||{};
+    b.innerHTML='<div class="grid2" style="margin-top:0"><div class="box"><h3>Map data sources</h3><dl class="kv" style="font-size:13px">'+
+      '<dt>Parcels &amp; zoning</dt><dd>'+esc(src.parcels||"—")+'</dd><dt>City limits</dt><dd>'+esc(src.limits||"—")+'</dd><dt>Gas lines</dt><dd>'+esc(src.gas||"—")+'</dd><dt>Parcels loaded</dt><dd class="mono">'+(parcelData?parcelData.features.length.toLocaleString():"0")+'</dd></dl>'+
+      '<p class="sub" style="margin-top:14px">The live site reads these from the <code>data/</code> folder next to the page. Import a file here to preview it on your map, then download it and commit it to the site\'s <code>data/</code> folder so every visitor sees it.</p>'+
+      '<div class="btnrow"><button class="btn" data-dl="parcels">'+ICON.down+'Download parcels.geojson</button><button class="btn" data-dl="limits">'+ICON.down+'city-limits.geojson</button><button class="btn" data-dl="gas">'+ICON.down+'gas-lines.geojson</button></div></div>'+
+      '<div class="box"><h3>Import a map layer</h3><div class="field" style="margin-bottom:10px"><label for="impKind">Layer</label><select id="impKind"><option value="parcels">Parcels &amp; zoning</option><option value="limits">City limits</option><option value="gas">Gas lines</option></select></div>'+
+      '<label class="drop" id="drop" for="impFile">'+ICON.up+'<div style="margin-top:6px"><b>Choose a GeoJSON file</b> or drop it here</div><div style="font-size:12px;margin-top:4px">WGS84 (EPSG:4326). Shapefile or KML? Convert it at mapshaper.org first.</div></label><input type="file" id="impFile" accept=".geojson,.json,application/geo+json,application/json" hidden>'+
+      '<p class="sub" style="margin-top:10px;font-size:12px">Parcel files exported from the current Greenstone map keep their field names (ZONE, PARCELNUMB, OWNER, PROPPIN, PROPADDR, PROPVALUE, ACREAGE, MAILADD1…) and are read automatically.</p>'+
+      '<div class="btnrow"><button class="btn danger" id="impReset">Go back to the built-in data</button></div></div></div>';
+    const handle=async file=>{
+      if(!file) return; const kind=$("#impKind",b).value;
+      try{ const j=JSON.parse(await file.text()); const fc = j.type==="FeatureCollection"? j : j.type==="Feature"? {type:"FeatureCollection",features:[j]} : null; if(!fc || !fc.features.length) throw new Error("No features found in that file");
+        const c=fc.features.find(f=>f.geometry)?.geometry; const sample=JSON.stringify(c&&c.coordinates).match(/-?\d+\.?\d*/g)||[]; if(sample.length && Math.abs(+sample[0])>180) throw new Error("Coordinates look projected (state plane). Re-export in WGS84 / EPSG:4326.");
+        await idbSet(kind,fc); await loadMapData(); toast("Loaded "+fc.features.length.toLocaleString()+" features"); this.rParcels(b);
+        if(kind==="parcels"){ const bb=parcelLayer.getBounds(); if(bb.isValid()) map.fitBounds(bb); }
+      }catch(e){ toast("Import failed: "+e.message,5000); }
+    };
+    $("#impFile",b).onchange=e=>handle(e.target.files[0]);
+    const d=$("#drop",b); d.ondragover=e=>{e.preventDefault(); d.classList.add("over");}; d.ondragleave=()=>d.classList.remove("over"); d.ondrop=e=>{ e.preventDefault(); d.classList.remove("over"); handle(e.dataTransfer.files[0]); };
+    $("#impReset",b).onclick=async()=>{ await idbSet("parcels",null); await idbSet("limits",null); await idbSet("gas",null); await loadMapData(); toast("Using built-in data"); this.rParcels(b); };
+    $$("[data-dl]",b).forEach(x=>x.onclick=()=>{ const k=x.dataset.dl; const data={parcels:parcelData,limits:limitsData,gas:gasData}[k]; saveFile(CONFIG.DATA_FILES[k].split("/").pop(), JSON.stringify(data), "application/geo+json"); });
+  },
+  rFeed(b){
+    const cfg=getCfg(), ov=lsGet("arabmap.cfg",{});
+    b.innerHTML='<div class="grid2" style="margin-top:0"><div class="box"><h3>Connection</h3>'+
+      '<p class="note '+(Store.mode==="sheet"?"info":"warn")+'"><b>'+esc(Store.label())+'.</b> '+(Store.mode==="sheet"?"The map re-reads the sheet every "+esc(cfg.REFRESH_SECONDS)+" seconds and when a visitor returns to the tab.":"Paste the Apps Script web-app URL below to switch this browser to the live sheet. To switch every visitor, put the same URL in CONFIG.SHEET_API at the top of index.html.")+'</p>'+
+      (Store.error?'<p class="note warn" style="margin-top:8px">'+esc(Store.error)+'</p>':'')+
+      '<div class="fgrid" style="margin-top:12px"><div class="field full"><label for="fUrl">Apps Script web-app URL</label><input id="fUrl" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(cfg.SHEET_API)+'"><span class="hint">'+(ov.SHEET_API?"Override saved in this browser.":CONFIG.SHEET_API?"From the site settings.":"Not set.")+'</span></div>'+
+      '<div class="field"><label for="fKey">Write key</label><input id="fKey" type="password" value="'+esc(cfg.SHEET_KEY)+'" autocomplete="off"><span class="hint">Must match KEY in the script</span></div>'+
+      '<div class="field"><label for="fRef">Refresh every (seconds)</label><input id="fRef" type="number" min="15" value="'+esc(cfg.REFRESH_SECONDS)+'"></div></div>'+
+      '<div class="btnrow" style="margin-top:12px"><button class="btn primary" id="fSave">'+ICON.sync+'Save &amp; connect</button><button class="btn" id="fSync">Sync now</button><button class="btn ghost" id="fClear">Use preview storage</button></div></div>'+
+      '<div class="box"><h3>How the feed works</h3><ol style="margin:0;padding-left:18px;display:grid;gap:8px;font-size:13px">'+
+        '<li>Create a Google Sheet with a tab named <b>Properties</b> and the columns below in row 1.</li>'+
+        '<li>Extensions → Apps Script, paste <b>apps-script.gs</b>, set KEY, then Deploy → New deployment → Web app (Execute as: Me, Access: Anyone).</li>'+
+        '<li>Paste the /exec URL here. The map reads the sheet; staff edits here write back to it.</li>'+
+        '<li>The permit site posts new annexation applications (status <code>submitted</code>) updates it to <code>approved</code> with the vote in <code>pc_vote</code> when the Planning Commission recommends it, then to <code>annexed</code> with <code>council_vote</code> when the City Council approves. The map picks it up on the next refresh.</li></ol></div></div>'+
+      '<div class="box" style="margin-top:16px"><h3>Sheet columns</h3><div style="overflow-x:auto"><pre class="code">'+esc(COLUMNS.join("\t"))+'</pre></div><p class="sub" style="margin-top:8px;font-size:12px">status values: '+STATUSES.map(s=>'<code>'+s.key+'</code>').join(", ")+' · kind values: '+Object.keys(KINDS).map(k=>'<code>'+k+'</code>').join(", ")+' · geometry: GeoJSON text, or leave blank and fill lat + lng for a point · public: Y or N</p><div class="btnrow"><button class="btn" id="fCols">Copy header row</button><button class="btn" id="fTpl">'+ICON.down+'Download starter sheet (CSV)</button></div></div>'+
+      '<div class="box" style="margin-top:16px"><h3>Example: what the permit site sends</h3><pre class="code">'+esc(JSON.stringify({key:"YOUR-KEY",action:"upsert",row:{id:"ANX-2026-018",kind:"annexation",name:"Smith annexation",address:"1200 Example Rd",ppin:"15247",status:"submitted",application_no:"ANX-2026-018",submitted_date:"2026-09-24",source:"permit-site",public:"Y"}},null,2))+'</pre><p class="sub" style="margin-top:8px;font-size:12px">POST it to the same /exec URL with Content-Type text/plain. Sending the same id again updates that row, so the permit site only sends <code>{id, status:"approved", pc_date, pc_vote}</code> after the Planning Commission recommends it, <code>{id, status:"council", council_date}</code> once it is on the Council agenda, and <code>{id, status:"annexed", council_vote, decision_date, ordinance_no}</code> when the Council approves. If geometry is blank, the map places it on the parcel whose PPIN or parcel number matches.</p></div>';
+    $("#fSave",b).onclick=async()=>{ const o=lsGet("arabmap.cfg",{}); o.SHEET_API=$("#fUrl",b).value.trim(); o.SHEET_KEY=$("#fKey",b).value; o.REFRESH_SECONDS=+$("#fRef",b).value||60; lsSet("arabmap.cfg",o); toast("Connecting…"); await Store.init(); toast(Store.mode==="sheet"?"Connected to the Google Sheet":"Couldn't connect. Using "+Store.label().toLowerCase(),4000); this.render(); };
+    $("#fSync",b).onclick=async()=>{ if(Store.mode!=="sheet"){ toast("Connect a sheet first"); return; } try{ await Store.pullSheet(); toast("Synced"); this.render(); }catch(e){ toast("Sync failed: "+e.message,4000); } };
+    $("#fClear",b).onclick=async()=>{ const o=lsGet("arabmap.cfg",{}); delete o.SHEET_API; delete o.SHEET_KEY; lsSet("arabmap.cfg",o); await Store.init(); this.render(); };
+    $("#fCols",b).onclick=()=>copyText(COLUMNS.join("\t"),"Header row copied — paste into row 1");
+    $("#fTpl",b).onclick=()=>saveFile("arab-map-properties-template.csv",toCSV(Store.rows.length?Store.rows:sampleProperties()),"text/csv");
+  },
+
+  /* ---------- add / edit on the map ---------- */
+  blank(){ return {id:uid(),kind:"annexation",name:"",address:"",ppin:"",parcel_number:"",owner:"",acreage:"",current_zone:"",requested_zone:"",status:"submitted",application_no:"",submitted_date:today(),pc_date:"",pc_vote:"",council_date:"",council_vote:"",decision_date:"",ordinance_no:"",notes:"",public:"Y",geometry:"",source:"staff"}; },
+  startAdd({fromParcel}={}){
+    this.form=this.blank(); this.form._new=true; this.close();
+    if(fromParcel) this.captureParcel(fromParcel,true);
+    State.selected=null; restyleParcels(); renderPropLayer();
+    State.mode="form"; openTab("property"); if(isMobile()) setSheet("full"); this.showGeo();
+  },
+  startEdit(id){
+    const r=Store.rows.find(x=>x.id===id); if(!r) return;
+    this.form=Object.assign({},r); this.form._new=false; this.close();
+    State.selected=null; restyleParcels(); renderPropLayer();
+    State.mode="form"; openTab("property"); if(isMobile()) setSheet("full"); this.showGeo();
+    const g=geomOf(r); if(g){ if(g.type==="Point") flyPoint(L.latLng(g.coordinates[1],g.coordinates[0]),17); else map.flyToBounds(L.geoJSON(g).getBounds(),Object.assign({maxZoom:18},fitPad())); }
+  },
+  exitForm(){ this.form=null; this.cancelGeo(); State.mode=null; map.getContainer().classList.remove("leaflet-crosshair"); hideToolbar(); this.geoLayer.clearLayers(); renderPanel(); },
+  cancelGeo(sync=true){ if(!this.form) return; if(["pick","point","draw"].includes(State.mode)){ if(sync) this.syncFormFromDom(); State.mode="form"; this.drawPts=[]; this.geoLayer.clearLayers(); map.getContainer().classList.remove("leaflet-crosshair"); hideToolbar(); this.showGeo(); renderPanel(); if(isMobile()) setSheet("full"); } },
+  geoMode(m){
+    setMode(null); State.mode = m; this.drawPts=[];
+    map.getContainer().classList.add("leaflet-crosshair");
+    if(isMobile()) setSheet("peek");
+    const msg={pick:"Tap a parcel to use its boundary and record",point:"Tap the map to place a point",draw:"Tap the map to add corners of the boundary"}[m];
+    showToolbar('<span class="tl">'+msg+'</span>'+(m==="draw"?'<button class="btn sm" id="dUndo">Undo</button><button class="btn sm primary" id="dFin">Finish shape</button>':'')+'<button class="btn sm" id="dCan">Cancel</button>');
+    $("#dCan").onclick=()=>this.cancelGeo();
+    if(m==="draw"){ $("#dUndo").onclick=()=>{ this.drawPts.pop(); this.drawTemp(); }; $("#dFin").onclick=()=>this.finishDraw(); }
+    this.syncFormFromDom(); renderPanel();
+  },
+  mapClick(ll){
+    this.syncFormFromDom();
+    if(State.mode==="point"){ this.form.geometry=JSON.stringify({type:"Point",coordinates:[+ll.lng.toFixed(7),+ll.lat.toFixed(7)]}); const f=parcelAt(ll); if(f) this.fillFromParcel(f,false); this.cancelGeo(false); }
+    else if(State.mode==="draw"){ this.drawPts.push(ll); this.drawTemp(); }
+  },
+  drawTemp(){ this.geoLayer.clearLayers(); if(this.drawPts.length) L.polyline(this.drawPts.length>2?[...this.drawPts,this.drawPts[0]]:this.drawPts,{color:"#F2C230",weight:3,dashArray:"6 4",pane:"toolPane",interactive:false}).addTo(this.geoLayer); this.drawPts.forEach(p=>L.circleMarker(p,{radius:5,color:"#0F3273",weight:2,fillColor:"#fff",fillOpacity:1,pane:"toolPane",interactive:false}).addTo(this.geoLayer)); },
+  finishDraw(){ if(this.drawPts.length<3){ toast("Add at least 3 corners"); return; } this.syncFormFromDom(); const ring=this.drawPts.map(p=>[+p.lng.toFixed(7),+p.lat.toFixed(7)]); ring.push(ring[0]); this.form.geometry=JSON.stringify({type:"Polygon",coordinates:[ring]}); if(!this.form.acreage) this.form.acreage=(geoArea(this.drawPts)/4046.86).toFixed(2); this.cancelGeo(false); },
+  captureParcel(f,silent){ if(!silent) this.syncFormFromDom(); this.form.geometry=JSON.stringify(f.geometry); this.fillFromParcel(f,true); if(!silent){ this.cancelGeo(false); toast("Parcel boundary and record copied"); } },
+  fillFromParcel(f,withAcres){ const p=P(f); const F=this.form; F.address=F.address||p.address; F.ppin=F.ppin||p.ppin; F.parcel_number=F.parcel_number||p.parcel; F.owner=F.owner||p.owner; F.current_zone=F.current_zone||(p.zone!=="X"?p.zone:""); if(withAcres && !F.acreage && p.acres) F.acreage=String(p.acres); if(!F.name) F.name=p.address||""; },
+  showGeo(){ this.geoLayer.clearLayers(); if(!this.form) return; const g=geomOf(this.form); if(!g) return; if(g.type==="Point") L.circleMarker([g.coordinates[1],g.coordinates[0]],{radius:10,color:"#fff",weight:3,fillColor:"#F2C230",fillOpacity:1,pane:"toolPane",interactive:false}).addTo(this.geoLayer); else L.geoJSON(g,{pane:"toolPane",interactive:false,style:{color:"#F2C230",weight:4,fillColor:"#F2C230",fillOpacity:.2}}).addTo(this.geoLayer); },
+  formHTML(){
+    const F=this.form, g=geomOf(F), m=State.mode;
+    const sel=(id,opts,val)=>'<select id="'+id+'">'+opts.map(([v,l])=>'<option value="'+esc(v)+'"'+(String(val)===String(v)?' selected':'')+'>'+esc(l)+'</option>').join("")+'</select>';
+    const zopts=[["","—"],...Object.keys(ZONES).map(z=>[z,z+" · "+ZONES[z].name])];
+    const inp=(id,label,val,type="text",cls="")=>'<div class="field '+cls+'"><label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+type+'" value="'+esc(val)+'"></div>';
+    return '<p class="eyebrow">Staff · '+(F._new?"New property":"Editing")+'</p><h2 class="ph">'+(F._new?"Add a property to the map":esc(F.name||"Edit property"))+'</h2><p class="sub">Choose where it goes on the map, fill in the record, then save. '+(Store.mode==="sheet"?"Saving writes to the Google Sheet.":"Saving writes to "+esc(Store.label().toLowerCase())+".")+'</p>'+
+      '<div class="section"><h3>Location on the map</h3><div class="geo-tools"><button class="gt" data-gm="pick" aria-pressed="'+(m==="pick")+'">'+ICON.parcel+'Pick parcel</button><button class="gt" data-gm="point" aria-pressed="'+(m==="point")+'">'+ICON.dot+'Drop point</button><button class="gt" data-gm="draw" aria-pressed="'+(m==="draw")+'">'+ICON.draw+'Draw boundary</button></div>'+
+      '<div class="geo-sum">'+(g?'<span><span class="dot" style="background:var(--gold)"></span>'+(g.type==="Point"?"Point placed":"Boundary set · "+(g.type==="Polygon"?g.coordinates[0].length-1:"multi")+" corners")+'</span><button class="btn sm ghost" id="gClear">Clear</button>':'<span style="color:var(--ink-soft)">No location yet. Without one it still saves, and shows on the parcel with a matching PPIN.</span>')+'</div></div>'+
+      '<div class="section"><h3>Record</h3><div class="fgrid">'+
+        '<div class="field"><label for="fKind">Type</label>'+sel("fKind",Object.entries(KINDS),F.kind)+'</div>'+
+        '<div class="field"><label for="fStatus">Status</label>'+sel("fStatus",STATUSES.map(s=>[s.key,s.label]),F.status)+'</div>'+
+        inp("fName","Name on the map",F.name,"text","full")+inp("fAddr","Address",F.address,"text","full")+
+        inp("fApp","Application #",F.application_no)+inp("fAc","Acreage",F.acreage,"number")+
+        inp("fPpin","PPIN",F.ppin)+inp("fParcel","Parcel number",F.parcel_number)+
+        '<div class="field"><label for="fCz">Current zoning</label>'+sel("fCz",zopts,F.current_zone)+'</div>'+
+        '<div class="field"><label for="fRz">Requested zoning</label>'+sel("fRz",zopts,F.requested_zone)+'</div>'+
+        inp("fSub","Submitted",F.submitted_date,"date")+inp("fPc","PC hearing",F.pc_date,"date")+
+        inp("fPcv","PC recommendation / vote",F.pc_vote,"text","full")+
+        inp("fCd","City Council meeting",F.council_date,"date")+inp("fCv","Council vote",F.council_vote)+
+        inp("fDec","Final decision date",F.decision_date,"date")+inp("fOrd","Ordinance #",F.ordinance_no)+
+        inp("fOwner","Owner / applicant (staff only)",F.owner,"text","full")+
+        '<div class="field full"><label for="fNotes">Notes (shown to the public)</label><textarea id="fNotes">'+esc(F.notes)+'</textarea></div>'+
+        '<label class="check full"><input type="checkbox" id="fPub" '+(String(F.public||"Y").toUpperCase()!=="N"?"checked":"")+'> Show on the public map</label>'+
+      '</div></div>'+
+      '<div class="section btnrow" style="position:sticky;bottom:-16px;background:var(--surface);padding-block:12px;margin-bottom:-16px;border-top:1px solid var(--line)"><button class="btn primary" id="fSaveP">Save property</button><button class="btn" id="fCancelP">Cancel</button></div>';
+  },
+  syncFormFromDom(){
+    const F=this.form, v=id=>{ const e=document.getElementById(id); return e? e.value : undefined; };
+    if(!document.getElementById("fKind")) return;
+    Object.assign(F,{kind:v("fKind"),status:v("fStatus"),name:v("fName"),address:v("fAddr"),application_no:v("fApp"),acreage:v("fAc"),ppin:v("fPpin"),parcel_number:v("fParcel"),current_zone:v("fCz"),requested_zone:v("fRz"),submitted_date:v("fSub"),pc_date:v("fPc"),pc_vote:v("fPcv"),council_date:v("fCd"),council_vote:v("fCv"),decision_date:v("fDec"),ordinance_no:v("fOrd"),owner:v("fOwner"),notes:v("fNotes"),public:document.getElementById("fPub").checked?"Y":"N"});
+  },
+  bindForm(){
+    const el=$("#pbody"); this.showGeo();
+    $$("[data-gm]",el).forEach(b=>b.onclick=()=>{ this.syncFormFromDom(); State.mode===b.dataset.gm ? this.cancelGeo(false) : this.geoMode(b.dataset.gm); });
+    const gc=$("#gClear",el); if(gc) gc.onclick=()=>{ this.syncFormFromDom(); this.form.geometry=""; this.showGeo(); renderPanel(); };
+    $("#fCancelP",el).onclick=()=>this.exitForm();
+    $("#fStatus",el).onchange=e=>{ const v=e.target.value; if((v==="annexed"||v==="denied"||v==="withdrawn") && !$("#fDec",el).value) $("#fDec",el).value=today(); if(v==="approved" && !$("#fPcv",el).value){ $("#fPcv",el).placeholder="e.g. Recommended approval, 5–0"; $("#fPcv",el).focus(); } if(v==="annexed" && !$("#fCv",el).value) $("#fCv",el).placeholder="e.g. Approved 5–0"; };
+    $("#fSaveP",el).onclick=async()=>{
+      this.syncFormFromDom(); const F=this.form;
+      if(!F.name && !F.address){ toast("Give it a name or an address"); $("#fName",el).focus(); return; }
+      if(!F.geometry && !F.ppin && !F.parcel_number){ toast("Set a location, or enter a PPIN or parcel number"); return; }
+      if(!F.geometry){ const f=findParcel(F.ppin,F.parcel_number); if(f) F.geometry=JSON.stringify(f.geometry); }
+      const row=Object.assign({},F); delete row._new;
+      const btn=$("#fSaveP",el); btn.disabled=true; btn.textContent="Saving…";
+      try{ await Store.upsert(row); toast(F._new?"Property added to the map":"Changes saved"); const id=row.id; this.exitForm(); selectProp(id,true); }
+      catch(e){ toast("Couldn't save: "+e.message,5000); btn.disabled=false; btn.textContent="Save property"; }
+    };
+  },
+};
+function findParcel(ppin,pn){ let hit=null; if(!parcelLayer) return null; parcelLayer.eachLayer(l=>{ if(hit) return; const p=P(l.feature); if((ppin&&p.ppin===String(ppin))||(pn&&p.parcel===String(pn))) hit=l.feature; }); return hit; }
+const COLUMNS=["id","kind","name","address","ppin","parcel_number","owner","acreage","current_zone","requested_zone","status","application_no","submitted_date","pc_date","pc_vote","council_date","council_vote","decision_date","ordinance_no","notes","public","lat","lng","geometry","source","updated_at","updated_by"];
+function toCSV(rows){ const q=v=>{ v=v==null?"":String(v); return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }; return [COLUMNS.join(","),...rows.map(r=>COLUMNS.map(c=>q(r[c])).join(","))].join("\r\n"); }
+$("#adminBtn").onclick=()=>Admin.open();
+
+/* rows without geometry: place on the matching parcel, or on lat/lng columns */
+function hydrateRows(rows){ rows.forEach(r=>{ if(geomOf(r)) return; if(r.lat && r.lng && !isNaN(+r.lat)){ r.geometry=JSON.stringify({type:"Point",coordinates:[+r.lng,+r.lat]}); return; } const f=findParcel(r.ppin,r.parcel_number); if(f) r.geometry=JSON.stringify(f.geometry); }); }
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+Store.on(rows=>{ hydrateRows(rows); renderPropLayer(); buildIndex(); if(!Admin.form) renderPanel(); if(!$("#admin").hidden) Admin.render(); applyHash(); });
+let hashApplied=false;
+function applyHash(){
+  if(hashApplied) return; const h=decodeURIComponent(location.hash.slice(1)); if(!h) { hashApplied=true; return; }
+  if(h==="staff"){ hashApplied=true; Admin.open(); return; }
+  if(h.startsWith("a-")){ if(Store.mode==="loading") return; hashApplied=true; selectProp(h.slice(2),true); return; }
+  if(h.startsWith("p-")){ hashApplied=true; const k=h.slice(2); const f=findParcel(k,k); if(f) selectParcel(f,true); }
+}
+(async function boot(){
+  if(Admin.unlocked) $("#adminBtn .lbl").textContent="Dashboard";
+  setBasemap(State.basemap);
+  if(State.layers.flood) floodLayer.addTo(map);
+  setTimeout(()=>{ if(State.tilesOk===null && tileOk===0){ State.tilesOk=false; onTilesDecided(); } },6000);
+  for(let i=0;i<80 && $("#map").clientWidth<50;i++) await new Promise(r=>setTimeout(r,100));
+  map.invalidateSize();
+  if(isMobile()){ setSheet("peek"); qEl.placeholder="Address, owner or PPIN"; }
+  await loadMapData();
+  if(!location.hash){ const b=limitsLayer.getBounds(); if(b.isValid() && $("#map").clientWidth>=50) map.fitBounds(b,Object.assign({maxZoom:17},fitPad())); }
+  renderPanel(); applyHash();
+  await Store.init();
+  renderPanel();
+})();
+</script>
+
+</body>
+</html>

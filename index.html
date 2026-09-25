@@ -795,7 +795,7 @@ function buildLabels(){
   labelLayer.clearLayers();
   if(!State.layers.labels || map.getZoom()<17 || !parcelLayer) return;
   const b=map.getBounds().pad(.1); let n=0;
-  parcelLayer.eachLayer(l=>{ if(n>400) return; const c=l.getBounds().getCenter(); if(!b.contains(c)) return; const p=P(l.feature); const num=(p.address.match(/^\d+/)||[""])[0]; if(!num) return; n++;
+  parcelLayer.eachLayer(l=>{ if(n>400) return; const c=l.getBounds().getCenter(); if(!b.contains(c)) return; const p=P(l.feature); const num=(p.address.match(/^(\d+)\s/)||["",""])[1]; if(!num) return; n++;
     labelLayer.addLayer(L.marker(c,{interactive:false,icon:L.divIcon({className:"",html:'<div class="plabel" style="transform:translate(-50%,-50%)">'+esc(num)+'</div>',iconSize:[0,0]})})); });
 }
 map.on("zoomend moveend",()=>{ buildLabels(); if(parcelLayer && map._lastZ!==map.getZoom()){ map._lastZ=map.getZoom(); parcelLayer.setStyle(parcelStyle);} });

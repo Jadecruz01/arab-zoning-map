@@ -1636,7 +1636,7 @@ const View3D = {
   },
   refresh(){ if(!this.map||!this.map.getSource("annex")) return; this.map.getSource("annex").setData(this.annexFC()); },
   apply(){
-    const m=this.map, o=this.opts; if(!m||!m.isStyleLoaded()) return;
+    const m=this.map, o=this.opts; if(!m||!m.getLayer("z-fill")) return;
     const vis=(id,on)=>{ if(m.getLayer(id)) m.setLayoutProperty(id,"visibility",on?"visible":"none"); };
     vis("sat",o.base==="sat"); vis("light",o.base==="light");
     vis("bldg",o.buildings); vis("z-fill",State.layers.zoning); vis("z-line",State.layers.parcels); vis("limits",State.layers.limits);

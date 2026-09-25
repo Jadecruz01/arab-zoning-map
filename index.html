@@ -1165,8 +1165,8 @@ function renderLayersTab(el){
     '<div class="section"><h3>Annexation status</h3><div class="legend">'+STATUSES.map(s=>'<div class="lg" style="cursor:default"><span class="sq" style="background:color-mix(in srgb,'+s.color+' 30%,transparent);border:2px '+(s.key==="annexed"?"solid":"dashed")+' '+s.color+'"></span><span>'+esc(s.label)+'</span></div>').join("")+'</div></div>';
   $$("[data-layer]",el).forEach(i=>i.onchange=()=>setLayer(i.dataset.layer,i.checked));
   $$("[data-bm]",el).forEach(b=>b.onclick=()=>setBasemap(b.dataset.bm));
-  $$("[data-z]",el).forEach(b=>b.onclick=()=>{ const z=b.dataset.z; State.zoneOn[z]=!State.zoneOn[z]; b.setAttribute("aria-pressed",State.zoneOn[z]); restyleParcels(); });
-  $("#op",el).oninput=e=>{ State.opacity=+e.target.value; lsSet("arabmap.opacity",State.opacity); restyleParcels(); };
+  $$("[data-z]",el).forEach(b=>b.onclick=()=>{ const z=b.dataset.z; State.zoneOn[z]=!State.zoneOn[z]; b.setAttribute("aria-pressed",State.zoneOn[z]); restyleParcels(); if(View3D.on) View3D.apply(); });
+  $("#op",el).oninput=e=>{ State.opacity=+e.target.value; lsSet("arabmap.opacity",State.opacity); restyleParcels(); if(View3D.on) View3D.apply(); };
 }
 function setLayer(id,on){
   State.layers[id]=on; lsSet("arabmap.layers",State.layers);
@@ -1176,7 +1176,7 @@ function setLayer(id,on){
   if(id==="limits") on? limitsLayer.addTo(map) : map.removeLayer(limitsLayer);
   if(id==="gas") on? gasLayer.addTo(map) : map.removeLayer(gasLayer);
   if(id==="flood") on? floodLayer.addTo(map) : map.removeLayer(floodLayer);
-  if(View3D.on) View3D.apply();
+  if(View3D.on){ View3D.apply(); View3D.renderCtl(); }
 }
 
 function renderAnnexTab(el){
@@ -1639,7 +1639,8 @@ const View3D = {
     const m=this.map, o=this.opts; if(!m||!m.isStyleLoaded()) return;
     const vis=(id,on)=>{ if(m.getLayer(id)) m.setLayoutProperty(id,"visibility",on?"visible":"none"); };
     vis("sat",o.base==="sat"); vis("light",o.base==="light");
-    vis("bldg",o.buildings); ["z-fill","z-line"].forEach(id=>vis(id,o.zoning)); vis("limits",State.layers.limits); ["a-fill","a-pt"].forEach(id=>vis(id,State.layers.annex));
+    vis("bldg",o.buildings); vis("z-fill",State.layers.zoning); vis("z-line",State.layers.parcels); vis("limits",State.layers.limits);
+    if(m.getLayer("z-fill")){ const onZ=Object.keys(ZONES).filter(z=>z!=="X" && State.zoneOn[z]!==false); m.setFilter("z-fill",["all",["!=",["get","_z"],"X"],["in",["get","_z"],["literal",onZ]]]); m.setPaintProperty("z-fill","fill-opacity",Math.min(.85,State.opacity+.1)); } ["a-fill","a-pt"].forEach(id=>vis(id,State.layers.annex));
     try{ m.setTerrain(o.terrain?{source:"dem",exaggeration:+o.exag}:null); }catch(e){}
     vis("hill",o.terrain);
     this.save();
@@ -1690,7 +1691,7 @@ const View3D = {
     const el=$("#ctl3d"); if(!this.on){ el.hidden=true; return; }
     const o=this.opts, chip=(k,l)=>'<button class="chip" data-o="'+k+'" aria-pressed="'+!!o[k]+'">'+l+'</button>';
     el.innerHTML='<div class="c3-row"><div class="seg"><button data-base="sat" aria-pressed="'+(o.base==="sat")+'">Satellite</button><button data-base="light" aria-pressed="'+(o.base==="light")+'">Light</button></div>'+
-      chip("buildings","3D buildings")+chip("terrain","Hills")+chip("zoning","Zoning")+'</div>'+
+      chip("buildings","3D buildings")+chip("terrain","Hills")+'<button class="chip" data-zon aria-pressed="'+!!State.layers.zoning+'">Zoning</button>'+'</div>'+
       '<div class="c3-row"><button class="btn sm primary" id="c3Tour">'+(this.touring?"Stop tour":"▶ Fly-over tour")+'</button><button class="btn sm" id="c3Orbit" aria-pressed="'+this.orbiting+'">'+(this.orbiting?"Stop rotating":"Rotate")+'</button>'+
       '<label class="c3-ex">Hills ×<b>'+(+o.exag).toFixed(1)+'</b><input type="range" id="c3Ex" min="1" max="4" step="0.1" value="'+o.exag+'"'+(o.terrain?'':' disabled')+' aria-label="Hill exaggeration"></label><button class="btn sm ghost" id="c3Exit">Exit 3D</button></div>'+
       (this.stopLabel?'<div class="c3-now">'+esc(this.stopLabel)+'</div>':'')+
@@ -1698,6 +1699,7 @@ const View3D = {
     el.hidden=false;
     $$("[data-base]",el).forEach(b=>b.onclick=()=>{ o.base=b.dataset.base; this.apply(); this.renderCtl(); });
     $$("[data-o]",el).forEach(b=>b.onclick=()=>{ o[b.dataset.o]=!o[b.dataset.o]; this.apply(); this.renderCtl(); });
+    $("[data-zon]",el).onclick=()=>{ setLayer("zoning",!State.layers.zoning); this.renderCtl(); if(State.tab==="layers") renderPanel(); };
     $("#c3Tour",el).onclick=()=>this.tour();
     $("#c3Orbit",el).onclick=()=>this.orbit();
     $("#c3Exit",el).onclick=()=>this.exit();

@@ -104,7 +104,7 @@ svg.leaflet-zoom-animated{will-change:transform}
 /* ---------- App ---------- */
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
@@ -151,7 +151,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .ptab{flex:1;height:34px;border:0;border-radius:8px;background:none;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .ptab[aria-selected="true"]{background:var(--surface-2);color:var(--ink)}
 .ptab .cnt{font:600 11px var(--mono);background:var(--gold);color:#1A1400;border-radius:999px;padding:0 6px}
-.pbody{flex:1 1 auto;overflow:auto;padding:16px}
+.pbody{flex:1 1 auto;overflow:auto;padding:16px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .handle{display:none}
 .collapse-btn{position:absolute;z-index:1001;top:16px;left:404px;width:28px;height:44px;border-radius:0 8px 8px 0;border:1px solid var(--line);border-left:0;background:var(--surface);box-shadow:var(--shadow);cursor:pointer;display:grid;place-items:center;color:var(--ink-soft);transition:left .25s ease}
 .collapse-btn.out{left:0}
@@ -382,7 +382,10 @@ body.is3d .leaflet-control-container, body.is3d .coords, body.is3d #tPin, body.i
   .panel.sheet-full{height:calc(100% - 10px)}
   .stage:has(.panel.sheet-full) .rail{visibility:hidden}
   .collapse-btn{display:none}
-  .handle{display:block;width:100%;height:22px;border:0;padding:0;background:none;cursor:pointer;flex:0 0 auto;position:relative}
+  body{position:fixed;inset:0;width:100%}
+  .handle{display:block;width:100%;height:26px;border:0;padding:0;background:none;cursor:grab;flex:0 0 auto;position:relative;touch-action:none}
+  .panel-tabs{touch-action:none}
+  .panel.dragging{transition:none}
   .handle::after{content:"";position:absolute;left:50%;top:9px;width:40px;height:4px;margin-left:-20px;border-radius:2px;background:var(--line-strong)}
   .panel-tabs{padding:0 6px 6px}
   .ptab{height:32px;font-size:12.5px}
@@ -707,8 +710,8 @@ const Auth = {
   token: lsGet("arabmap.token",null), user:null, ready:false,
   enabled(){ return !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY); },
   can(min){ return !!this.user && (RANK[this.user.role]||0) >= RANK[min]; },
-  async restore(){ this.ready=true; if(!this.enabled()||!this.token) return; try{ this.user=await sbRpc("zm_me",{p_token:this.token}); }catch(e){ this.clear(); } },
-  async login(name,pw){ const r=await sbRpc("pm_staff_login",{p_username:name,p_password:pw}); if(!r||!r.ok) throw new Error(r&&r.error==="locked"?"Too many tries. Wait 15 minutes and try again.":"That username and password don't match."); this.token=r.token; this.user={username:r.username,role:r.role,full_name:r.full_name}; lsSet("arabmap.token",r.token); },
+  async restore(){ this.ready=true; if(!this.enabled()||!this.token) return; if(isPhone()){ this.user=null; return; } try{ this.user=await sbRpc("zm_me",{p_token:this.token}); }catch(e){ this.clear(); } },
+  async login(name,pw){ if(isPhone()) throw new Error("Staff sign-in works on a computer or iPad."); const r=await sbRpc("pm_staff_login",{p_username:name,p_password:pw}); if(!r||!r.ok) throw new Error(r&&r.error==="locked"?"Too many tries. Wait 15 minutes and try again.":"That username and password don't match."); this.token=r.token; this.user={username:r.username,role:r.role,full_name:r.full_name}; lsSet("arabmap.token",r.token); },
   async logout(){ if(this.token){ try{ await sbRpc("pm_staff_logout",{p_token:this.token}); }catch(e){} } this.clear(); },
   clear(){ this.token=null; this.user=null; lsSet("arabmap.token",null); updateStaffBtn(); },
 };
@@ -1028,13 +1031,39 @@ function setHash(h){ try{ history.replaceState(null,"",h?"#"+h:location.pathname
 function openTab(t){ if(Admin.form && State.tab==="property" && t!=="property") Admin.syncFormFromDom(); State.tab=t; $$(".ptab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t)); setPanelOpen(true); renderPanel(); }
 $("#ptabs").addEventListener("click",e=>{ const b=e.target.closest(".ptab"); if(b) openTab(b.dataset.tab); });
 const isMobile = () => window.innerWidth<=720;
+/* Phones can't sign in (iPads and computers can). iPadOS reports a desktop Mac user agent, so check touch points too. */
+function isPhone(){ const ua=navigator.userAgent||""; if(/iPad/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints>1)) return false;
+  if(/iPhone|iPod|Windows Phone|Android.+Mobile/i.test(ua)) return true;
+  return !!(window.matchMedia && matchMedia("(pointer:coarse)").matches && Math.min(screen.width,screen.height)<600); }
 function setSheet(st){ const p=$("#panel"); p.classList.remove("sheet-peek","sheet-half","sheet-full"); p.classList.add("sheet-"+st); State.sheet=st; const sh=$("#stage").clientHeight; document.documentElement.style.setProperty("--sheet-h", Math.round(st==="peek"?96:st==="half"?sh*0.48:sh-10)+"px"); $("#handle").setAttribute("aria-label",st==="full"?"Shrink panel":"Expand panel"); }
 function sheetHeight(){ return isMobile() ? $("#panel").getBoundingClientRect().height : 0; }
 function fitPad(){ if(isMobile()){ const h=({peek:96,half:window.innerHeight*0.48,full:window.innerHeight*0.48})[State.sheet||"half"]; return {paddingTopLeft:[24,24],paddingBottomRight:[24,Math.round(h)+24]}; } return {paddingTopLeft:panelPad(),paddingBottomRight:[60,60]}; }
 function flyPoint(ll,z){ const pad=fitPad(); const dx=(pad.paddingTopLeft[0]-pad.paddingBottomRight[0])/2, dy=(pad.paddingTopLeft[1]-pad.paddingBottomRight[1])/2; const c=map.unproject(map.project(ll,z).subtract([dx,dy]),z); map.flyTo(c,z); }
 function setPanelOpen(open){ if(isMobile()){ setSheet(open ? (State.sheet==="full"?"full":"half") : "peek"); return; } $("#panel").classList.toggle("collapsed",!open); $("#collapseBtn").classList.toggle("out",!open); $("#collapseBtn").setAttribute("aria-label",open?"Hide panel":"Show panel"); }
 $("#collapseBtn").onclick=()=>setPanelOpen($("#panel").classList.contains("collapsed"));
-$("#handle").onclick=()=>setSheet(({peek:"half",half:"full",full:"peek"})[State.sheet||"half"]);
+$("#handle").onclick=()=>{ if($("#panel")._justDragged) return; setSheet(({peek:"half",half:"full",full:"peek"})[State.sheet||"half"]); };
+/* Bottom sheet: follow the finger while dragging the handle or tab strip, then snap to peek / half / full. */
+(function(){
+  const p=$("#panel"); let dragging=false, moved=false, startY=0, startH=0, lastY=0, lastT=0, vel=0;
+  const snaps=()=>{ const sh=$("#stage").clientHeight; return {peek:96, half:sh*0.48, full:sh-10}; };
+  const pt=e=>(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;
+  function down(e){ if(!isMobile()) return; const t=pt(e); startY=lastY=t.clientY; lastT=performance.now(); startH=p.getBoundingClientRect().height; dragging=true; moved=false; vel=0; }
+  function move(e){ if(!dragging) return; const t=pt(e), dy=startY-t.clientY;
+    if(!moved){ if(Math.abs(dy)<6) return; moved=true; p.classList.add("dragging"); }
+    const s=snaps(); p.style.height=Math.max(s.peek,Math.min(s.full,startH+dy))+"px";
+    const now=performance.now(); vel=(lastY-t.clientY)/Math.max(1,now-lastT); lastY=t.clientY; lastT=now;
+    if(e.cancelable) e.preventDefault(); }
+  function up(){ if(!dragging) return; dragging=false; if(!moved) return;
+    const h=p.getBoundingClientRect().height, s=snaps(); p.classList.remove("dragging"); p.style.height="";
+    let st; if(vel>0.45) st = h<s.half ? "half" : "full"; else if(vel<-0.45) st = h>s.half ? "half" : "peek";
+    else st=Object.keys(s).reduce((a,k)=>Math.abs(s[k]-h)<Math.abs(s[a]-h)?k:a,"half");
+    setSheet(st); p._justDragged=true; setTimeout(()=>{ p._justDragged=false; },350); }
+  [$("#handle"),$("#ptabs")].forEach(el=>{ el.addEventListener("touchstart",down,{passive:true}); el.addEventListener("pointerdown",e=>{ if(e.pointerType==="mouse") down(e); }); });
+  window.addEventListener("touchmove",move,{passive:false}); window.addEventListener("touchend",up); window.addEventListener("touchcancel",up);
+  window.addEventListener("pointermove",e=>{ if(e.pointerType==="mouse") move(e); }); window.addEventListener("pointerup",e=>{ if(e.pointerType==="mouse") up(); });
+  $("#ptabs").addEventListener("click",e=>{ if(p._justDragged){ e.stopImmediatePropagation(); e.preventDefault(); } },true);
+  window.addEventListener("resize",()=>{ if(isMobile()) setSheet(State.sheet||"half"); });
+})();
 
 function matchRowForParcel(p){ return visibleRows().find(r => (p.ppin && String(r.ppin)===p.ppin) || (p.parcel && String(r.parcel_number)===p.parcel)); }
 function trackerHTML(r){
@@ -1286,6 +1315,7 @@ const Admin = {
     ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),users:()=>this.rUsers(body),account:()=>this.rSetPassword(body,false)})[this.tab]();
   },
   rLogin(el){
+    if(isPhone()){ el.innerHTML='<div class="admin-in"><div class="gate"><p class="eyebrow">Building Department</p><h2>Use a computer or iPad</h2><p class="sub">Staff sign-in isn\'t available on phones. Open this map on a computer or iPad to sign in. Everything else on the map works here.</p><div class="btnrow" style="margin-top:14px"><button class="btn primary" id="gBack" type="button">Back to map</button></div></div></div>'; $("#gBack").onclick=()=>this.close(); return; }
     el.innerHTML='<div class="admin-in"><form class="gate" id="lgForm" autocomplete="on"><p class="eyebrow">Building Department</p><h2>Staff sign-in</h2><p class="sub">Use your permit checker login. Changes you make here are saved for everyone.</p>'+
       '<div class="field" style="margin-bottom:10px"><label for="lgEmail">Username</label><input id="lgEmail" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>'+
       '<div class="field" style="margin-bottom:6px"><label for="lgPw">Password</label><input id="lgPw" type="password" autocomplete="current-password" required></div>'+
@@ -1688,7 +1718,7 @@ function applyHash(){
   if(h.startsWith("p-")){ hashApplied=true; const k=h.slice(2); const f=findParcel(k,k); if(f) selectParcel(f,true); }
 }
 (async function boot(){
-  await Auth.restore(); updateStaffBtn();
+  await Auth.restore(); updateStaffBtn(); if(isPhone() && Auth.enabled()) $("#adminBtn").hidden=true;
   setBasemap(State.basemap);
   if(State.layers.flood) floodLayer.addTo(map);
   setTimeout(()=>{ if(State.tilesOk===null && tileOk===0){ State.tilesOk=false; onTilesDecided(); } },6000);

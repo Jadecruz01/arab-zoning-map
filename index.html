@@ -798,7 +798,7 @@ const geomOf = r => { try{ return typeof r.geometry==="string" ? (r.geometry? JS
    ===================================================================== */
 const map = L.map("map",{zoomControl:false, attributionControl:true, minZoom:11, maxZoom:20, zoomSnap:0.5, preferCanvas:false}).setView(CONFIG.CENTER, CONFIG.ZOOM);
 L.control.scale({imperial:true,metric:false,position:"bottomleft"}).addTo(map);
-map.attributionControl.setPrefix('<span class="credit">Designed by Jade Cruz</span> · <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+map.attributionControl.setPrefix('<span class="credit">Designed &amp; built by Collins Alexander (Pending Business License)</span> · <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
 map.createPane("limitsPane").style.zIndex=410;
 map.createPane("parcelPane").style.zIndex=420;
 map.createPane("floodPane").style.zIndex=415;
@@ -1694,7 +1694,7 @@ const View3D = {
       '<div class="c3-row"><button class="btn sm primary" id="c3Tour">'+(this.touring?"Stop tour":"▶ Fly-over tour")+'</button><button class="btn sm" id="c3Orbit" aria-pressed="'+this.orbiting+'">'+(this.orbiting?"Stop rotating":"Rotate")+'</button>'+
       '<label class="c3-ex">Hills ×<b>'+(+o.exag).toFixed(1)+'</b><input type="range" id="c3Ex" min="1" max="4" step="0.1" value="'+o.exag+'"'+(o.terrain?'':' disabled')+' aria-label="Hill exaggeration"></label><button class="btn sm ghost" id="c3Exit">Exit 3D</button></div>'+
       (this.stopLabel?'<div class="c3-now">'+esc(this.stopLabel)+'</div>':'')+
-      '<div class="c3-attr">Designed by Jade Cruz · MapLibre · Imagery © Esri, Maxar · © OpenStreetMap, OpenFreeMap · Terrain: AWS Terrain Tiles</div>';
+      '<div class="c3-attr">Designed &amp; built by Collins Alexander (Pending Business License) · MapLibre · Imagery © Esri, Maxar · © OpenStreetMap, OpenFreeMap · Terrain: AWS Terrain Tiles</div>';
     el.hidden=false;
     $$("[data-base]",el).forEach(b=>b.onclick=()=>{ o.base=b.dataset.base; this.apply(); this.renderCtl(); });
     $$("[data-o]",el).forEach(b=>b.onclick=()=>{ o[b.dataset.o]=!o[b.dataset.o]; this.apply(); this.renderCtl(); });

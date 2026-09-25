@@ -200,11 +200,13 @@ dl.kv dd{margin:0;font-weight:500;text-align:right;overflow-wrap:anywhere}
 .zkey{margin-top:22px;text-align:left}
 .zkey h3{margin:0 0 8px}
 .zkey ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
-.zkey li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink);line-height:1.2;min-width:0}
-.zkey .sw{flex:0 0 16px;height:16px;border-radius:4px;border:1px solid rgba(0,0,0,.18)}
+.zkey li{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--ink);line-height:1.25;min-width:0}
+.zkey .sw{flex:0 0 16px;height:16px;margin-top:-1px;border-radius:4px;border:1px solid rgba(0,0,0,.18)}
 .zkey code{font:600 11px var(--mono);color:var(--ink-soft);flex:0 0 auto}
-.zkey span.n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zkey span.n{min-width:0}
+.zkey code{min-width:30px}
 .zkey .more{margin-top:10px;font-size:12px}
+.zkey .more a{color:var(--navy-2);font-weight:600}
 .pclose{float:right;margin:-4px -4px 0 8px;width:36px;height:36px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink-soft);cursor:pointer;display:grid;place-items:center}
 .pclose:hover{background:var(--surface-2);border-color:var(--line)}
 .pclose svg{width:18px;height:18px}
@@ -855,9 +857,10 @@ floodLayer.on("tileerror",()=>{ if(State.layers.flood && !floodLayer._warned){ f
 
 /* parcels */
 let parcelData=null, parcelLayer=null, labelLayer=L.layerGroup(), limitsLayer=null, gasLayer=null, gasData=null, limitsData=null;
+const cleanV = v => { v=String(v??"").trim(); return (/^(null|none|0)$/i.test(v) || /^[,\s]*$/.test(v) || /\bnull\b/i.test(v)) ? "" : v; };
 const P = f => { const p=f.properties||{}; const g=k=>p[k]??p[k.toLowerCase()]??""; return {
-  zone:zoneOf(g("ZONE")||g("ZONING")), ppin:String(g("PROPPIN")||g("PPIN")||""), parcel:String(g("PARCELNUMB")||g("PARCEL")||g("PIN")||""),
-  owner:String(g("OWNER")||""), address:String(g("PROPADDR")||g("ADDRESS")||"").replace(/^0\s+/,""), mail:String(g("MAILADDR")||[g("MAILADD1"),g("MAILADD2"),g("MAILADD3")].filter(Boolean).join(", ")||""),
+  zone:zoneOf(g("ZONE")||g("ZONING")), ppin:cleanV(g("PROPPIN")||g("PPIN")), parcel:cleanV(g("PARCELNUMB")||g("PARCEL")||g("PIN")),
+  owner:cleanV(g("OWNER")), address:cleanV(String(g("PROPADDR")||g("ADDRESS")||"").replace(/^0\s+/,"")), mail:cleanV(g("MAILADDR")||[g("MAILADD1"),g("MAILADD2"),g("MAILADD3")].filter(Boolean).join(", ")),
   value:g("PROPVALUE"), acres:g("ACREAGE")||g("CALCACRES")||g("DEEDEDARE"), sqft:g("AREA"), limit:String(g("CITYLIMIT")||""), county:String(g("COUNTY")||""), sample:!!p.SAMPLE }; };
 function parcelStyle(f){
   const z=f._z || (f._z=P(f).zone), zd=ZONES[z], on = State.layers.zoning && State.zoneOn[z];
@@ -1062,7 +1065,7 @@ function renderPanel(){
   }
   if(s.kind==="parcel"){
     const p=P(s.feature), c=L.geoJSON(s.feature).getBounds().getCenter(), row=matchRowForParcel(p);
-    el.innerHTML = '<button class="pclose" type="button" data-clear aria-label="Close this parcel">'+ICON.close+'</button><p class="eyebrow">Parcel'+(p.sample?' · sample':'')+'</p><h2 class="ph">'+esc(p.address||"No address on file")+'</h2><p class="sub">'+esc(p.owner||"Owner not listed")+'</p>'+
+    el.innerHTML = '<button class="pclose" type="button" data-clear aria-label="Close this parcel">'+ICON.close+'</button><p class="eyebrow">Parcel'+(p.sample?' · sample':'')+'</p><h2 class="ph">'+esc(p.address||(p.zone==="X"&&!p.owner?"Street or right-of-way":"No address on file"))+'</h2><p class="sub">'+esc(p.owner||(p.zone==="X"?"Public right-of-way":"Owner not listed"))+'</p>'+
       zoneBadge(p.zone)+
       (row?'<div class="section"><h3>'+esc(KINDS[row.kind]||"Property")+' on file</h3><div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center">'+pillHTML(row.status)+'<span class="mono" style="font-size:12px;color:var(--ink-soft)">'+esc(row.application_no||"")+'</span></div>'+trackerHTML(row)+'<button class="btn sm" style="margin-top:10px" data-open-prop="'+esc(row.id)+'">View details</button></div></div>':'')+
       '<div class="section"><h3>Parcel record</h3><dl class="kv">'+
@@ -1070,7 +1073,7 @@ function renderPanel(){
         '<dt>Parcel number</dt><dd class="mono">'+esc(p.parcel||"—")+'</dd>'+
         '<dt>Acreage</dt><dd class="mono">'+fmtNum(p.acres)+' ac</dd>'+
         (p.sqft?'<dt>Area</dt><dd class="mono">'+fmtNum(p.sqft,0)+' sq ft</dd>':'')+
-        '<dt>Assessed value</dt><dd class="mono">'+fmtMoney(p.value)+'</dd>'+
+        '<dt>Assessed value</dt><dd class="mono">'+(+p.value>0?fmtMoney(p.value):"—")+'</dd>'+
         '<dt>City limits</dt><dd>'+(p.limit? (p.limit.toUpperCase()==="IN"?"Inside":"Outside"):"—")+'</dd>'+
         '<dt>Mailing address</dt><dd>'+esc(p.mail||"—")+'</dd>'+
         '<dt>Coordinates</dt><dd class="mono">'+c.lat.toFixed(5)+', '+c.lng.toFixed(5)+'</dd>'+

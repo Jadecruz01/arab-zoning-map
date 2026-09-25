@@ -690,7 +690,9 @@ map.createPane("toolPane").style.zIndex=480;
 const parcelRenderer = L.canvas({padding:0.4, pane:"parcelPane", tolerance:2});
 
 const BASEMAPS = {
-  light:{label:"Light", sw:"linear-gradient(135deg,#f3f3f1,#dfe3e8)", make:()=>L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:20,maxNativeZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'})},
+  light:{label:"Light", sw:"linear-gradient(135deg,#f3f3f1,#dfe3e8)", make:()=>L.layerGroup([
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:16,attribution:"Esri, HERE, Garmin, &copy; OpenStreetMap contributors"}),
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:16})])},
   streets:{label:"Streets", sw:"linear-gradient(135deg,#f2efe9,#aad3df 60%,#f7c77d)", make:()=>L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:20,maxNativeZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'})},
   aerial:{label:"Aerial", sw:"linear-gradient(135deg,#3d5a36,#6e7d5a 50%,#a39b86)", make:()=>L.layerGroup([
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:19,attribution:"Imagery &copy; Esri, Maxar, Earthstar Geographics"}),

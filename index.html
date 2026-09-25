@@ -783,7 +783,7 @@ function parcelStyle(f){
   return {renderer:parcelRenderer, pane:"parcelPane",
     color: sel ? "#F2C230" : (State.layers.parcels ? (State.tilesOk===false?"#6E7A94":"#3A4660") : "transparent"),
     weight: sel ? 3.5 : (map.getZoom()>=17 ? 1 : .6), opacity: sel?1:.85,
-    fillColor: zd.color, fillOpacity: on ? State.opacity : 0};
+    fillColor: zd.color, fillOpacity: on ? (z==="X" ? 0.04 : State.opacity) : 0};
 }
 function buildParcelLayer(){
   if(parcelLayer) map.removeLayer(parcelLayer);
@@ -1427,7 +1427,7 @@ const View3D = {
     m.addSource("limits",{type:"geojson",data:limitsData||{type:"FeatureCollection",features:[]}});
     m.addSource("annex",{type:"geojson",data:this.annexFC()});
     const before=m.getLayer("bldg")?"bldg":undefined;
-    m.addLayer({id:"z-fill",type:"fill",source:"parcels",paint:{"fill-color":this.zoneExpr(),"fill-opacity":Math.min(.85,State.opacity+.1)}},before);
+    m.addLayer({id:"z-fill",type:"fill",source:"parcels",filter:["!=",["get","_z"],"X"],paint:{"fill-color":this.zoneExpr(),"fill-opacity":Math.min(.85,State.opacity+.1)}},before);
     m.addLayer({id:"z-line",type:"line",source:"parcels",minzoom:14,paint:{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],14,.3,18,1.4],"line-opacity":.8}},before);
     m.addLayer({id:"z-sel",type:"line",source:"parcels",filter:["==",["get","_i"],-1],paint:{"line-color":"#F2C230","line-width":4}},before);
     m.addLayer({id:"limits",type:"line",source:"limits",paint:{"line-color":"#F2C230","line-width":3,"line-dasharray":[3,2]}},before);

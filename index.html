@@ -299,7 +299,14 @@ pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:
 .gate{max-width:440px;margin:10vh auto 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
 .gate h2{font:700 22px var(--serif);margin:0 0 6px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
-.drop{border:2px dashed var(--line-strong);border-radius:12px;padding:22px;text-align:center;color:var(--ink-soft);background:var(--surface-2)}
+.drop{display:block;cursor:pointer;border:2px dashed var(--line-strong);border-radius:12px;padding:20px 16px;text-align:center;color:var(--ink-soft);background:var(--surface-2)}
+.drop svg{display:block;width:28px;height:28px;margin:0 auto;color:var(--navy-2)}
+.drop:hover{border-color:var(--navy-2)}
+.lyr{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.lyr:last-of-type{border-bottom:0}
+.lyr .ln{flex:1;min-width:160px}
+.lyr .ln b{display:block;font-size:13.5px}
+.lyr .ln span{font-size:12px;color:var(--ink-soft)}
 .drop.over{border-color:var(--navy-2);background:var(--info-bg)}
 
 /* 3D view */
@@ -813,7 +820,9 @@ async function loadMapData(){
   parcelData = pi || pf || buildSampleParcels(); State.sample.parcels = !(pi||pf);
   limitsData = li || lf || buildSampleLimits(); State.sample.limits = !(li||lf);
   gasData = gi || gf || buildSampleGas(); State.sample.gas = !(gi||gf);
-  State.sourceNote = {parcels: pi?"imported in this browser":pf?CONFIG.DATA_FILES.parcels:"sample", limits: li?"imported in this browser":lf?CONFIG.DATA_FILES.limits:"sample", gas: gi?"imported in this browser":gf?CONFIG.DATA_FILES.gas:"sample"};
+  const nt=(i,f,path)=> i ? (i.features&&i.features.length?"Imported in this browser":"Removed in this browser") : f ? "From "+path : "Sample data";
+  State.sourceNote = {parcels:nt(pi,pf,CONFIG.DATA_FILES.parcels), limits:nt(li,lf,CONFIG.DATA_FILES.limits), gas:nt(gi,gf,CONFIG.DATA_FILES.gas)};
+  if(State.selected && State.selected.kind==="parcel") State.selected=null;
   buildParcelLayer(); buildLimits(); buildGas();
 }
 
@@ -1215,14 +1224,18 @@ const Admin = {
   },
   rParcels(b){
     const src=State.sourceNote||{};
-    b.innerHTML='<div class="grid2" style="margin-top:0"><div class="box"><h3>Map data sources</h3><dl class="kv" style="font-size:13px">'+
-      '<dt>Parcels &amp; zoning</dt><dd>'+esc(src.parcels||"—")+'</dd><dt>City limits</dt><dd>'+esc(src.limits||"—")+'</dd><dt>Gas lines</dt><dd>'+esc(src.gas||"—")+'</dd><dt>Parcels loaded</dt><dd class="mono">'+(parcelData?parcelData.features.length.toLocaleString():"0")+'</dd></dl>'+
-      '<p class="sub" style="margin-top:14px">The live site reads these from the <code>data/</code> folder next to the page. Import a file here to preview it on your map, then download it and commit it to the site\'s <code>data/</code> folder so every visitor sees it.</p>'+
-      '<div class="btnrow"><button class="btn" data-dl="parcels">'+ICON.down+'Download parcels.geojson</button><button class="btn" data-dl="limits">'+ICON.down+'city-limits.geojson</button><button class="btn" data-dl="gas">'+ICON.down+'gas-lines.geojson</button></div></div>'+
+    const cnt={parcels:parcelData,limits:limitsData,gas:gasData};
+    const LAYERS=[["parcels","Parcels & zoning"],["limits","City limits"],["gas","Gas lines"]];
+    const row=([k,l])=>{ const n=cnt[k]?cnt[k].features.length:0; const note=src[k]||"—"; return '<div class="lyr"><div class="ln"><b>'+esc(l)+'</b><span>'+esc(note)+' · '+n.toLocaleString()+' feature'+(n===1?'':'s')+'</span></div><div class="btnrow">'+
+      '<button class="btn sm" data-dl="'+k+'" title="Download">'+ICON.down+'Download</button>'+
+      (note.indexOf("this browser")>=0?'<button class="btn sm" data-restore="'+k+'">Restore default</button>':'')+
+      (n?'<button class="btn sm danger" data-remove="'+k+'">Remove from map</button>':'')+'</div></div>'; };
+    b.innerHTML='<div class="grid2" style="margin-top:0"><div class="box"><h3>Map layers</h3>'+LAYERS.map(row).join("")+
+      '<p class="sub" style="margin-top:14px">Changes here apply to this browser only. For every visitor, the live site reads <code>data/parcels.geojson</code>, <code>data/city-limits.geojson</code> and <code>data/gas-lines.geojson</code> from the site folder: download a layer here and commit it there, or commit an empty file to remove a layer for everyone.</p></div>'+
       '<div class="box"><h3>Import a map layer</h3><div class="field" style="margin-bottom:10px"><label for="impKind">Layer</label><select id="impKind"><option value="parcels">Parcels &amp; zoning</option><option value="limits">City limits</option><option value="gas">Gas lines</option></select></div>'+
       '<label class="drop" id="drop" for="impFile">'+ICON.up+'<div style="margin-top:6px"><b>Choose a GeoJSON file</b> or drop it here</div><div style="font-size:12px;margin-top:4px">WGS84 (EPSG:4326). Shapefile or KML? Convert it at mapshaper.org first.</div></label><input type="file" id="impFile" accept=".geojson,.json,application/geo+json,application/json" hidden>'+
       '<p class="sub" style="margin-top:10px;font-size:12px">Parcel files exported from the current Greenstone map keep their field names (ZONE, PARCELNUMB, OWNER, PROPPIN, PROPADDR, PROPVALUE, ACREAGE, MAILADD1…) and are read automatically.</p>'+
-      '<div class="btnrow"><button class="btn danger" id="impReset">Go back to the built-in data</button></div></div></div>';
+      '</div></div>';
     const handle=async file=>{
       if(!file) return; const kind=$("#impKind",b).value;
       try{ const j=JSON.parse(await file.text()); const fc = j.type==="FeatureCollection"? j : j.type==="Feature"? {type:"FeatureCollection",features:[j]} : null; if(!fc || !fc.features.length) throw new Error("No features found in that file");
@@ -1233,7 +1246,8 @@ const Admin = {
     };
     $("#impFile",b).onchange=e=>handle(e.target.files[0]);
     const d=$("#drop",b); d.ondragover=e=>{e.preventDefault(); d.classList.add("over");}; d.ondragleave=()=>d.classList.remove("over"); d.ondrop=e=>{ e.preventDefault(); d.classList.remove("over"); handle(e.dataTransfer.files[0]); };
-    $("#impReset",b).onclick=async()=>{ await idbSet("parcels",null); await idbSet("limits",null); await idbSet("gas",null); await loadMapData(); toast("Using built-in data"); this.rParcels(b); };
+    $$("[data-remove]",b).forEach(x=>x.onclick=async()=>{ const k=x.dataset.remove; await idbSet(k,{type:"FeatureCollection",features:[]}); await loadMapData(); renderPanel(); toast("Removed from the map in this browser"); this.rParcels(b); });
+    $$("[data-restore]",b).forEach(x=>x.onclick=async()=>{ const k=x.dataset.restore; await idbSet(k,null); await loadMapData(); renderPanel(); toast("Restored the default layer"); this.rParcels(b); });
     $$("[data-dl]",b).forEach(x=>x.onclick=()=>{ const k=x.dataset.dl; const data={parcels:parcelData,limits:limitsData,gas:gasData}[k]; saveFile(CONFIG.DATA_FILES[k].split("/").pop(), JSON.stringify(data), "application/geo+json"); });
   },
   rFeed(b){

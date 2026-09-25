@@ -477,6 +477,9 @@ const CONFIG = {
     gas: "data/gas-lines.geojson",
   },
   PERMIT_SITE: "https://arabcitypermitchecker.starsonn.com/",
+  // Staff sign-in + shared storage (Supabase). Paste the project's publishable key to turn logins on.
+  SUPABASE_URL: "https://yighcuismepfmappcfui.supabase.co",
+  SUPABASE_KEY: "",
 };
 
 /* ---------------- Zoning districts (Ordinance 2016-3, colors from the current city map) ---------------- */
@@ -645,6 +648,31 @@ function sampleProperties(){
 }
 
 /* =====================================================================
+   STAFF SIGN-IN (Supabase, shared with the permit checker project)
+   ===================================================================== */
+const RANK={viewer:1,editor:2,admin:3,super_admin:4};
+const ROLE_LABEL={super_admin:"Super admin",admin:"Admin",editor:"Editor",viewer:"Viewer"};
+async function sbRpc(fn,args){
+  const r=await fetch(CONFIG.SUPABASE_URL.replace(/\/$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",headers:{"apikey":CONFIG.SUPABASE_KEY,"Authorization":"Bearer "+CONFIG.SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify(args||{})});
+  const txt=await r.text(); let j=null; try{ j=txt?JSON.parse(txt):null; }catch(e){}
+  if(!r.ok){ const msg=(j&&(j.message||j.hint))||("Server error "+r.status); if(/session has expired/i.test(msg) && Auth.user){ Auth.clear(); toast("Your session expired. Sign in again."); } throw new Error(msg); }
+  return j;
+}
+const Auth = {
+  token: lsGet("arabmap.token",null), user:null, ready:false,
+  enabled(){ return !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY); },
+  can(min){ return !!this.user && (RANK[this.user.role]||0) >= RANK[min]; },
+  async restore(){ this.ready=true; if(!this.enabled()||!this.token) return; try{ this.user=await sbRpc("zm_me",{p_token:this.token}); }catch(e){ this.clear(); } },
+  async login(email,pw){ const r=await sbRpc("zm_login",{p_email:email,p_password:pw}); this.token=r.token; this.user=r.user; lsSet("arabmap.token",r.token); },
+  async logout(){ if(this.token){ try{ await sbRpc("zm_logout",{p_token:this.token}); }catch(e){} } this.clear(); },
+  clear(){ this.token=null; this.user=null; lsSet("arabmap.token",null); updateStaffBtn(); },
+};
+const canEdit = () => Auth.enabled() ? Auth.can("editor") : Admin.unlocked;
+const canAdmin = () => Auth.enabled() ? Auth.can("admin") : Admin.unlocked;
+function updateStaffBtn(){ const l=$("#adminBtn .lbl"); if(l) l.textContent = Admin.unlocked ? (Auth.user ? (Auth.user.name||Auth.user.email.split("@")[0]) : "Dashboard") : "Staff"; }
+function tempPassword(){ const w="abcdefghjkmnpqrstuvwxyz", d="23456789"; const a=new Uint32Array(12); crypto.getRandomValues(a); let s=""; for(let i=0;i<12;i++){ s+= i===4||i===8 ? "-" : (i%4===3 ? d[a[i]%d.length] : w[a[i]%w.length]); } return s; }
+
+/* =====================================================================
    DATA STORE — Google Sheet (live site) · preview database · this browser
    ===================================================================== */
 function getCfg(){ return Object.assign({}, CONFIG, lsGet("arabmap.cfg",{})); }
@@ -655,6 +683,12 @@ const Store = {
   async init(){
     clearInterval(this.timer);
     const cfg=getCfg(); this.error="";
+    if(Auth.enabled()){
+      try{ this.mode="cloud"; await this.pullCloud();
+        this.timer=setInterval(()=>this.pullCloud().catch(()=>{}), Math.max(15,+cfg.REFRESH_SECONDS||60)*1000);
+        return;
+      }catch(e){ this.error="Couldn't reach the map database: "+e.message; }
+    }
     if(cfg.SHEET_API){
       try{ this.mode="sheet"; await this.pullSheet();
         this.timer=setInterval(()=>this.pullSheet().catch(()=>{}), Math.max(15,+cfg.REFRESH_SECONDS||60)*1000);
@@ -676,6 +710,10 @@ const Store = {
     }
     this.mode="local"; this.rows=lsGet("arabmap.rows",null) || sampleProperties(); this.lastSync=new Date().toISOString(); this.emit();
   },
+  async pullCloud(){
+    const rows=await sbRpc("zm_list_properties",{p_token:Auth.user?Auth.token:null});
+    this.rows=(rows||[]).map(x=>Object.assign({},x,{id:String(x.id)})); this.lastSync=new Date().toISOString(); this.emit();
+  },
   async pullSheet(){
     const cfg=getCfg();
     const u = cfg.SHEET_API + (cfg.SHEET_API.includes("?")?"&":"?") + "action=list" + (Admin.unlocked && cfg.SHEET_KEY ? "&key="+encodeURIComponent(cfg.SHEET_KEY) : "");
@@ -691,16 +729,18 @@ const Store = {
   },
   async upsert(row){
     row = Object.assign({}, row, {updated_at:new Date().toISOString(), updated_by: row.updated_by || "staff"});
-    if(this.mode==="sheet"){ await this.post({action:"upsert",row}); await this.pullSheet(); }
+    if(this.mode==="cloud"){ const r=Object.assign({},row); delete r.updated_by; await sbRpc("zm_upsert_property",{p_token:Auth.token,p_row:r}); await this.pullCloud(); }
+    else if(this.mode==="sheet"){ await this.post({action:"upsert",row}); await this.pullSheet(); }
     else if(this.mode==="db"){ const {id,...data}=row; await this.db.doc("properties/"+id).set(data); }
     else { const i=this.rows.findIndex(r=>r.id===row.id); if(i>=0) this.rows[i]=row; else this.rows.push(row); lsSet("arabmap.rows",this.rows); this.emit(); }
   },
   async remove(id){
-    if(this.mode==="sheet"){ await this.post({action:"delete",id}); await this.pullSheet(); }
+    if(this.mode==="cloud"){ await sbRpc("zm_delete_property",{p_token:Auth.token,p_id:id}); await this.pullCloud(); }
+    else if(this.mode==="sheet"){ await this.post({action:"delete",id}); await this.pullSheet(); }
     else if(this.mode==="db"){ await this.db.doc("properties/"+id).delete(); }
     else { this.rows=this.rows.filter(r=>r.id!==id); lsSet("arabmap.rows",this.rows); this.emit(); }
   },
-  label(){ return {sheet:"Live from Google Sheet", db:"Preview database (shared)", local:"Sample data in this browser", loading:"Connecting…"}[this.mode]; },
+  label(){ return {cloud:"Saved for everyone", sheet:"Live from Google Sheet", db:"Preview database (shared)", local:"Sample data in this browser", loading:"Connecting…"}[this.mode]; },
 };
 const visibleRows = () => Store.rows.filter(r => Admin.unlocked || String(r.public||"Y").toUpperCase()!=="N");
 const geomOf = r => { try{ return typeof r.geometry==="string" ? (r.geometry? JSON.parse(r.geometry):null) : r.geometry; }catch(e){ return null; } };
@@ -815,12 +855,17 @@ function buildGas(){
 async function tryFetchJSON(url){ try{ const r=await fetch(url,{cache:"no-cache"}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
 async function idbGet(key){ return new Promise(res=>{ try{ const o=indexedDB.open("arabmap",1); o.onupgradeneeded=()=>o.result.createObjectStore("kv"); o.onsuccess=()=>{ try{ const tx=o.result.transaction("kv","readonly").objectStore("kv").get(key); tx.onsuccess=()=>res(tx.result||null); tx.onerror=()=>res(null);}catch(e){res(null);} }; o.onerror=()=>res(null); }catch(e){ res(null); } }); }
 async function idbSet(key,val){ return new Promise(res=>{ try{ const o=indexedDB.open("arabmap",1); o.onupgradeneeded=()=>o.result.createObjectStore("kv"); o.onsuccess=()=>{ try{ const tx=o.result.transaction("kv","readwrite"); tx.objectStore("kv").put(val,key); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false);}catch(e){res(false);} }; o.onerror=()=>res(false); }catch(e){ res(false); } }); }
+async function cloudLayers(){ if(!Auth.enabled()) return null; try{ return await sbRpc("zm_get_layers",{}); }catch(e){ return null; } }
 async function loadMapData(){
-  const [pf,lf,gf,pi,li,gi] = await Promise.all([tryFetchJSON(CONFIG.DATA_FILES.parcels),tryFetchJSON(CONFIG.DATA_FILES.limits),tryFetchJSON(CONFIG.DATA_FILES.gas), idbGet("parcels"), idbGet("limits"), idbGet("gas")]);
+  const [pf,lf,gf,cl] = await Promise.all([tryFetchJSON(CONFIG.DATA_FILES.parcels),tryFetchJSON(CONFIG.DATA_FILES.limits),tryFetchJSON(CONFIG.DATA_FILES.gas), cloudLayers()]);
+  let pi=null, li=null, gi=null;
+  if(cl){ const ov=k=> cl[k] ? (cl[k].geojson || {type:"FeatureCollection",features:[]}) : null; pi=ov("parcels"); li=ov("limits"); gi=ov("gas"); }
+  else { [pi,li,gi]=await Promise.all([idbGet("parcels"), idbGet("limits"), idbGet("gas")]); }
   parcelData = pi || pf || buildSampleParcels(); State.sample.parcels = !(pi||pf);
   limitsData = li || lf || buildSampleLimits(); State.sample.limits = !(li||lf);
   gasData = gi || gf || buildSampleGas(); State.sample.gas = !(gi||gf);
-  const nt=(i,f,path)=> i ? (i.features&&i.features.length?"Imported in this browser":"Removed in this browser") : f ? "From "+path : "Sample data";
+  const where = cl ? "for everyone" : "in this browser";
+  const nt=(i,f,path)=> i ? (i.features&&i.features.length?"Uploaded by staff "+where:"Removed "+where) : f ? "From "+path : "Sample data";
   State.sourceNote = {parcels:nt(pi,pf,CONFIG.DATA_FILES.parcels), limits:nt(li,lf,CONFIG.DATA_FILES.limits), gas:nt(gi,gf,CONFIG.DATA_FILES.gas)};
   if(State.selected && State.selected.kind==="parcel") State.selected=null;
   buildParcelLayer(); buildLimits(); buildGas();
@@ -982,7 +1027,7 @@ function renderPanel(){
         '<dt>Coordinates</dt><dd class="mono">'+c.lat.toFixed(5)+', '+c.lng.toFixed(5)+'</dd>'+
       '</dl></div>'+
       '<div class="section btnrow"><button class="btn" id="bShare">'+ICON.link+'Copy link</button><a class="btn" target="_blank" rel="noopener" href="'+gmaps(c.lat,c.lng)+'">'+ICON.nav+'Directions</a></div>'+
-      (Admin.unlocked?'<div class="section"><button class="btn gold" id="bAddFrom">'+ICON.plus+'Add to map as a property</button></div>':'')+
+      (canEdit()?'<div class="section"><button class="btn gold" id="bAddFrom">'+ICON.plus+'Add to map as a property</button></div>':'')+
       '<p class="sub" style="margin-top:16px;font-size:11.5px">Parcel lines are approximate and are not a survey. Confirm zoning with the Building Department before you buy or build.</p>';
     $("#bShare").onclick=()=>copyText(location.href,"Link copied");
     const af=$("#bAddFrom"); if(af) af.onclick=()=>Admin.startAdd({fromParcel:s.feature});
@@ -1009,7 +1054,7 @@ function renderPanel(){
       '</dl></div>'+
       (r.notes?'<div class="section"><h3>Notes</h3><p style="margin:0;font-size:13px">'+esc(r.notes)+'</p></div>':'')+
       '<div class="section btnrow"><button class="btn" id="bShare">'+ICON.link+'Copy link</button>'+(c?'<a class="btn" target="_blank" rel="noopener" href="'+gmaps(c.lat,c.lng)+'">'+ICON.nav+'Directions</a>':'')+
-      (Admin.unlocked?'<button class="btn gold" id="bEdit">'+ICON.edit+'Edit</button>':'')+'</div>'+
+      (canEdit()?'<button class="btn gold" id="bEdit">'+ICON.edit+'Edit</button>':'')+'</div>'+
       '<p class="sub" style="margin-top:14px;font-size:11.5px">Updated '+esc(ago(r.updated_at))+'. Status comes from the Building Department\'s tracking sheet.</p>';
     $("#bShare").onclick=()=>copyText(location.href,"Link copied");
     const be=$("#bEdit"); if(be) be.onclick=()=>Admin.startEdit(r.id);
@@ -1159,25 +1204,94 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape" && State.mode && !A
    STAFF DASHBOARD
    ===================================================================== */
 const Admin = {
-  unlocked: (()=>{ try{ return sessionStorage.getItem("arabmap.staff")==="1"; }catch(e){ return false; } })(),
+  _preview: (()=>{ try{ return sessionStorage.getItem("arabmap.staff")==="1"; }catch(e){ return false; } })(),
+  get unlocked(){ return Auth.enabled() ? !!Auth.user : this._preview; },
   tab:"overview", form:null, geoLayer:L.layerGroup().addTo(map), drawPts:[], confirmDel:null, q:"", fstatus:"all",
   open(){ $("#admin").hidden=false; this.render(); },
   close(){ $("#admin").hidden=true; setTimeout(()=>map.invalidateSize(),50); },
-  unlock(){ this.unlocked=true; try{ sessionStorage.setItem("arabmap.staff","1"); }catch(e){} $("#adminBtn .lbl").textContent="Dashboard"; Store.mode==="sheet" && Store.pullSheet().catch(()=>{}); buildIndex(); this.render(); },
-  lock(){ this.unlocked=false; try{ sessionStorage.removeItem("arabmap.staff"); }catch(e){} $("#adminBtn .lbl").textContent="Staff"; this.close(); renderPropLayer(); buildIndex(); renderPanel(); },
+  unlock(){ if(!Auth.enabled()){ this._preview=true; try{ sessionStorage.setItem("arabmap.staff","1"); }catch(e){} } updateStaffBtn(); Store.mode==="sheet" && Store.pullSheet().catch(()=>{}); Store.mode==="cloud" && Store.pullCloud().catch(()=>{}); buildIndex(); renderPropLayer(); renderPanel(); this.render(); },
+  async lock(){ if(Auth.enabled()) await Auth.logout(); this._preview=false; try{ sessionStorage.removeItem("arabmap.staff"); }catch(e){} updateStaffBtn(); this.close(); Store.mode==="cloud" && Store.pullCloud().catch(()=>{}); renderPropLayer(); buildIndex(); renderPanel(); },
   render(){
     const el=$("#admin");
+    if(Auth.enabled() && !Auth.user){ this.rLogin(el); return; }
+    if(Auth.enabled() && Auth.user.must_change){ this.rSetPassword(el,true); return; }
     if(!this.unlocked){
       el.innerHTML='<div class="admin-in"><div class="gate"><p class="eyebrow">Building Department</p><h2>Staff dashboard</h2><p class="sub">Staff sign-in will go here once logins are set up. Until then this preview opens without a password, so don\'t share the staff link publicly yet.</p><div class="btnrow"><button class="btn primary" id="gOpen">Open dashboard</button><button class="btn" id="gBack">Back to map</button></div></div></div>';
       $("#gOpen").onclick=()=>this.unlock(); $("#gBack").onclick=()=>this.close(); return;
     }
-    const tabs=[["overview","Overview"],["properties","Properties"],["parcels","Parcel data"],["feed","Google Sheet feed"]];
-    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1></div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button><button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button><button class="btn ghost" id="aLock">Sign out</button></div></div>'+
+    const tabs=[["overview","Overview"],["properties","Properties"]];
+    if(canAdmin()) tabs.push(["parcels","Map layers"]);
+    if(Auth.enabled()){ if(canAdmin()) tabs.push(["users","Staff logins"]); tabs.push(["account","My account"]); }
+    if(canAdmin()) tabs.push(["feed","Google Sheet feed"]);
+    if(!tabs.some(t=>t[0]===this.tab)) this.tab="overview";
+    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1>'+(Auth.user?'<p class="sub" style="margin:4px 0 0">Signed in as <b>'+esc(Auth.user.email)+'</b> · '+esc(ROLE_LABEL[Auth.user.role]||Auth.user.role)+'</p>':'')+'</div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button>'+(canEdit()?'<button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button>':'')+'<button class="btn ghost" id="aLock">Sign out</button></div></div>'+
       '<nav class="anav" role="tablist">'+tabs.map(([k,l])=>'<button role="tab" data-at="'+k+'" aria-selected="'+(this.tab===k)+'">'+l+'</button>').join("")+'</nav><div id="abody"></div></div>';
-    $("#aMap").onclick=()=>this.close(); $("#aAdd").onclick=()=>this.startAdd({}); $("#aLock").onclick=()=>this.lock();
+    $("#aMap").onclick=()=>this.close(); const aa=$("#aAdd"); if(aa) aa.onclick=()=>this.startAdd({}); $("#aLock").onclick=()=>this.lock();
     $$("[data-at]",el).forEach(b=>b.onclick=()=>{ this.tab=b.dataset.at; this.render(); });
     const body=$("#abody");
-    ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body)})[this.tab]();
+    ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),users:()=>this.rUsers(body),account:()=>this.rSetPassword(body,false)})[this.tab]();
+  },
+  rLogin(el){
+    el.innerHTML='<div class="admin-in"><form class="gate" id="lgForm" autocomplete="on"><p class="eyebrow">Building Department</p><h2>Staff sign-in</h2><p class="sub">Sign in to add and edit properties on the map. Changes are saved for everyone.</p>'+
+      '<div class="field" style="margin-bottom:10px"><label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username" required></div>'+
+      '<div class="field" style="margin-bottom:6px"><label for="lgPw">Password</label><input id="lgPw" type="password" autocomplete="current-password" required></div>'+
+      '<p class="note warn" id="lgErr" hidden style="margin:8px 0 0"></p>'+
+      '<div class="btnrow" style="margin-top:14px"><button class="btn primary" id="lgGo" type="submit">Sign in</button><button class="btn" id="gBack" type="button">Back to map</button></div>'+
+      '<p class="sub" style="margin:14px 0 0;font-size:12px">Forgot your password? Ask a map admin to reset it.</p></form></div>';
+    $("#gBack").onclick=()=>this.close();
+    setTimeout(()=>{ const e=$("#lgEmail"); if(e) e.focus(); },50);
+    $("#lgForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#lgGo"), er=$("#lgErr"); b.disabled=true; b.textContent="Signing in…"; er.hidden=true;
+      try{ await Auth.login($("#lgEmail").value,$("#lgPw").value); this.unlock(); toast("Signed in"); }
+      catch(e){ er.textContent=e.message; er.hidden=false; b.disabled=false; b.textContent="Sign in"; } };
+  },
+  rSetPassword(el,forced){
+    const html='<form class="'+(forced?'gate':'box')+'" id="pwForm" style="'+(forced?'':'max-width:480px')+'"><p class="eyebrow">'+(forced?'Welcome':'My account')+'</p><h2 style="font:700 20px var(--serif);margin:0 0 6px">'+(forced?'Choose your own password':'Change password')+'</h2>'+
+      (forced?'<p class="sub">You signed in with a temporary password. Set a new one to continue.</p>':'<p class="sub">Signed in as '+esc(Auth.user.email)+'.</p>')+
+      '<div class="field" style="margin-bottom:10px"><label for="pwOld">'+(forced?'Temporary password':'Current password')+'</label><input id="pwOld" type="password" autocomplete="current-password" required></div>'+
+      '<div class="field" style="margin-bottom:10px"><label for="pwNew">New password</label><input id="pwNew" type="password" autocomplete="new-password" minlength="10" required><span class="hint">At least 10 characters</span></div>'+
+      '<div class="field"><label for="pwNew2">Type it again</label><input id="pwNew2" type="password" autocomplete="new-password" required></div>'+
+      '<p class="note warn" id="pwErr" hidden style="margin:10px 0 0"></p><div class="btnrow" style="margin-top:14px"><button class="btn primary" type="submit" id="pwGo">Save password</button>'+(forced?'<button class="btn ghost" type="button" id="pwOut">Sign out</button>':'')+'</div></form>';
+    el.innerHTML = forced ? '<div class="admin-in">'+html+'</div>' : html;
+    const out=$("#pwOut"); if(out) out.onclick=()=>this.lock();
+    $("#pwForm").onsubmit=async ev=>{ ev.preventDefault(); const er=$("#pwErr"); er.hidden=true;
+      if($("#pwNew").value!==$("#pwNew2").value){ er.textContent="The new passwords don't match."; er.hidden=false; return; }
+      try{ await sbRpc("zm_change_password",{p_token:Auth.token,p_old:$("#pwOld").value,p_new:$("#pwNew").value}); Auth.user.must_change=false; toast("Password saved"); this.render(); }
+      catch(e){ er.textContent=e.message; er.hidden=false; } };
+  },
+  async rUsers(b){
+    b.innerHTML='<p class="sub">Loading logins…</p>';
+    let users=[]; try{ users=await sbRpc("zm_list_users",{p_token:Auth.token}); }catch(e){ b.innerHTML='<p class="note warn">'+esc(e.message)+'</p>'; return; }
+    const me=Auth.user, isSuper=me.role==="super_admin";
+    const roles=Object.keys(ROLE_LABEL).filter(r=>isSuper || RANK[r]<RANK.admin);
+    const manageable=u=> u.id!==me.id && (isSuper || RANK[u.role]<RANK.admin);
+    const roleSel=(id,val,dis)=>'<select id="'+id+'"'+(dis?' disabled':'')+'>'+Object.keys(ROLE_LABEL).filter(r=>roles.includes(r)||r===val).map(r=>'<option value="'+r+'"'+(r===val?' selected':'')+'>'+ROLE_LABEL[r]+'</option>').join("")+'</select>';
+    b.innerHTML='<div class="grid2" style="margin-top:0;grid-template-columns:1fr"><div class="box"><h3>Add a login</h3><form id="nuForm" class="fgrid">'+
+      '<div class="field"><label for="nuEmail">Email</label><input id="nuEmail" type="email" required></div>'+
+      '<div class="field"><label for="nuName">Name</label><input id="nuName"></div>'+
+      '<div class="field"><label for="nuRole">Access</label>'+roleSel("nuRole","editor")+'</div>'+
+      '<div class="field"><label for="nuPw">Temporary password</label><div style="display:flex;gap:6px"><input id="nuPw" value="'+tempPassword()+'" minlength="10" required style="flex:1"><button class="btn" type="button" id="nuGen">New</button></div><span class="hint">They\'ll be asked to change it the first time they sign in</span></div>'+
+      '<div class="btnrow full"><button class="btn primary" type="submit">Create login</button></div></form><p class="note info" id="nuDone" hidden style="margin-top:10px"></p></div>'+
+      '<div class="box"><h3>Staff logins</h3><p class="sub" style="font-size:12px">Super admin: everything, including admins · Admin: manages editor and viewer logins, map layers · Editor: adds and edits properties · Viewer: sees staff-only details</p>'+
+      '<div class="tablewrap"><table class="t"><thead><tr><th>Login</th><th>Access</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>'+
+      users.map(u=>{ const m=manageable(u); return '<tr data-u="'+esc(u.id)+'"><td class="first"><b>'+esc(u.name||u.email)+'</b><div style="font-size:12px;color:var(--ink-soft)">'+esc(u.email)+(u.id===me.id?' · you':'')+'</div></td>'+
+        '<td data-l="Access">'+(m?roleSel("ur-"+u.id,u.role,false):esc(ROLE_LABEL[u.role]||u.role))+'</td>'+
+        '<td data-l="Status">'+(u.active?(u.must_change?'<span class="pill" style="color:var(--warn);background:var(--warn-bg)"><i></i>Temporary password</span>':'<span class="pill" style="color:var(--ok);background:var(--ok-bg)"><i></i>Active</span>'):'<span class="pill" style="color:var(--ink-faint);background:var(--surface-2)"><i></i>Turned off</span>')+'</td>'+
+        '<td data-l="Last sign-in" style="font-size:12px;color:var(--ink-soft)">'+(u.last_login?esc(ago(u.last_login)):'Never')+'</td>'+
+        '<td class="act">'+(m?'<button class="btn sm" data-reset="'+esc(u.id)+'">Reset password</button><button class="btn sm ghost" data-toggle="'+esc(u.id)+'">'+(u.active?'Turn off':'Turn on')+'</button><button class="btn sm ghost danger" data-deluser="'+esc(u.id)+'" aria-label="Delete login">✕</button>':'')+'</td></tr>'; }).join("")+
+      '</tbody></table></div><p class="note info" id="urDone" hidden style="margin-top:10px"></p></div></div>';
+    const byId=id=>users.find(u=>u.id===id);
+    $("#nuGen",b).onclick=()=>{ $("#nuPw",b).value=tempPassword(); };
+    $("#nuForm",b).onsubmit=async ev=>{ ev.preventDefault(); const pw=$("#nuPw",b).value, em=$("#nuEmail",b).value;
+      try{ await sbRpc("zm_save_user",{p_token:Auth.token,p_email:em,p_name:$("#nuName",b).value,p_role:$("#nuRole",b).value,p_active:true,p_password:pw}); await this.rUsers(b);
+        const d=$("#nuDone",b); d.innerHTML='Login created for <b>'+esc(em)+'</b>. Temporary password: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw">Copy</button><br>Share it with them privately; they\'ll set their own password when they first sign in.'; d.hidden=false; $("#cpPw",b).onclick=()=>copyText(pw,"Password copied"); }
+      catch(e){ toast(e.message,5000); } };
+    $$("select[id^=ur-]",b).forEach(sel=>sel.onchange=async()=>{ const u=byId(sel.id.slice(3)); try{ await sbRpc("zm_save_user",{p_token:Auth.token,p_email:u.email,p_name:u.name,p_role:sel.value,p_active:u.active}); toast("Access updated"); await this.rUsers(b); }catch(e){ toast(e.message,5000); sel.value=u.role; } });
+    $$("[data-toggle]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.toggle); try{ await sbRpc("zm_save_user",{p_token:Auth.token,p_email:u.email,p_name:u.name,p_role:u.role,p_active:!u.active}); toast(u.active?"Login turned off":"Login turned on"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
+    $$("[data-reset]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.reset); const pw=tempPassword();
+      try{ await sbRpc("zm_reset_password",{p_token:Auth.token,p_user:u.id,p_password:pw}); await this.rUsers(b); const d=$("#urDone",b); d.innerHTML='New temporary password for <b>'+esc(u.email)+'</b>: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw2">Copy</button><br>They\'ll be asked to change it when they sign in. Their other sessions were signed out.'; d.hidden=false; $("#cpPw2",b).onclick=()=>copyText(pw,"Password copied"); }
+      catch(e){ toast(e.message,5000); } });
+    $$("[data-deluser]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.deluser); if(x.dataset.sure!=="1"){ x.dataset.sure="1"; x.textContent="Delete?"; x.classList.remove("ghost"); setTimeout(()=>{ if(x.isConnected){ x.dataset.sure=""; x.textContent="✕"; x.classList.add("ghost"); } },4000); return; }
+      try{ await sbRpc("zm_delete_user",{p_token:Auth.token,p_user:u.id}); toast("Login deleted"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
   },
   rOverview(b){
     const rows=Store.rows, ann=rows.filter(r=>r.kind==="annexation");
@@ -1205,16 +1319,16 @@ const Admin = {
     rows.sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")));
     b.innerHTML='<div class="filters"><div class="field" style="flex:1;min-width:200px"><input id="pq" type="search" placeholder="Filter by name, address, application #, owner" value="'+esc(this.q)+'" aria-label="Filter properties"></div>'+
       '<div class="field"><select id="pfs" aria-label="Status filter"><option value="all">All statuses</option>'+STATUSES.map(s=>'<option value="'+s.key+'"'+(this.fstatus===s.key?' selected':'')+'>'+esc(s.label)+'</option>').join("")+'</select></div>'+
-      '<button class="btn" id="pExp">'+ICON.down+'Export CSV</button><button class="btn gold" id="pAdd">'+ICON.plus+'Add property</button></div>'+
+      '<button class="btn" id="pExp">'+ICON.down+'Export CSV</button>'+(canEdit()?'<button class="btn gold" id="pAdd">'+ICON.plus+'Add property</button>':'')+'</div>'+
       '<div class="tablewrap"><table class="t"><thead><tr><th>Property</th><th>Type</th><th>Status</th><th>Application</th><th>PC hearing</th><th>Acres</th><th>Public</th><th>Updated</th><th></th></tr></thead><tbody>'+
       (rows.length?rows.map(r=>'<tr><td class="first"><b>'+esc(r.name||"—")+'</b><div style="font-size:12px;color:var(--ink-soft)">'+esc(r.address||"")+'</div></td><td data-l="Type">'+esc(KINDS[r.kind]||"—")+'</td><td data-l="Status">'+pillHTML(r.status)+'</td><td data-l="Application" class="mono">'+esc(r.application_no||"—")+'</td><td data-l="PC hearing">'+fmtDate(r.pc_date)+'</td><td data-l="Acres" class="mono">'+fmtNum(r.acreage,1)+'</td><td data-l="Public">'+(String(r.public||"Y").toUpperCase()==="N"?"Hidden":"Yes")+'</td><td data-l="Updated" style="font-size:12px;color:var(--ink-soft)">'+esc(ago(r.updated_at))+'</td><td class="act">'+
         (this.confirmDel===r.id?'<span class="inline-confirm">Delete? <button class="btn sm danger" data-del-yes="'+esc(r.id)+'">Delete</button><button class="btn sm" data-del-no>Keep</button></span>':
-        '<button class="btn sm ghost" data-show="'+esc(r.id)+'">Map</button><button class="btn sm" data-edit="'+esc(r.id)+'">Edit</button><button class="btn sm ghost danger" data-del="'+esc(r.id)+'" aria-label="Delete">✕</button>')+'</td></tr>').join("")
+        '<button class="btn sm ghost" data-show="'+esc(r.id)+'">Map</button>'+(canEdit()?'<button class="btn sm" data-edit="'+esc(r.id)+'">Edit</button><button class="btn sm ghost danger" data-del="'+esc(r.id)+'" aria-label="Delete">✕</button>':''))+'</td></tr>').join("")
         :'<tr><td colspan="9" style="text-align:center;color:var(--ink-soft);padding:24px">No properties match.</td></tr>')+
       '</tbody></table></div>';
     const pq=$("#pq",b); pq.oninput=()=>{ this.q=pq.value; const pos=pq.selectionStart; this.rProps(b); const n=$("#pq",b); n.focus(); n.setSelectionRange(pos,pos); };
     $("#pfs",b).onchange=e=>{ this.fstatus=e.target.value; this.rProps(b); };
-    $("#pAdd",b).onclick=()=>this.startAdd({});
+    const pa=$("#pAdd",b); if(pa) pa.onclick=()=>this.startAdd({});
     $("#pExp",b).onclick=()=>saveFile("arab-map-properties.csv",toCSV(Store.rows),"text/csv");
     $$("[data-show]",b).forEach(x=>x.onclick=()=>{ this.close(); selectProp(x.dataset.show,true); });
     $$("[data-edit]",b).forEach(x=>x.onclick=()=>this.startEdit(x.dataset.edit));
@@ -1228,10 +1342,10 @@ const Admin = {
     const LAYERS=[["parcels","Parcels & zoning"],["limits","City limits"],["gas","Gas lines"]];
     const row=([k,l])=>{ const n=cnt[k]?cnt[k].features.length:0; const note=src[k]||"—"; return '<div class="lyr"><div class="ln"><b>'+esc(l)+'</b><span>'+esc(note)+' · '+n.toLocaleString()+' feature'+(n===1?'':'s')+'</span></div><div class="btnrow">'+
       '<button class="btn sm" data-dl="'+k+'" title="Download">'+ICON.down+'Download</button>'+
-      (note.indexOf("this browser")>=0?'<button class="btn sm" data-restore="'+k+'">Restore default</button>':'')+
+      (/this browser|everyone/.test(note)?'<button class="btn sm" data-restore="'+k+'">Restore default</button>':'')+
       (n?'<button class="btn sm danger" data-remove="'+k+'">Remove from map</button>':'')+'</div></div>'; };
     b.innerHTML='<div class="grid2" style="margin-top:0"><div class="box"><h3>Map layers</h3>'+LAYERS.map(row).join("")+
-      '<p class="sub" style="margin-top:14px">Changes here apply to this browser only. For every visitor, the live site reads <code>data/parcels.geojson</code>, <code>data/city-limits.geojson</code> and <code>data/gas-lines.geojson</code> from the site folder: download a layer here and commit it there, or commit an empty file to remove a layer for everyone.</p></div>'+
+      '<p class="sub" style="margin-top:14px">'+(Auth.enabled()?'Remove, restore and upload here apply to everyone who opens the map. Without an upload,':'Changes here apply to this browser only. For every visitor,')+' the live site reads <code>data/parcels.geojson</code>, <code>data/city-limits.geojson</code> and <code>data/gas-lines.geojson</code> from the site folder: download a layer here and commit it there, or commit an empty file to remove a layer for everyone.</p></div>'+
       '<div class="box"><h3>Import a map layer</h3><div class="field" style="margin-bottom:10px"><label for="impKind">Layer</label><select id="impKind"><option value="parcels">Parcels &amp; zoning</option><option value="limits">City limits</option><option value="gas">Gas lines</option></select></div>'+
       '<label class="drop" id="drop" for="impFile">'+ICON.up+'<div style="margin-top:6px"><b>Choose a GeoJSON file</b> or drop it here</div><div style="font-size:12px;margin-top:4px">WGS84 (EPSG:4326). Shapefile or KML? Convert it at mapshaper.org first.</div></label><input type="file" id="impFile" accept=".geojson,.json,application/geo+json,application/json" hidden>'+
       '<p class="sub" style="margin-top:10px;font-size:12px">Parcel files exported from the current Greenstone map keep their field names (ZONE, PARCELNUMB, OWNER, PROPPIN, PROPADDR, PROPVALUE, ACREAGE, MAILADD1…) and are read automatically.</p>'+
@@ -1240,14 +1354,14 @@ const Admin = {
       if(!file) return; const kind=$("#impKind",b).value;
       try{ const j=JSON.parse(await file.text()); const fc = j.type==="FeatureCollection"? j : j.type==="Feature"? {type:"FeatureCollection",features:[j]} : null; if(!fc || !fc.features.length) throw new Error("No features found in that file");
         const c=fc.features.find(f=>f.geometry)?.geometry; const sample=JSON.stringify(c&&c.coordinates).match(/-?\d+\.?\d*/g)||[]; if(sample.length && Math.abs(+sample[0])>180) throw new Error("Coordinates look projected (state plane). Re-export in WGS84 / EPSG:4326.");
-        await idbSet(kind,fc); await loadMapData(); toast("Loaded "+fc.features.length.toLocaleString()+" features"); this.rParcels(b);
+        if(Auth.enabled()){ await sbRpc("zm_set_layer",{p_token:Auth.token,p_kind:kind,p_mode:"set",p_geojson:fc}); } else await idbSet(kind,fc); await loadMapData(); toast("Loaded "+fc.features.length.toLocaleString()+" features"); this.rParcels(b);
         if(kind==="parcels"){ const bb=parcelLayer.getBounds(); if(bb.isValid()) map.fitBounds(bb); }
       }catch(e){ toast("Import failed: "+e.message,5000); }
     };
     $("#impFile",b).onchange=e=>handle(e.target.files[0]);
     const d=$("#drop",b); d.ondragover=e=>{e.preventDefault(); d.classList.add("over");}; d.ondragleave=()=>d.classList.remove("over"); d.ondrop=e=>{ e.preventDefault(); d.classList.remove("over"); handle(e.dataTransfer.files[0]); };
-    $$("[data-remove]",b).forEach(x=>x.onclick=async()=>{ const k=x.dataset.remove; await idbSet(k,{type:"FeatureCollection",features:[]}); await loadMapData(); renderPanel(); toast("Removed from the map in this browser"); this.rParcels(b); });
-    $$("[data-restore]",b).forEach(x=>x.onclick=async()=>{ const k=x.dataset.restore; await idbSet(k,null); await loadMapData(); renderPanel(); toast("Restored the default layer"); this.rParcels(b); });
+    $$("[data-remove]",b).forEach(x=>x.onclick=async()=>{ const k=x.dataset.remove; try{ if(Auth.enabled()) await sbRpc("zm_set_layer",{p_token:Auth.token,p_kind:k,p_mode:"remove"}); else await idbSet(k,{type:"FeatureCollection",features:[]}); }catch(e){ toast(e.message,5000); return; } await loadMapData(); renderPanel(); toast(Auth.enabled()?"Removed from the map for everyone":"Removed from the map in this browser"); this.rParcels(b); });
+    $$("[data-restore]",b).forEach(x=>x.onclick=async()=>{ const k=x.dataset.restore; try{ if(Auth.enabled()) await sbRpc("zm_set_layer",{p_token:Auth.token,p_kind:k,p_mode:"restore"}); else await idbSet(k,null); }catch(e){ toast(e.message,5000); return; } await loadMapData(); renderPanel(); toast("Restored the default layer"); this.rParcels(b); });
     $$("[data-dl]",b).forEach(x=>x.onclick=()=>{ const k=x.dataset.dl; const data={parcels:parcelData,limits:limitsData,gas:gasData}[k]; saveFile(CONFIG.DATA_FILES[k].split("/").pop(), JSON.stringify(data), "application/geo+json"); });
   },
   rFeed(b){
@@ -1518,7 +1632,7 @@ function applyHash(){
   if(h.startsWith("p-")){ hashApplied=true; const k=h.slice(2); const f=findParcel(k,k); if(f) selectParcel(f,true); }
 }
 (async function boot(){
-  if(Admin.unlocked) $("#adminBtn .lbl").textContent="Dashboard";
+  await Auth.restore(); updateStaffBtn();
   setBasemap(State.basemap);
   if(State.layers.flood) floodLayer.addTo(map);
   setTimeout(()=>{ if(State.tilesOk===null && tileOk===0){ State.tilesOk=false; onTilesDecided(); } },6000);

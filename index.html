@@ -189,7 +189,25 @@ dl.kv dd{margin:0;font-weight:500;text-align:right;overflow-wrap:anywhere}
 .empty-state svg{width:44px;height:44px;color:var(--ink-faint);margin-bottom:8px}
 .tips{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:8px;text-align:left}
 .tips li{display:flex;gap:10px;align-items:flex-start;font-size:13px}
-.tips kbd{font:600 10.5px var(--mono);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px 6px;color:var(--ink)}
+.qa{display:grid;gap:8px;margin-top:16px;text-align:left}
+.qa button{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+.qa button:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.qa button:focus-visible{outline:2px solid var(--navy-2);outline-offset:2px}
+.qa .qi{flex:0 0 32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--surface-2);color:var(--navy-2)}
+.qa .qi svg{width:18px;height:18px}
+.qa b{display:block;font-size:13.5px}
+.qa small{display:block;font-size:12px;color:var(--ink-soft);line-height:1.35}
+.zkey{margin-top:22px;text-align:left}
+.zkey h3{margin:0 0 8px}
+.zkey ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.zkey li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink);line-height:1.2;min-width:0}
+.zkey .sw{flex:0 0 16px;height:16px;border-radius:4px;border:1px solid rgba(0,0,0,.18)}
+.zkey code{font:600 11px var(--mono);color:var(--ink-soft);flex:0 0 auto}
+.zkey span.n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zkey .more{margin-top:10px;font-size:12px}
+.pclose{float:right;margin:-4px -4px 0 8px;width:36px;height:36px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink-soft);cursor:pointer;display:grid;place-items:center}
+.pclose:hover{background:var(--surface-2);border-color:var(--line)}
+.pclose svg{width:18px;height:18px}
 
 /* status pill + tracker */
 .pill{display:inline-flex;align-items:center;gap:6px;font:600 11.5px var(--sans);padding:3px 9px;border-radius:999px;white-space:nowrap}
@@ -197,7 +215,7 @@ dl.kv dd{margin:0;font-weight:500;text-align:right;overflow-wrap:anywhere}
 .track{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:10px}
 .track .st{height:6px;border-radius:3px;background:var(--line)}
 .track .st.on{background:var(--c)}
-.track-l{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:9.5px;color:var(--ink-faint);margin-top:4px;line-height:1.2}
+.track-l{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.2}
 .track-l span.on{color:var(--ink);font-weight:600}
 .card{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface)}
 .alist{display:grid;gap:8px}
@@ -569,6 +587,10 @@ const ICON = {
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>',
   down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12M6 11l6 6 6-6M4 20h16"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V8M6 13l6-6 6 6M4 4h16"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  ruler:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg>',
+  layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   sync:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 00-14.3-4.9L4 8M4 13a8 8 0 0014.3 4.9L20 16"/><path d="M4 3v5h5M20 21v-5h-5"/></svg>',
 };
 
@@ -861,7 +883,11 @@ function buildLabels(){
 map.on("zoomend moveend",()=>{ buildLabels(); if(parcelLayer && map._lastZ!==map.getZoom()){ map._lastZ=map.getZoom(); parcelLayer.setStyle(parcelStyle);} });
 labelLayer.addTo(map);
 
-function restyleParcels(){ if(parcelLayer) parcelLayer.setStyle(parcelStyle); }
+const selHalo=L.layerGroup().addTo(map);
+function drawSelHalo(){ selHalo.clearLayers(); const s=State.selected; if(!s||s.kind!=="parcel") return;
+  L.geoJSON(s.feature,{pane:"propPane",interactive:false,style:{color:"#fff",weight:8,opacity:.95,fill:false}}).addTo(selHalo);
+  L.geoJSON(s.feature,{pane:"propPane",interactive:false,style:{color:"#0F3273",weight:3.5,opacity:1,fillColor:"#F2C230",fillOpacity:.18}}).addTo(selHalo); }
+function restyleParcels(){ if(parcelLayer) parcelLayer.setStyle(parcelStyle); drawSelHalo(); }
 function buildLimits(){
   if(limitsLayer) map.removeLayer(limitsLayer);
   limitsLayer = L.geoJSON(limitsData,{pane:"limitsPane",interactive:false,style:{color:"#0F3273",weight:3,dashArray:"10 6",fill:false,opacity:.9}});
@@ -976,7 +1002,6 @@ function pickResult(it){
 /* =====================================================================
    SELECTION + PANEL
    ===================================================================== */
-const selHalo = L.layerGroup().addTo(map);
 function selectParcel(f,fly){
   State.selected={kind:"parcel",feature:f}; restyleParcels(); renderPropLayer();
   if(View3D.on){ if(fly) View3D.flyToGeom(f.geometry); else View3D.select(); }
@@ -1026,14 +1051,18 @@ function renderPanel(){
   if(State.tab==="annex") return renderAnnexTab(el);
   const s=State.selected;
   if(!s){
-    el.innerHTML='<div class="empty-state">'+ICON.parcel+'<h2 class="ph">Find a property</h2><p class="sub">Tap any parcel on the map, or search above, to see its zoning, owner, acreage and any pending annexation.</p>'+
-      '<ul class="tips"><li><kbd>Search</kbd><span>Address, owner name, PPIN or parcel number. Results appear as you type.</span></li><li><kbd>Layers</kbd><span>Switch to aerial or topo, show flood zones, or hide zoning districts.</span></li><li><kbd>Measure</kbd><span>Tap the ruler to measure a frontage in feet or a lot in acres.</span></li></ul>'+
+    const qi=(ic,t,d,act)=>'<button type="button" data-qa="'+act+'"><span class="qi">'+ic+'</span><span><b>'+t+'</b><small>'+d+'</small></span></button>';
+    const zkeys=Object.keys(ZONES).filter(z=>z!=="X");
+    el.innerHTML='<div class="empty-state">'+ICON.parcel+'<h2 class="ph">Find a property</h2><p class="sub">Tap any parcel on the map to see its zoning, owner, acreage and any pending annexation.</p>'+
+      '<div class="qa">'+qi(ICON.search,"Search by address or owner","Also works with a PPIN or parcel number","search")+qi(ICON.ruler,"Measure a lot","Frontage in feet, area in acres","measure")+qi(ICON.layers,"Change what the map shows","Aerial photos, flood zones, city limits","layers")+'</div>'+
+      '<div class="zkey"><h3 class="eyebrow">What the colors mean</h3><ul>'+zkeys.map(z=>'<li><i class="sw" style="background:'+ZONES[z].color+(ZONES[z].hatch?';background-image:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,0,0,.25) 3px 4px)':'')+'"></i><code>'+esc(z)+'</code><span class="n">'+esc(ZONES[z].name)+'</span></li>').join("")+'</ul><p class="more"><a href="#" data-qa="layers">Hide or show districts in Layers</a></p></div>'+
       (State.sample.parcels?'<p class="note warn" style="margin-top:16px;text-align:left"><b>Sample parcels.</b> The owners, addresses and values shown are placeholders until the city\'s parcel file is loaded.</p>':'')+'</div>';
+    $$("[data-qa]",el).forEach(b=>b.onclick=ev=>{ ev.preventDefault(); const a=b.dataset.qa; if(a==="search"){ const q=$("#q"); q.focus(); q.select&&q.select(); } else if(a==="measure"){ Admin.cancelGeo&&Admin.cancelGeo(); setMode("measure"); } else openTab("layers"); });
     return;
   }
   if(s.kind==="parcel"){
     const p=P(s.feature), c=L.geoJSON(s.feature).getBounds().getCenter(), row=matchRowForParcel(p);
-    el.innerHTML = '<p class="eyebrow">Parcel'+(p.sample?' · sample':'')+'</p><h2 class="ph">'+esc(p.address||"No address on file")+'</h2><p class="sub">'+esc(p.owner||"Owner not listed")+'</p>'+
+    el.innerHTML = '<button class="pclose" type="button" data-clear aria-label="Close this parcel">'+ICON.close+'</button><p class="eyebrow">Parcel'+(p.sample?' · sample':'')+'</p><h2 class="ph">'+esc(p.address||"No address on file")+'</h2><p class="sub">'+esc(p.owner||"Owner not listed")+'</p>'+
       zoneBadge(p.zone)+
       (row?'<div class="section"><h3>'+esc(KINDS[row.kind]||"Property")+' on file</h3><div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center">'+pillHTML(row.status)+'<span class="mono" style="font-size:12px;color:var(--ink-soft)">'+esc(row.application_no||"")+'</span></div>'+trackerHTML(row)+'<button class="btn sm" style="margin-top:10px" data-open-prop="'+esc(row.id)+'">View details</button></div></div>':'')+
       '<div class="section"><h3>Parcel record</h3><dl class="kv">'+
@@ -1054,7 +1083,7 @@ function renderPanel(){
   } else {
     const r=Store.rows.find(x=>x.id===s.id); if(!r){ State.selected=null; return renderPanel(); }
     const g=geomOf(r); const c = g ? (g.type==="Point"? L.latLng(g.coordinates[1],g.coordinates[0]) : L.geoJSON(g).getBounds().getCenter()) : null;
-    el.innerHTML='<p class="eyebrow">'+esc(KINDS[r.kind]||"Property")+(r.source==="permit-site"?' · from permit site':'')+'</p><h2 class="ph">'+esc(r.name||r.address||"Property")+'</h2><p class="sub">'+esc(r.address||"")+'</p>'+
+    el.innerHTML='<button class="pclose" type="button" data-clear aria-label="Close">'+ICON.close+'</button><p class="eyebrow">'+esc(KINDS[r.kind]||"Property")+(r.source==="permit-site"?' · from permit site':'')+'</p><h2 class="ph">'+esc(r.name||r.address||"Property")+'</h2><p class="sub">'+esc(r.address||"")+'</p>'+
       '<div class="card">'+pillHTML(r.status)+trackerHTML(r)+'</div>'+
       '<div class="section"><h3>Details</h3><dl class="kv">'+
         (r.application_no?'<dt>Application</dt><dd class="mono">'+esc(r.application_no)+'</dd>':'')+
@@ -1075,7 +1104,7 @@ function renderPanel(){
       (r.notes?'<div class="section"><h3>Notes</h3><p style="margin:0;font-size:13px">'+esc(r.notes)+'</p></div>':'')+
       '<div class="section btnrow"><button class="btn" id="bShare">'+ICON.link+'Copy link</button>'+(c?'<a class="btn" target="_blank" rel="noopener" href="'+gmaps(c.lat,c.lng)+'">'+ICON.nav+'Directions</a>':'')+
       (canEdit()?'<button class="btn gold" id="bEdit">'+ICON.edit+'Edit</button>':'')+'</div>'+
-      '<p class="sub" style="margin-top:14px;font-size:11.5px">Updated '+esc(ago(r.updated_at))+'. Status comes from the Building Department\'s tracking sheet.</p>';
+      '<p class="sub" style="margin-top:14px;font-size:11.5px">Updated '+esc(ago(r.updated_at))+'. Status is updated by the Building Department.</p>';
     $("#bShare").onclick=()=>copyText(location.href,"Link copied");
     const be=$("#bEdit"); if(be) be.onclick=()=>Admin.startEdit(r.id);
   }
@@ -1093,7 +1122,7 @@ function renderLayersTab(el){
       L1("zoning","Zoning districts","Color each parcel by its district",State.layers.zoning)+
       L1("parcels","Parcel lines","Property boundaries"+(State.sample.parcels?" (sample)":""),State.layers.parcels)+
       L1("labels","House numbers","Shown when zoomed in close",State.layers.labels)+
-      L1("annex","Annexations & tracked properties","Live from the city's tracking sheet",State.layers.annex)+
+      L1("annex","Annexations & tracked properties","Requests the Building Department is tracking",State.layers.annex)+
       L1("limits","City limits","Arab corporate boundary"+(State.sample.limits?" (sample)":""),State.layers.limits)+
       L1("flood","FEMA flood zones","Special flood hazard areas (A, AE, X)"+(tl?" · live site only":""),State.layers.flood,tl)+
       L1("gas","Gas lines","City gas utility"+(State.sample.gas?" (sample)":""),State.layers.gas)+
@@ -1218,7 +1247,8 @@ map.on("click",e=>{
   if(State.selected) clearSelection();
 });
 map.on("mousemove",e=>{ $("#coords").textContent=e.latlng.lat.toFixed(5)+", "+e.latlng.lng.toFixed(5).replace("-","−"); });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape" && State.mode && !Admin.form){ setMode(null); } });
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape" || Admin.form) return; if(State.mode){ setMode(null); return; } if(State.selected && !(e.target&&e.target.closest&&e.target.closest("input,textarea,select"))) clearSelection(); });
+$("#panel").addEventListener("click",e=>{ if(e.target.closest("[data-clear]")) clearSelection(); });
 
 /* =====================================================================
    STAFF DASHBOARD
@@ -1662,7 +1692,7 @@ function applyHash(){
   map.invalidateSize();
   if(isMobile()){ setSheet("peek"); qEl.placeholder="Address, owner or PPIN"; }
   await loadMapData();
-  if(!location.hash){ const b=limitsLayer.getBounds(); if(b.isValid() && $("#map").clientWidth>=50) map.fitBounds(b,Object.assign({maxZoom:17},fitPad())); }
+  if(!location.hash && $("#map").clientWidth>=50){ const c=CONFIG.CENTER; map.fitBounds(L.latLngBounds([c[0]-0.011,c[1]-0.014],[c[0]+0.011,c[1]+0.014]),Object.assign({maxZoom:16},fitPad())); }
   renderPanel(); applyHash();
   await Store.init();
   renderPanel();

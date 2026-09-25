@@ -302,6 +302,19 @@ pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:
 .drop{border:2px dashed var(--line-strong);border-radius:12px;padding:22px;text-align:center;color:var(--ink-soft);background:var(--surface-2)}
 .drop.over{border-color:var(--navy-2);background:var(--info-bg)}
 
+/* 3D view */
+#map3d{position:absolute;inset:0;z-index:950;background:#dfe4ea}
+#map3d .maplibregl-canvas{position:absolute;left:0;top:0}
+#map3d .maplibregl-canvas-container.maplibregl-interactive{cursor:grab}
+body.is3d .leaflet-control-container, body.is3d .coords, body.is3d #tPin, body.is3d #tMeasure{display:none}
+.rbtn .b3{font:700 12px var(--sans);letter-spacing:.02em}
+.ctl3d{position:absolute;z-index:1001;left:calc(50% + 200px);transform:translateX(-50%);bottom:18px;width:min(600px,calc(100% - 480px));min-width:300px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;display:grid;gap:8px}
+.c3-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.c3-ex{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);margin-left:auto}
+.c3-ex input{width:90px;accent-color:var(--navy-2)}
+.c3-now{font:600 13px var(--sans);color:var(--ink);padding:6px 10px;border-radius:8px;background:var(--surface-2);border-left:3px solid var(--gold)}
+.c3-attr{font-size:10.5px;color:var(--ink-faint)}
+
 @media (max-width: 900px){
   .grid2{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr)}
@@ -346,6 +359,9 @@ pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:
   .leaflet-bottom{bottom:var(--sheet-h,0px);transition:bottom .25s ease}
   .banner{bottom:auto;top:10px;left:10px;right:58px;max-width:none;font-size:12px;padding:8px 30px 8px 10px}
   .toolbar{top:10px;left:10px;right:58px;transform:none;max-width:none;justify-content:space-between}
+  .ctl3d{top:10px;bottom:auto;left:10px;right:58px;transform:none;width:auto;min-width:0;padding:8px 10px;gap:6px}
+  .c3-ex{margin-left:0}
+  .c3-attr{display:none}
   .fgrid{grid-template-columns:1fr}
   .geo-tools .gt{padding:8px 2px;font-size:11.5px}
   /* staff dashboard */
@@ -394,6 +410,8 @@ pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:
 
   <main class="stage" id="stage">
     <div id="map" aria-label="Map of Arab, Alabama"></div>
+    <div id="map3d" hidden aria-label="3D view of Arab, Alabama"></div>
+    <div class="ctl3d" id="ctl3d" hidden></div>
 
     <aside class="panel" id="panel" aria-label="Map details">
       <button class="handle" id="handle" aria-label="Expand or collapse panel"></button>
@@ -415,6 +433,7 @@ pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:
         <button class="rbtn" id="tLocate" aria-label="My location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg><span class="tip">My location</span></button>
         <button class="rbtn" id="tPin" aria-pressed="false" aria-label="Drop a pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.2 7-12.2A7 7 0 005 9.8C5 14.8 12 22 12 22z"/><circle cx="12" cy="9.8" r="2.6"/></svg><span class="tip">Drop a pin</span></button>
         <button class="rbtn" id="tMeasure" aria-pressed="false" aria-label="Measure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg><span class="tip">Measure distance or area</span></button>
+        <button class="rbtn" id="t3d" aria-pressed="false" aria-label="3D fly-over"><span class="b3">3D</span><span class="tip">3D view &amp; fly-over tour</span></button>
         <button class="rbtn" id="tShare" aria-label="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg><span class="tip">Copy link to this view</span></button>
       </div>
     </div>
@@ -883,7 +902,8 @@ function pickResult(it){
 const selHalo = L.layerGroup().addTo(map);
 function selectParcel(f,fly){
   State.selected={kind:"parcel",feature:f}; restyleParcels(); renderPropLayer();
-  if(fly){ const b=L.geoJSON(f).getBounds(); map.flyToBounds(b,Object.assign({maxZoom:18},fitPad())); }
+  if(View3D.on){ if(fly) View3D.flyToGeom(f.geometry); else View3D.select(); }
+  else if(fly){ const b=L.geoJSON(f).getBounds(); map.flyToBounds(b,Object.assign({maxZoom:18},fitPad())); }
   setHash("p-"+(P(f).ppin||P(f).parcel));
   openTab("property");
 }
@@ -891,11 +911,12 @@ function selectProp(id,fly){
   const r=Store.rows.find(x=>x.id===id); if(!r) return;
   State.selected={kind:"prop",id}; restyleParcels(); renderPropLayer();
   const g=geomOf(r);
-  if(fly && g){ if(g.type==="Point") flyPoint(L.latLng(g.coordinates[1],g.coordinates[0]),17); else map.flyToBounds(L.geoJSON(g).getBounds(),Object.assign({maxZoom:18},fitPad())); }
+  if(View3D.on){ if(fly && g) View3D.flyToGeom(g); else View3D.select(); }
+  else if(fly && g){ if(g.type==="Point") flyPoint(L.latLng(g.coordinates[1],g.coordinates[0]),17); else map.flyToBounds(L.geoJSON(g).getBounds(),Object.assign({maxZoom:18},fitPad())); }
   setHash("a-"+id);
   openTab("property");
 }
-function clearSelection(){ State.selected=null; restyleParcels(); renderPropLayer(); setHash(""); if(State.tab==="property") renderPanel(); }
+function clearSelection(){ State.selected=null; restyleParcels(); renderPropLayer(); setHash(""); if(State.tab==="property") renderPanel(); if(View3D.on) View3D.select(); }
 function panelPad(){ return window.innerWidth>720 && !$("#panel").classList.contains("collapsed") ? [420,60] : [40,40]; }
 function setHash(h){ try{ history.replaceState(null,"",h?"#"+h:location.pathname+location.search); }catch(e){} }
 function openTab(t){ if(Admin.form && State.tab==="property" && t!=="property") Admin.syncFormFromDom(); State.tab=t; $$(".ptab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t)); setPanelOpen(true); renderPanel(); }
@@ -1016,6 +1037,7 @@ function setLayer(id,on){
   if(id==="limits") on? limitsLayer.addTo(map) : map.removeLayer(limitsLayer);
   if(id==="gas") on? gasLayer.addTo(map) : map.removeLayer(gasLayer);
   if(id==="flood") on? floodLayer.addTo(map) : map.removeLayer(floodLayer);
+  if(View3D.on) View3D.apply();
 }
 
 function renderAnnexTab(el){
@@ -1073,8 +1095,8 @@ function showToolbar(h){ const t=$("#toolbar"); t.innerHTML=h; t.hidden=false; }
 function hideToolbar(){ $("#toolbar").hidden=true; }
 $("#tPin").onclick=()=>{ Admin.cancelGeo(); setMode("pin"); };
 $("#tMeasure").onclick=()=>{ Admin.cancelGeo(); setMode("measure"); };
-$("#zin").onclick=()=>map.zoomIn(); $("#zout").onclick=()=>map.zoomOut();
-$("#homeBtn").onclick=()=>{ const b = limitsLayer ? limitsLayer.getBounds() : null; b && b.isValid() ? map.flyToBounds(b,fitPad()) : map.flyTo(CONFIG.CENTER,CONFIG.ZOOM); };
+$("#zin").onclick=()=>View3D.on&&View3D.map ? View3D.map.zoomIn() : map.zoomIn(); $("#zout").onclick=()=>View3D.on&&View3D.map ? View3D.map.zoomOut() : map.zoomOut();
+$("#homeBtn").onclick=()=>{ if(View3D.on&&View3D.map){ const lb=limitsLayer&&limitsLayer.getBounds(); if(lb&&lb.isValid()){ const c=lb.getCenter(); View3D.map.flyTo({center:[c.lng,c.lat],zoom:13.6,pitch:55,bearing:0,duration:2500}); } return; } const b = limitsLayer ? limitsLayer.getBounds() : null; b && b.isValid() ? map.flyToBounds(b,fitPad()) : map.flyTo(CONFIG.CENTER,CONFIG.ZOOM); };
 $("#tShare").onclick=()=>copyText(location.href,"Link copied");
 $("#tLocate").onclick=()=>{
   if(!navigator.geolocation){ toast("Location isn't available on this device"); return; }
@@ -1237,12 +1259,14 @@ const Admin = {
   /* ---------- add / edit on the map ---------- */
   blank(){ return {id:uid(),kind:"annexation",name:"",address:"",ppin:"",parcel_number:"",owner:"",acreage:"",current_zone:"",requested_zone:"",status:"submitted",application_no:"",submitted_date:today(),pc_date:"",pc_vote:"",council_date:"",council_vote:"",decision_date:"",ordinance_no:"",notes:"",public:"Y",geometry:"",source:"staff"}; },
   startAdd({fromParcel}={}){
+    if(View3D.on) View3D.exit();
     this.form=this.blank(); this.form._new=true; this.close();
     if(fromParcel) this.captureParcel(fromParcel,true);
     State.selected=null; restyleParcels(); renderPropLayer();
     State.mode="form"; openTab("property"); if(isMobile()) setSheet("full"); this.showGeo();
   },
   startEdit(id){
+    if(View3D.on) View3D.exit();
     const r=Store.rows.find(x=>x.id===id); if(!r) return;
     this.form=Object.assign({},r); this.form._new=false; this.close();
     State.selected=null; restyleParcels(); renderPropLayer();
@@ -1329,9 +1353,146 @@ $("#adminBtn").onclick=()=>Admin.open();
 function hydrateRows(rows){ rows.forEach(r=>{ if(geomOf(r)) return; if(r.lat && r.lng && !isNaN(+r.lat)){ r.geometry=JSON.stringify({type:"Point",coordinates:[+r.lng,+r.lat]}); return; } const f=findParcel(r.ppin,r.parcel_number); if(f) r.geometry=JSON.stringify(f.geometry); }); }
 
 /* =====================================================================
+   3D FLY-OVER (MapLibre GL, loaded on demand)
+   ===================================================================== */
+const ML_URL="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/";
+const View3D = {
+  on:false, map:null, loading:false, touring:false, orbiting:false, raf:0, stopLabel:"",
+  opts: Object.assign({base:"sat",terrain:true,buildings:true,zoning:true,exag:1.8}, lsGet("arabmap.3d",{})),
+  save(){ lsSet("arabmap.3d",this.opts); },
+  async load(){
+    if(window.maplibregl) return;
+    const css=document.createElement("link"); css.rel="stylesheet"; css.href=ML_URL+"maplibre-gl.min.css"; document.head.appendChild(css);
+    await new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=ML_URL+"maplibre-gl.js"; s.onload=res; s.onerror=()=>rej(new Error("The 3D engine didn't load. Check your connection and try again.")); document.head.appendChild(s); });
+  },
+  toggle(){ this.on ? this.exit() : this.enter(); },
+  async enter(){
+    if(this.loading||this.on) return;
+    if(Admin.form){ toast("Finish or cancel the property you're editing first"); return; }
+    setMode(null); this.loading=true; $("#t3d").setAttribute("aria-pressed","true"); toast("Loading 3D view…");
+    try{ await this.load(); }catch(e){ toast(e.message,5000); this.loading=false; $("#t3d").setAttribute("aria-pressed","false"); return; }
+    const c=map.getCenter(), el=$("#map3d"); el.hidden=false; document.body.classList.add("is3d");
+    this.map=new maplibregl.Map({container:el, style:this.style(), center:[c.lng,c.lat], zoom:Math.max(map.getZoom()-1,13.5), pitch:62, bearing:-18, maxPitch:85, attributionControl:false, fadeDuration:0});
+    this.map.on("load",()=>{ this.addData(); this.apply(); try{ this.map.setSky({"sky-color":"#8fb6e3","horizon-color":"#dfe9f5","fog-color":"#dfe9f5","sky-horizon-blend":0.6,"horizon-fog-blend":0.5,"fog-ground-blend":0.3}); }catch(e){} });
+    this.map.on("error",()=>{});
+    this.map.on("click",e=>this.click(e));
+    this.map.on("mousemove",e=>{ const f=this.map.getLayer("z-fill") && this.map.queryRenderedFeatures(e.point,{layers:["z-fill","a-fill","a-pt"].filter(l=>this.map.getLayer(l))}); this.map.getCanvas().style.cursor = f&&f.length ? "pointer" : ""; });
+    ["mousedown","touchstart","wheel"].forEach(ev=>this.map.getCanvasContainer().addEventListener(ev,()=>{ if(this.orbiting) this.stopOrbit(); },{passive:true}));
+    this.on=true; this.loading=false; this.renderCtl();
+  },
+  exit(){
+    this.stopTour(); this.stopOrbit();
+    if(this.map){ const c=this.map.getCenter(); map.setView([c.lat,c.lng], Math.min(19,this.map.getZoom()+1)); this.map.remove(); this.map=null; }
+    $("#map3d").hidden=true; $("#ctl3d").hidden=true; document.body.classList.remove("is3d");
+    this.on=false; $("#t3d").setAttribute("aria-pressed","false"); setTimeout(()=>map.invalidateSize(),60);
+  },
+  style(){
+    const esri=p=>"https://server.arcgisonline.com/ArcGIS/rest/services/"+p+"/MapServer/tile/{z}/{y}/{x}";
+    const dem={type:"raster-dem",tiles:["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],tileSize:256,maxzoom:15,encoding:"terrarium"};
+    return {version:8, glyphs:"https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+      sources:{ sat:{type:"raster",tiles:[esri("World_Imagery")],tileSize:256,maxzoom:19}, light:{type:"raster",tiles:[esri("Canvas/World_Light_Gray_Base")],tileSize:256,maxzoom:16},
+        dem:dem, demhs:Object.assign({},dem), omt:{type:"vector",url:"https://tiles.openfreemap.org/planet"} },
+      layers:[
+        {id:"bg",type:"background",paint:{"background-color":"#dfe4ea"}},
+        {id:"light",type:"raster",source:"light",layout:{visibility:"none"}},
+        {id:"sat",type:"raster",source:"sat"},
+        {id:"hill",type:"hillshade",source:"demhs",paint:{"hillshade-exaggeration":0.3,"hillshade-shadow-color":"#0b1a33"}},
+        {id:"bldg",type:"fill-extrusion",source:"omt","source-layer":"building",minzoom:13,paint:{"fill-extrusion-color":"#ece6d8","fill-extrusion-height":["coalesce",["get","render_height"],6],"fill-extrusion-base":["coalesce",["get","render_min_height"],0],"fill-extrusion-opacity":0.95}},
+        {id:"road-name",type:"symbol",source:"omt","source-layer":"transportation_name",minzoom:14.5,layout:{"symbol-placement":"line","text-field":["get","name"],"text-font":["Noto Sans Regular"],"text-size":12},paint:{"text-color":"#ffffff","text-halo-color":"#0b1a33","text-halo-width":1.5}}
+      ]};
+  },
+  zoneExpr(){ const e=["match",["get","_z"]]; Object.entries(ZONES).forEach(([k,z])=>e.push(k,z.color)); e.push("#ffffff"); return e; },
+  annexFC(){ return {type:"FeatureCollection",features:visibleRows().map(r=>{ const g=geomOf(r); if(!g) return null; const s=statusOf(r.status); return {type:"Feature",geometry:g,properties:{id:r.id,name:r.name||r.address||"",color:s.color,label:s.label}}; }).filter(Boolean)}; },
+  addData(){
+    const m=this.map; if(!m) return;
+    const pfc={type:"FeatureCollection",features:(parcelData?parcelData.features:[]).map((f,i)=>({type:"Feature",geometry:f.geometry,properties:{_i:i,_z:P(f).zone}}))};
+    m.addSource("parcels",{type:"geojson",data:pfc});
+    m.addSource("limits",{type:"geojson",data:limitsData||{type:"FeatureCollection",features:[]}});
+    m.addSource("annex",{type:"geojson",data:this.annexFC()});
+    const before=m.getLayer("bldg")?"bldg":undefined;
+    m.addLayer({id:"z-fill",type:"fill",source:"parcels",paint:{"fill-color":this.zoneExpr(),"fill-opacity":Math.min(.85,State.opacity+.1)}},before);
+    m.addLayer({id:"z-line",type:"line",source:"parcels",minzoom:14,paint:{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],14,.3,18,1.4],"line-opacity":.8}},before);
+    m.addLayer({id:"z-sel",type:"line",source:"parcels",filter:["==",["get","_i"],-1],paint:{"line-color":"#F2C230","line-width":4}},before);
+    m.addLayer({id:"limits",type:"line",source:"limits",paint:{"line-color":"#F2C230","line-width":3,"line-dasharray":[3,2]}},before);
+    m.addLayer({id:"a-fill",type:"fill-extrusion",source:"annex",filter:["==",["geometry-type"],"Polygon"],paint:{"fill-extrusion-color":["get","color"],"fill-extrusion-height":28,"fill-extrusion-opacity":.55}});
+    m.addLayer({id:"a-pt",type:"circle",source:"annex",filter:["==",["geometry-type"],"Point"],paint:{"circle-radius":9,"circle-color":["get","color"],"circle-stroke-color":"#fff","circle-stroke-width":2.5}});
+  },
+  refresh(){ if(!this.map||!this.map.getSource("annex")) return; this.map.getSource("annex").setData(this.annexFC()); },
+  apply(){
+    const m=this.map, o=this.opts; if(!m||!m.isStyleLoaded()) return;
+    const vis=(id,on)=>{ if(m.getLayer(id)) m.setLayoutProperty(id,"visibility",on?"visible":"none"); };
+    vis("sat",o.base==="sat"); vis("light",o.base==="light");
+    vis("bldg",o.buildings); ["z-fill","z-line"].forEach(id=>vis(id,o.zoning)); vis("limits",State.layers.limits); ["a-fill","a-pt"].forEach(id=>vis(id,State.layers.annex));
+    try{ m.setTerrain(o.terrain?{source:"dem",exaggeration:+o.exag}:null); }catch(e){}
+    vis("hill",o.terrain);
+    this.save();
+  },
+  select(){
+    if(!this.map||!this.map.getLayer("z-sel")) return;
+    const i = State.selected && State.selected.kind==="parcel" && parcelData ? parcelData.features.indexOf(State.selected.feature) : -1;
+    this.map.setFilter("z-sel",["==",["get","_i"],i]);
+  },
+  click(e){
+    const m=this.map; const layers=["a-fill","a-pt","z-fill"].filter(l=>m.getLayer(l));
+    const f=m.queryRenderedFeatures(e.point,{layers})[0];
+    if(!f){ clearSelection(); this.select(); return; }
+    if(f.layer.id!=="z-fill") selectProp(f.properties.id,false); else selectParcel(parcelData.features[f.properties._i],false);
+    this.select();
+  },
+  pad(){ return isMobile()? {top:40,bottom:Math.round(sheetHeight()||96)+20,left:20,right:20} : {top:60,bottom:120,left:(panelPad()[0]||40),right:70}; },
+  flyToGeom(g,zoom){
+    if(!this.map||!g) return; this.stopOrbit();
+    const b=L.geoJSON(g).getBounds(), c=b.getCenter();
+    this.map.flyTo({center:[c.lng,c.lat],zoom:zoom||Math.min(17.2,Math.max(15.5,this.map.cameraForBounds([[b.getWest(),b.getSouth()],[b.getEast(),b.getNorth()]],{padding:this.pad()})?.zoom||16.5)),pitch:62,bearing:this.map.getBearing(),padding:this.pad(),duration:2600,essential:true});
+    this.select();
+  },
+  orbit(){ if(this.orbiting){ this.stopOrbit(); return; } this.stopTour(); this.orbiting=true; const step=()=>{ if(!this.orbiting||!this.map) return; this.map.setBearing((this.map.getBearing()+0.12)%360); this.raf=requestAnimationFrame(step); }; step(); this.renderCtl(); },
+  stopOrbit(){ if(!this.orbiting) return; this.orbiting=false; cancelAnimationFrame(this.raf); this.renderCtl(); },
+  async tour(){
+    if(this.touring){ this.stopTour(); return; }
+    this.stopOrbit(); this.touring=true; const m=this.map;
+    const stops=[];
+    const lb=limitsLayer && limitsLayer.getBounds(); if(lb && lb.isValid()){ const c=lb.getCenter(); stops.push({label:"City of Arab",center:[c.lng,c.lat],zoom:13.6,pitch:50,bearing:0}); }
+    stops.push({label:"Downtown · Main Street",center:[CONFIG.CENTER[1],CONFIG.CENTER[0]],zoom:16.6,pitch:72,bearing:-35});
+    visibleRows().filter(isOpen).slice(0,6).forEach((r,i)=>{ const g=geomOf(r); if(!g) return; const c=L.geoJSON(g).getBounds().getCenter(); stops.push({label:(r.name||r.address)+" · "+statusOf(r.status).label,center:[c.lng,c.lat],zoom:16.2,pitch:66,bearing:30+i*55,id:r.id}); });
+    if(stops[0]) stops.push(Object.assign({},stops[0],{label:"City of Arab",bearing:40}));
+    const wait=ms=>new Promise(r=>setTimeout(r,ms));
+    for(const s of stops){
+      if(!this.touring||!this.map) break;
+      this.stopLabel=s.label; this.renderCtl();
+      m.flyTo({center:s.center,zoom:s.zoom,pitch:s.pitch,bearing:s.bearing,padding:this.pad(),duration:6000,curve:1.3,essential:true});
+      await new Promise(r=>m.once("moveend",r));
+      if(!this.touring) break;
+      if(s.id){ selectProp(s.id,false); }
+      m.easeTo({bearing:s.bearing+25,duration:3200,easing:t=>t}); await wait(3400);
+    }
+    this.touring=false; this.stopLabel=""; this.renderCtl();
+  },
+  stopTour(){ if(!this.touring) return; this.touring=false; if(this.map) this.map.stop(); this.stopLabel=""; this.renderCtl(); },
+  renderCtl(){
+    const el=$("#ctl3d"); if(!this.on){ el.hidden=true; return; }
+    const o=this.opts, chip=(k,l)=>'<button class="chip" data-o="'+k+'" aria-pressed="'+!!o[k]+'">'+l+'</button>';
+    el.innerHTML='<div class="c3-row"><div class="seg"><button data-base="sat" aria-pressed="'+(o.base==="sat")+'">Satellite</button><button data-base="light" aria-pressed="'+(o.base==="light")+'">Light</button></div>'+
+      chip("buildings","3D buildings")+chip("terrain","Hills")+chip("zoning","Zoning")+'</div>'+
+      '<div class="c3-row"><button class="btn sm primary" id="c3Tour">'+(this.touring?"Stop tour":"▶ Fly-over tour")+'</button><button class="btn sm" id="c3Orbit" aria-pressed="'+this.orbiting+'">'+(this.orbiting?"Stop rotating":"Rotate")+'</button>'+
+      '<label class="c3-ex">Hills ×<b>'+(+o.exag).toFixed(1)+'</b><input type="range" id="c3Ex" min="1" max="4" step="0.1" value="'+o.exag+'"'+(o.terrain?'':' disabled')+' aria-label="Hill exaggeration"></label><button class="btn sm ghost" id="c3Exit">Exit 3D</button></div>'+
+      (this.stopLabel?'<div class="c3-now">'+esc(this.stopLabel)+'</div>':'')+
+      '<div class="c3-attr">Designed by Jade Cruz · MapLibre · Imagery © Esri, Maxar · © OpenStreetMap, OpenFreeMap · Terrain: AWS Terrain Tiles</div>';
+    el.hidden=false;
+    $$("[data-base]",el).forEach(b=>b.onclick=()=>{ o.base=b.dataset.base; this.apply(); this.renderCtl(); });
+    $$("[data-o]",el).forEach(b=>b.onclick=()=>{ o[b.dataset.o]=!o[b.dataset.o]; this.apply(); this.renderCtl(); });
+    $("#c3Tour",el).onclick=()=>this.tour();
+    $("#c3Orbit",el).onclick=()=>this.orbit();
+    $("#c3Exit",el).onclick=()=>this.exit();
+    const ex=$("#c3Ex",el); ex.oninput=()=>{ o.exag=+ex.value; ex.previousElementSibling.textContent=o.exag.toFixed(1); try{ this.map.setTerrain(o.terrain?{source:"dem",exaggeration:o.exag}:null); }catch(e){} }; ex.onchange=()=>this.save();
+  },
+};
+$("#t3d").onclick=()=>View3D.toggle();
+
+/* =====================================================================
    BOOT
    ===================================================================== */
-Store.on(rows=>{ hydrateRows(rows); renderPropLayer(); buildIndex(); if(!Admin.form) renderPanel(); if(!$("#admin").hidden) Admin.render(); applyHash(); });
+Store.on(rows=>{ hydrateRows(rows); renderPropLayer(); View3D.refresh(); buildIndex(); if(!Admin.form) renderPanel(); if(!$("#admin").hidden) Admin.render(); applyHash(); });
 let hashApplied=false;
 function applyHash(){
   if(hashApplied) return; const h=decodeURIComponent(location.hash.slice(1)); if(!h) { hashApplied=true; return; }

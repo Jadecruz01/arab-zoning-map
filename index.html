@@ -650,12 +650,12 @@ function sampleProperties(){
 /* =====================================================================
    STAFF SIGN-IN (Supabase, shared with the permit checker project)
    ===================================================================== */
-const RANK={viewer:1,editor:2,admin:3,super_admin:4};
-const ROLE_LABEL={super_admin:"Super admin",admin:"Admin",editor:"Editor",viewer:"Viewer"};
+const RANK={viewer:1,staff:2,admin:3};
+const ROLE_LABEL={admin:"Administrator",staff:"Staff",viewer:"Viewer"};
 async function sbRpc(fn,args){
   const r=await fetch(CONFIG.SUPABASE_URL.replace(/\/$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",headers:{"apikey":CONFIG.SUPABASE_KEY,"Authorization":"Bearer "+CONFIG.SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify(args||{})});
   const txt=await r.text(); let j=null; try{ j=txt?JSON.parse(txt):null; }catch(e){}
-  if(!r.ok){ const msg=(j&&(j.message||j.hint))||("Server error "+r.status); if(/session has expired/i.test(msg) && Auth.user){ Auth.clear(); toast("Your session expired. Sign in again."); } throw new Error(msg); }
+  if(!r.ok){ let msg=(j&&(j.message||j.hint))||("Server error "+r.status); if(msg==="unauthorized") msg="Your session has expired. Sign in again."; if(msg==="forbidden") msg="You don't have permission to do that."; if(/session has expired/i.test(msg) && Auth.user){ Auth.clear(); toast("Your session expired. Sign in again."); } throw new Error(msg); }
   return j;
 }
 const Auth = {
@@ -663,13 +663,13 @@ const Auth = {
   enabled(){ return !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY); },
   can(min){ return !!this.user && (RANK[this.user.role]||0) >= RANK[min]; },
   async restore(){ this.ready=true; if(!this.enabled()||!this.token) return; try{ this.user=await sbRpc("zm_me",{p_token:this.token}); }catch(e){ this.clear(); } },
-  async login(email,pw){ const r=await sbRpc("zm_login",{p_email:email,p_password:pw}); this.token=r.token; this.user=r.user; lsSet("arabmap.token",r.token); },
-  async logout(){ if(this.token){ try{ await sbRpc("zm_logout",{p_token:this.token}); }catch(e){} } this.clear(); },
+  async login(name,pw){ const r=await sbRpc("pm_staff_login",{p_username:name,p_password:pw}); if(!r||!r.ok) throw new Error(r&&r.error==="locked"?"Too many tries. Wait 15 minutes and try again.":"That username and password don't match."); this.token=r.token; this.user={username:r.username,role:r.role,full_name:r.full_name}; lsSet("arabmap.token",r.token); },
+  async logout(){ if(this.token){ try{ await sbRpc("pm_staff_logout",{p_token:this.token}); }catch(e){} } this.clear(); },
   clear(){ this.token=null; this.user=null; lsSet("arabmap.token",null); updateStaffBtn(); },
 };
-const canEdit = () => Auth.enabled() ? Auth.can("editor") : Admin.unlocked;
+const canEdit = () => Auth.enabled() ? Auth.can("staff") : Admin.unlocked;
 const canAdmin = () => Auth.enabled() ? Auth.can("admin") : Admin.unlocked;
-function updateStaffBtn(){ const l=$("#adminBtn .lbl"); if(l) l.textContent = Admin.unlocked ? (Auth.user ? (Auth.user.name||Auth.user.email.split("@")[0]) : "Dashboard") : "Staff"; }
+function updateStaffBtn(){ const l=$("#adminBtn .lbl"); if(l) l.textContent = Admin.unlocked ? (Auth.user ? (Auth.user.full_name||Auth.user.username.split("@")[0]) : "Dashboard") : "Staff"; }
 function tempPassword(){ const w="abcdefghjkmnpqrstuvwxyz", d="23456789"; const a=new Uint32Array(12); crypto.getRandomValues(a); let s=""; for(let i=0;i<12;i++){ s+= i===4||i===8 ? "-" : (i%4===3 ? d[a[i]%d.length] : w[a[i]%w.length]); } return s; }
 
 /* =====================================================================
@@ -1224,7 +1224,7 @@ const Admin = {
     if(Auth.enabled()){ if(canAdmin()) tabs.push(["users","Staff logins"]); tabs.push(["account","My account"]); }
     if(canAdmin()) tabs.push(["feed","Google Sheet feed"]);
     if(!tabs.some(t=>t[0]===this.tab)) this.tab="overview";
-    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1>'+(Auth.user?'<p class="sub" style="margin:4px 0 0">Signed in as <b>'+esc(Auth.user.email)+'</b> · '+esc(ROLE_LABEL[Auth.user.role]||Auth.user.role)+'</p>':'')+'</div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button>'+(canEdit()?'<button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button>':'')+'<button class="btn ghost" id="aLock">Sign out</button></div></div>'+
+    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1>'+(Auth.user?'<p class="sub" style="margin:4px 0 0">Signed in as <b>'+esc(Auth.user.username)+'</b> · '+esc(ROLE_LABEL[Auth.user.role]||Auth.user.role)+'</p>':'')+'</div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button>'+(canEdit()?'<button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button>':'')+'<button class="btn ghost" id="aLock">Sign out</button></div></div>'+
       '<nav class="anav" role="tablist">'+tabs.map(([k,l])=>'<button role="tab" data-at="'+k+'" aria-selected="'+(this.tab===k)+'">'+l+'</button>').join("")+'</nav><div id="abody"></div></div>';
     $("#aMap").onclick=()=>this.close(); const aa=$("#aAdd"); if(aa) aa.onclick=()=>this.startAdd({}); $("#aLock").onclick=()=>this.lock();
     $$("[data-at]",el).forEach(b=>b.onclick=()=>{ this.tab=b.dataset.at; this.render(); });
@@ -1232,12 +1232,12 @@ const Admin = {
     ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),users:()=>this.rUsers(body),account:()=>this.rSetPassword(body,false)})[this.tab]();
   },
   rLogin(el){
-    el.innerHTML='<div class="admin-in"><form class="gate" id="lgForm" autocomplete="on"><p class="eyebrow">Building Department</p><h2>Staff sign-in</h2><p class="sub">Sign in to add and edit properties on the map. Changes are saved for everyone.</p>'+
-      '<div class="field" style="margin-bottom:10px"><label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username" required></div>'+
+    el.innerHTML='<div class="admin-in"><form class="gate" id="lgForm" autocomplete="on"><p class="eyebrow">Building Department</p><h2>Staff sign-in</h2><p class="sub">Use your permit checker login. Changes you make here are saved for everyone.</p>'+
+      '<div class="field" style="margin-bottom:10px"><label for="lgEmail">Username</label><input id="lgEmail" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>'+
       '<div class="field" style="margin-bottom:6px"><label for="lgPw">Password</label><input id="lgPw" type="password" autocomplete="current-password" required></div>'+
       '<p class="note warn" id="lgErr" hidden style="margin:8px 0 0"></p>'+
       '<div class="btnrow" style="margin-top:14px"><button class="btn primary" id="lgGo" type="submit">Sign in</button><button class="btn" id="gBack" type="button">Back to map</button></div>'+
-      '<p class="sub" style="margin:14px 0 0;font-size:12px">Forgot your password? Ask a map admin to reset it.</p></form></div>';
+      '<p class="sub" style="margin:14px 0 0;font-size:12px">Forgot your password? Ask an administrator to reset it.</p></form></div>';
     $("#gBack").onclick=()=>this.close();
     setTimeout(()=>{ const e=$("#lgEmail"); if(e) e.focus(); },50);
     $("#lgForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#lgGo"), er=$("#lgErr"); b.disabled=true; b.textContent="Signing in…"; er.hidden=true;
@@ -1246,7 +1246,7 @@ const Admin = {
   },
   rSetPassword(el,forced){
     const html='<form class="'+(forced?'gate':'box')+'" id="pwForm" style="'+(forced?'':'max-width:480px')+'"><p class="eyebrow">'+(forced?'Welcome':'My account')+'</p><h2 style="font:700 20px var(--serif);margin:0 0 6px">'+(forced?'Choose your own password':'Change password')+'</h2>'+
-      (forced?'<p class="sub">You signed in with a temporary password. Set a new one to continue.</p>':'<p class="sub">Signed in as '+esc(Auth.user.email)+'.</p>')+
+      (forced?'<p class="sub">You signed in with a temporary password. Set a new one to continue.</p>':'<p class="sub">Signed in as '+esc(Auth.user.username)+'. This also changes your permit checker password.</p>')+
       '<div class="field" style="margin-bottom:10px"><label for="pwOld">'+(forced?'Temporary password':'Current password')+'</label><input id="pwOld" type="password" autocomplete="current-password" required></div>'+
       '<div class="field" style="margin-bottom:10px"><label for="pwNew">New password</label><input id="pwNew" type="password" autocomplete="new-password" minlength="10" required><span class="hint">At least 10 characters</span></div>'+
       '<div class="field"><label for="pwNew2">Type it again</label><input id="pwNew2" type="password" autocomplete="new-password" required></div>'+
@@ -1255,43 +1255,45 @@ const Admin = {
     const out=$("#pwOut"); if(out) out.onclick=()=>this.lock();
     $("#pwForm").onsubmit=async ev=>{ ev.preventDefault(); const er=$("#pwErr"); er.hidden=true;
       if($("#pwNew").value!==$("#pwNew2").value){ er.textContent="The new passwords don't match."; er.hidden=false; return; }
-      try{ await sbRpc("zm_change_password",{p_token:Auth.token,p_old:$("#pwOld").value,p_new:$("#pwNew").value}); Auth.user.must_change=false; toast("Password saved"); this.render(); }
+      try{ const r=await sbRpc("pm_staff_change_password",{p_token:Auth.token,p_old:$("#pwOld").value,p_new:$("#pwNew").value}); if(r&&r.ok===false) throw new Error(r.error||"Couldn't change the password."); Auth.user.must_change=false; toast("Password saved"); this.render(); }
       catch(e){ er.textContent=e.message; er.hidden=false; } };
   },
   async rUsers(b){
+    const pmc=async(fn,args)=>{ const r=await sbRpc(fn,Object.assign({p_token:Auth.token},args)); if(r&&r.ok===false) throw new Error(r.error||"That didn't work."); return r; };
     b.innerHTML='<p class="sub">Loading logins…</p>';
-    let users=[]; try{ users=await sbRpc("zm_list_users",{p_token:Auth.token}); }catch(e){ b.innerHTML='<p class="note warn">'+esc(e.message)+'</p>'; return; }
-    const me=Auth.user, isSuper=me.role==="super_admin";
-    const roles=Object.keys(ROLE_LABEL).filter(r=>isSuper || RANK[r]<RANK.admin);
-    const manageable=u=> u.id!==me.id && (isSuper || RANK[u.role]<RANK.admin);
-    const roleSel=(id,val,dis)=>'<select id="'+id+'"'+(dis?' disabled':'')+'>'+Object.keys(ROLE_LABEL).filter(r=>roles.includes(r)||r===val).map(r=>'<option value="'+r+'"'+(r===val?' selected':'')+'>'+ROLE_LABEL[r]+'</option>').join("")+'</select>';
-    b.innerHTML='<div class="grid2" style="margin-top:0;grid-template-columns:1fr"><div class="box"><h3>Add a login</h3><form id="nuForm" class="fgrid">'+
-      '<div class="field"><label for="nuEmail">Email</label><input id="nuEmail" type="email" required></div>'+
-      '<div class="field"><label for="nuName">Name</label><input id="nuName"></div>'+
-      '<div class="field"><label for="nuRole">Access</label>'+roleSel("nuRole","editor")+'</div>'+
-      '<div class="field"><label for="nuPw">Temporary password</label><div style="display:flex;gap:6px"><input id="nuPw" value="'+tempPassword()+'" minlength="10" required style="flex:1"><button class="btn" type="button" id="nuGen">New</button></div><span class="hint">They\'ll be asked to change it the first time they sign in</span></div>'+
+    let users=[]; try{ users=await sbRpc("pm_staff_users_list",{p_token:Auth.token})||[]; }catch(e){ b.innerHTML='<p class="note warn">'+esc(e.message)+'</p>'; return; }
+    const me=Auth.user, isAdmin=me.role==="admin";
+    const roles=Object.keys(ROLE_LABEL).filter(r=>isAdmin || r!=="admin");
+    const manageable=u=> u.username!==me.username && (isAdmin || u.role!=="admin");
+    const roleSel=(id,val)=>'<select id="'+id+'">'+Object.keys(ROLE_LABEL).filter(r=>roles.includes(r)||r===val).map(r=>'<option value="'+r+'"'+(r===val?' selected':'')+'>'+ROLE_LABEL[r]+'</option>').join("")+'</select>';
+    b.innerHTML='<p class="note info" style="margin-bottom:12px">These are the same logins as the permit checker. Adding, changing or turning off someone here changes their access on both sites.</p>'+
+      '<div class="grid2" style="margin-top:0;grid-template-columns:1fr"><div class="box"><h3>Add a login</h3><form id="nuForm" class="fgrid">'+
+      '<div class="field"><label for="nuEmail">Username</label><input id="nuEmail" autocapitalize="off" spellcheck="false" required placeholder="name@collinsalexander.com"><span class="hint">3–64 characters: letters, numbers and . _ @ + -</span></div>'+
+      '<div class="field"><label for="nuName">Full name</label><input id="nuName"></div>'+
+      '<div class="field"><label for="nuRole">Access</label>'+roleSel("nuRole","staff")+'<span class="hint">Administrator: everything · Staff: add and edit properties · Viewer: look only</span></div>'+
+      '<div class="field"><label for="nuPw">Starting password</label><div style="display:flex;gap:6px"><input id="nuPw" value="'+tempPassword()+'" minlength="10" required style="flex:1"><button class="btn" type="button" id="nuGen">New</button></div><span class="hint">Share it privately; they can change it under My account</span></div>'+
       '<div class="btnrow full"><button class="btn primary" type="submit">Create login</button></div></form><p class="note info" id="nuDone" hidden style="margin-top:10px"></p></div>'+
-      '<div class="box"><h3>Staff logins</h3><p class="sub" style="font-size:12px">Super admin: everything, including admins · Admin: manages editor and viewer logins, map layers · Editor: adds and edits properties · Viewer: sees staff-only details</p>'+
+      '<div class="box"><h3>Staff logins</h3>'+
       '<div class="tablewrap"><table class="t"><thead><tr><th>Login</th><th>Access</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>'+
-      users.map(u=>{ const m=manageable(u); return '<tr data-u="'+esc(u.id)+'"><td class="first"><b>'+esc(u.name||u.email)+'</b><div style="font-size:12px;color:var(--ink-soft)">'+esc(u.email)+(u.id===me.id?' · you':'')+'</div></td>'+
-        '<td data-l="Access">'+(m?roleSel("ur-"+u.id,u.role,false):esc(ROLE_LABEL[u.role]||u.role))+'</td>'+
-        '<td data-l="Status">'+(u.active?(u.must_change?'<span class="pill" style="color:var(--warn);background:var(--warn-bg)"><i></i>Temporary password</span>':'<span class="pill" style="color:var(--ok);background:var(--ok-bg)"><i></i>Active</span>'):'<span class="pill" style="color:var(--ink-faint);background:var(--surface-2)"><i></i>Turned off</span>')+'</td>'+
-        '<td data-l="Last sign-in" style="font-size:12px;color:var(--ink-soft)">'+(u.last_login?esc(ago(u.last_login)):'Never')+'</td>'+
+      users.map(u=>{ const m=manageable(u); return '<tr><td class="first"><b>'+esc(u.full_name||u.username)+'</b><div style="font-size:12px;color:var(--ink-soft)">'+esc(u.username)+(u.username===me.username?' · you':'')+'</div></td>'+
+        '<td data-l="Access">'+(m?roleSel("ur-"+u.id,u.role):esc(ROLE_LABEL[u.role]||u.role))+'</td>'+
+        '<td data-l="Status">'+(u.active?'<span class="pill" style="color:var(--ok);background:var(--ok-bg)"><i></i>Active</span>':'<span class="pill" style="color:var(--ink-faint);background:var(--surface-2)"><i></i>Turned off</span>')+'</td>'+
+        '<td data-l="Last sign-in" style="font-size:12px;color:var(--ink-soft)">'+(u.last_login_at?esc(ago(u.last_login_at)):'Never')+'</td>'+
         '<td class="act">'+(m?'<button class="btn sm" data-reset="'+esc(u.id)+'">Reset password</button><button class="btn sm ghost" data-toggle="'+esc(u.id)+'">'+(u.active?'Turn off':'Turn on')+'</button><button class="btn sm ghost danger" data-deluser="'+esc(u.id)+'" aria-label="Delete login">✕</button>':'')+'</td></tr>'; }).join("")+
       '</tbody></table></div><p class="note info" id="urDone" hidden style="margin-top:10px"></p></div></div>';
-    const byId=id=>users.find(u=>u.id===id);
+    const byId=id=>users.find(u=>String(u.id)===String(id));
     $("#nuGen",b).onclick=()=>{ $("#nuPw",b).value=tempPassword(); };
-    $("#nuForm",b).onsubmit=async ev=>{ ev.preventDefault(); const pw=$("#nuPw",b).value, em=$("#nuEmail",b).value;
-      try{ await sbRpc("zm_save_user",{p_token:Auth.token,p_email:em,p_name:$("#nuName",b).value,p_role:$("#nuRole",b).value,p_active:true,p_password:pw}); await this.rUsers(b);
-        const d=$("#nuDone",b); d.innerHTML='Login created for <b>'+esc(em)+'</b>. Temporary password: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw">Copy</button><br>Share it with them privately; they\'ll set their own password when they first sign in.'; d.hidden=false; $("#cpPw",b).onclick=()=>copyText(pw,"Password copied"); }
+    $("#nuForm",b).onsubmit=async ev=>{ ev.preventDefault(); const pw=$("#nuPw",b).value, em=$("#nuEmail",b).value.trim().toLowerCase();
+      try{ await pmc("pm_staff_user_add",{p_username:em,p_full_name:$("#nuName",b).value,p_role:$("#nuRole",b).value,p_password:pw}); await this.rUsers(b);
+        const d=$("#nuDone",b); d.innerHTML='Login created for <b>'+esc(em)+'</b>. Starting password: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw">Copy</button><br>Share it privately. It works on the map and the permit checker.'; d.hidden=false; $("#cpPw",b).onclick=()=>copyText(pw,"Password copied"); }
       catch(e){ toast(e.message,5000); } };
-    $$("select[id^=ur-]",b).forEach(sel=>sel.onchange=async()=>{ const u=byId(sel.id.slice(3)); try{ await sbRpc("zm_save_user",{p_token:Auth.token,p_email:u.email,p_name:u.name,p_role:sel.value,p_active:u.active}); toast("Access updated"); await this.rUsers(b); }catch(e){ toast(e.message,5000); sel.value=u.role; } });
-    $$("[data-toggle]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.toggle); try{ await sbRpc("zm_save_user",{p_token:Auth.token,p_email:u.email,p_name:u.name,p_role:u.role,p_active:!u.active}); toast(u.active?"Login turned off":"Login turned on"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
+    $$("select[id^=ur-]",b).forEach(sel=>sel.onchange=async()=>{ const u=byId(sel.id.slice(3)); try{ await pmc("pm_staff_user_update",{p_id:u.id,p_full_name:u.full_name||"",p_role:sel.value,p_active:u.active}); toast("Access updated"); await this.rUsers(b); }catch(e){ toast(e.message,5000); sel.value=u.role; } });
+    $$("[data-toggle]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.toggle); try{ await pmc("pm_staff_user_update",{p_id:u.id,p_full_name:u.full_name||"",p_role:u.role,p_active:!u.active}); toast(u.active?"Login turned off":"Login turned on"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
     $$("[data-reset]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.reset); const pw=tempPassword();
-      try{ await sbRpc("zm_reset_password",{p_token:Auth.token,p_user:u.id,p_password:pw}); await this.rUsers(b); const d=$("#urDone",b); d.innerHTML='New temporary password for <b>'+esc(u.email)+'</b>: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw2">Copy</button><br>They\'ll be asked to change it when they sign in. Their other sessions were signed out.'; d.hidden=false; $("#cpPw2",b).onclick=()=>copyText(pw,"Password copied"); }
+      try{ await pmc("pm_staff_user_reset_password",{p_id:u.id,p_new:pw}); await this.rUsers(b); const d=$("#urDone",b); d.innerHTML='New password for <b>'+esc(u.username)+'</b>: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw2">Copy</button><br>Share it privately; they can change it under My account.'; d.hidden=false; $("#cpPw2",b).onclick=()=>copyText(pw,"Password copied"); }
       catch(e){ toast(e.message,5000); } });
     $$("[data-deluser]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.deluser); if(x.dataset.sure!=="1"){ x.dataset.sure="1"; x.textContent="Delete?"; x.classList.remove("ghost"); setTimeout(()=>{ if(x.isConnected){ x.dataset.sure=""; x.textContent="✕"; x.classList.add("ghost"); } },4000); return; }
-      try{ await sbRpc("zm_delete_user",{p_token:Auth.token,p_user:u.id}); toast("Login deleted"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
+      try{ await pmc("pm_staff_user_delete",{p_id:u.id}); toast("Login deleted"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
   },
   rOverview(b){
     const rows=Store.rows, ann=rows.filter(r=>r.kind==="annexation");

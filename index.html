@@ -5,41 +5,43 @@
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Arab Zoning Map</title>
-<meta name="description" content="City of Arab, Alabama zoning, property and annexation map.">
+<title>Zoning Map · City of Arab</title>
+<meta name="description" content="City of Arab, Alabama zoning map: look up the zoning district for any parcel, from the January 2025 zoning map.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Poppins:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
-  --navy:#0F3273; --navy-2:#1B4494; --gold:#F2C230; --gold-ink:#6B4E00;
-  --bg:#EEF1F7; --surface:#FFFFFF; --surface-2:#F5F7FB; --ink:#131C33; --ink-soft:#56627E; --ink-faint:#8490AA;
-  --line:#DCE2EE; --line-strong:#C3CCDD; --focus:#2F6BFF;
-  --ok:#1F8A5B; --ok-bg:#E3F4EC; --warn:#A86A00; --warn-bg:#FDF3DC; --bad:#B8322A; --bad-bg:#FBE6E4; --info:#2C63C9; --info-bg:#E4ECFB;
-  --shadow:0 1px 2px rgba(15,50,115,.08),0 8px 24px rgba(15,50,115,.12);
-  --map-bg:#E6EAF1; --grid:rgba(15,50,115,.07);
-  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  /* Same palette as the Building Department site (arabcityapplications.jadecruz.dev):
+     City of Arab navy #212c46, gold #c0a869, cream #fef6e9 */
+  --navy:#212c46; --navy-2:#2c3958; --gold:#c0a869; --gold-ink:#7d6528; --cream:#fef6e9;
+  --bg:#f4f1ea; --surface:#FFFFFF; --surface-2:#faf8f3; --sel:#f2ead6; --ink:#212c46; --ink-soft:#3e4862; --ink-faint:#68708a;
+  --line:#e0dbcf; --line-strong:#cfc7b6; --focus:#c0a869;
+  --ok:#1f6b3e; --ok-bg:#e6f2ea; --warn:#7d6528; --warn-bg:#f8f0dc; --bad:#c4283d; --bad-bg:#fbe9eb; --info:#2a4a80; --info-bg:#e9eef7;
+  --shadow:0 1px 2px rgba(33,44,70,.06),0 4px 16px rgba(33,44,70,.07);
+  --map-bg:#ece8de; --grid:rgba(33,44,70,.07);
+  --sans:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Poppins","DM Sans",ui-sans-serif,system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --r:10px;
+  --r:6px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#0A1222; --surface:#111C33; --surface-2:#16233F; --ink:#E6ECF7; --ink-soft:#A3B0CB; --ink-faint:#74819E;
-    --line:#233256; --line-strong:#2F4170; --gold-ink:#F2C230; --navy-2:#5B86E0;
-    --ok:#4CC08A; --ok-bg:#12322A; --warn:#F0B54A; --warn-bg:#352A12; --bad:#F07A70; --bad-bg:#3A1A1A; --info:#7FA6F2; --info-bg:#172A4D;
+    --bg:#141a29; --surface:#1c2438; --surface-2:#212a40; --sel:#2e3750; --ink:#f4efe4; --ink-soft:#d6d1c5; --ink-faint:#9ea5b6;
+    --line:#323c56; --line-strong:#3e4968; --gold-ink:#d8c48f; --navy-2:#a9c0ea;
+    --ok:#6fd99a; --ok-bg:#143524; --warn:#e3c97f; --warn-bg:#3a3018; --bad:#ff7b8c; --bad-bg:#3d1822; --info:#a9c0ea; --info-bg:#1e2a44;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.45);
-    --map-bg:#1A2438; --grid:rgba(160,180,220,.07);
+    --map-bg:#1c2438; --grid:rgba(160,180,220,.07);
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0A1222; --surface:#111C33; --surface-2:#16233F; --ink:#E6ECF7; --ink-soft:#A3B0CB; --ink-faint:#74819E;
-  --line:#233256; --line-strong:#2F4170; --gold-ink:#F2C230; --navy-2:#5B86E0;
-  --ok:#4CC08A; --ok-bg:#12322A; --warn:#F0B54A; --warn-bg:#352A12; --bad:#F07A70; --bad-bg:#3A1A1A; --info:#7FA6F2; --info-bg:#172A4D;
+  --bg:#141a29; --surface:#1c2438; --surface-2:#212a40; --sel:#2e3750; --ink:#f4efe4; --ink-soft:#d6d1c5; --ink-faint:#9ea5b6;
+  --line:#323c56; --line-strong:#3e4968; --gold-ink:#d8c48f; --navy-2:#a9c0ea;
+  --ok:#6fd99a; --ok-bg:#143524; --warn:#e3c97f; --warn-bg:#3a3018; --bad:#ff7b8c; --bad-bg:#3d1822; --info:#a9c0ea; --info-bg:#1e2a44;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.45);
-  --map-bg:#1A2438; --grid:rgba(160,180,220,.07);
+  --map-bg:#1c2438; --grid:rgba(160,180,220,.07);
 }
 
 /* ---------- Leaflet core (inlined) ---------- */
@@ -89,10 +91,10 @@ svg.leaflet-zoom-animated{will-change:transform}
 .leaflet-control-attribution .credit{font-weight:600;color:var(--ink)}
 
 /* ---------- Site banner (very top) ---------- */
-.sitebar{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:5px 16px;background:#0A2352;color:#E3E9F5;font-size:12px;line-height:1.3;position:relative;z-index:1201;border-bottom:1px solid rgba(242,194,48,.35)}
+.sitebar{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:5px 16px;background:#0A2352;color:#E3E9F5;font-size:12px;line-height:1.3;position:relative;z-index:1201;border-bottom:1px solid rgba(192,168,105,.35)}
 .sitebar .sb-seal{width:14px;height:14px;flex:0 0 auto}
 .sitebar b{color:#fff;font-weight:600}
-.sitebar .sb-tag{margin-left:2px;padding:1px 7px;border-radius:999px;background:rgba(242,194,48,.18);color:#F2C230;font-weight:600;font-size:11px;letter-spacing:.02em}
+.sitebar .sb-tag{margin-left:2px;padding:1px 7px;border-radius:999px;background:rgba(192,168,105,.18);color:#C0A869;font-weight:600;font-size:11px;letter-spacing:.02em}
 .sitebar .sb-secure{margin-left:auto;display:inline-flex;align-items:center;gap:5px;color:#C9D3E8;white-space:nowrap}
 .sitebar .sb-secure svg{width:12px;height:12px}
 @media (max-width: 720px){
@@ -137,7 +139,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .top-actions{display:flex;gap:8px;flex:0 0 auto}
 .tbtn{height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:13px;white-space:nowrap}
 .tbtn:hover{background:rgba(255,255,255,.1)}
-.tbtn.gold{background:var(--gold);color:#1A1400;border-color:var(--gold)}
+.tbtn.gold{background:var(--gold);color:#212C46;border-color:var(--gold)}
 .tbtn svg{width:16px;height:16px}
 
 .stage{flex:1 1 auto;position:relative;min-height:0}
@@ -150,7 +152,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .panel-tabs{display:flex;gap:2px;padding:6px;border-bottom:1px solid var(--line);flex:0 0 auto}
 .ptab{flex:1;height:34px;border:0;border-radius:8px;background:none;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink-soft);display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .ptab[aria-selected="true"]{background:var(--surface-2);color:var(--ink)}
-.ptab .cnt{font:600 11px var(--mono);background:var(--gold);color:#1A1400;border-radius:999px;padding:0 6px}
+.ptab .cnt{font:600 11px var(--mono);background:var(--gold);color:#212C46;border-radius:999px;padding:0 6px}
 .pbody{flex:1 1 auto;overflow:auto;padding:16px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .handle{display:none}
 .collapse-btn{position:absolute;z-index:1001;top:16px;left:404px;width:28px;height:44px;border-radius:0 8px 8px 0;border:1px solid var(--line);border-left:0;background:var(--surface);box-shadow:var(--shadow);cursor:pointer;display:grid;place-items:center;color:var(--ink-soft);transition:left .25s ease}
@@ -176,7 +178,7 @@ dl.kv dd{margin:0;font-weight:500;text-align:right;overflow-wrap:anywhere}
 .btn:hover{background:var(--surface-2)}
 .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
 .btn.primary:hover{background:var(--navy-2)}
-.btn.gold{background:var(--gold);border-color:var(--gold);color:#1A1400}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#212C46}
 .btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
 .btn.ghost{border-color:transparent;background:transparent}
 .btn.sm{height:28px;padding:0 9px;font-size:12px}
@@ -435,6 +437,73 @@ body.is3d .leaflet-control-container, body.is3d .coords, body.is3d #tPin, body.i
   table.t td.first{display:block;padding-bottom:6px}
   table.t td.act{justify-content:flex-end;padding-top:8px}
 }
+
+/* ---------- Theme: same look as the Building Department site (arabcityapplications.jadecruz.dev) ---------- */
+body{font:14px/1.45 var(--sans)}
+h1,h2,h3{letter-spacing:-.005em}
+.sitebar{background:#161e33;color:#d9d4c5;font:500 12.5px/1.3 var(--sans);border-bottom:0;padding:6px 24px}
+.sitebar .sb-seal{width:14px;height:14px;color:#c0a869}
+.sitebar b{color:#fff}
+.sitebar .sb-tag{background:rgba(192,168,105,.18);color:#c0a869;border-radius:4px}
+.sitebar .sb-secure{color:#d9d4c5}
+.topbar{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);padding:10px 24px;gap:20px}
+.seal{width:56px;height:56px;border-radius:50%;object-fit:contain;display:block}
+.brand{gap:14px}
+.brand-text{line-height:1.15}
+.brand-city{font:600 11px/1.3 var(--serif);letter-spacing:.16em;color:var(--gold-ink)}
+.brand-name{font:700 20px/1.15 var(--serif);color:var(--ink)}
+.pband{flex:0 0 auto;height:14px;background:var(--navy);border-bottom:4px solid var(--gold);position:relative;z-index:1100}
+.search input{border-radius:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink)}
+.search input::placeholder{color:var(--ink-faint)}
+.search input:focus{background:var(--surface);color:var(--ink);border-color:var(--navy);box-shadow:0 0 0 4px rgba(192,168,105,.35)}
+.search input:focus::placeholder{color:var(--ink-faint)}
+.search .s-ico,.search input:focus~.s-ico{color:var(--ink-faint)}
+.search .s-clear,.search input:focus~.s-clear{color:var(--ink-soft)}
+.results{border-radius:6px}
+.tbtn{border-radius:4px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 14px/1 var(--serif);height:38px;padding:0 14px}
+.tbtn:hover{background:var(--surface);border-color:var(--gold);color:var(--gold-ink)}
+.tbtn.gold{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.tbtn.gold:hover{border-color:var(--gold);color:var(--gold-ink)}
+.panel{border-radius:6px;border-top:4px solid var(--gold);box-shadow:0 2px 4px rgba(33,44,70,.06),0 18px 40px rgba(33,44,70,.12)}
+.ptab{border-radius:4px;font:600 13px var(--serif)}
+.ptab[aria-selected="true"]{background:var(--sel);color:var(--ink)}
+.ptab .cnt{background:var(--gold);color:var(--navy);border-radius:4px}
+.eyebrow{font:600 11px var(--serif);letter-spacing:.14em;color:var(--gold-ink)}
+h2.ph{font:700 20px/1.2 var(--serif)}
+.btn{border-radius:6px;border-color:var(--line);font-weight:600}
+.btn:hover{border-color:var(--ink-faint);background:var(--surface)}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy-2);border-color:var(--navy-2)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.qa button{border-radius:6px}
+.qa button:hover{border-color:var(--gold);box-shadow:0 6px 18px rgba(33,44,70,.10);background:var(--surface)}
+.qa .qi{background:var(--gold);color:var(--navy);border-radius:6px}
+.zkey h3{color:var(--gold-ink)}
+.note{border-radius:6px}
+.box{border-radius:6px}
+.gate{border-radius:6px;border-top:4px solid var(--gold);box-shadow:0 2px 4px rgba(33,44,70,.06),0 18px 40px rgba(33,44,70,.12)}
+.gate h2{font:700 22px/1.2 var(--serif)}
+.anav button{font-family:var(--serif)}
+.anav button[aria-selected="true"]{border-bottom-color:var(--gold)}
+.ahead h1{font-family:var(--serif)}
+.field input,.field select,.field textarea{border-radius:7px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--navy);box-shadow:0 0 0 4px rgba(192,168,105,.35)}
+.chk{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink-soft);margin:6px 0 0;cursor:pointer}
+.chk input{margin-top:2px;accent-color:var(--navy)}
+ul.plain{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13.5px}
+.gate a,.note a,.box p a,.sub a{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:2px}
+:focus-visible{outline-color:var(--gold)}
+.leaflet-control-attribution .credit{color:var(--ink)}
+@media (max-width: 720px){
+  .sitebar{padding:5px 12px;padding-top:calc(5px + env(safe-area-inset-top,0px))}
+  .sitebar > span:not(.sb-tag):not(.sb-secure){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
+  .sitebar .sb-tag{flex:0 0 auto}
+  .topbar{padding:8px 10px;gap:8px}
+  .seal{width:40px;height:40px}
+  .pband{height:6px;border-bottom-width:3px}
+  .tbtn{width:40px;height:40px;padding:0}
+  .results{top:calc(96px + env(safe-area-inset-top,0px))}
+}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -442,14 +511,14 @@ body.is3d .leaflet-control-container, body.is3d .coords, body.is3d #tPin, body.i
 <body>
 <div class="app" id="app">
   <div class="sitebar" role="note" aria-label="Site notice">
-    <svg class="sb-seal" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#F2C230"/><circle cx="20" cy="20" r="15.5" fill="#0F3273"/><path d="M20 9.5c-4.2 0-7.5 3.2-7.5 7.3 0 5.4 7.5 13.7 7.5 13.7s7.5-8.3 7.5-13.7c0-4.1-3.3-7.3-7.5-7.3z" fill="#F2C230"/></svg>
+    <svg class="sb-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
     <span>Prepared for <b>the City of Arab, Alabama</b></span><span class="sb-tag">Preview</span>
     <span class="sb-secure" title="This site uses an encrypted HTTPS connection"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-.5V4.5A3.5 3.5 0 0 0 8 1zm-2 6V4.5a2 2 0 1 1 4 0V7H6z"/></svg><span>Secure connection</span></span>
   </div>
   <header class="topbar">
     <button class="brand" id="homeBtn" aria-label="Zoom to all of Arab">
-      <svg class="seal" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#F2C230"/><circle cx="20" cy="20" r="15.5" fill="#0F3273"/><path d="M20 9.5c-4.2 0-7.5 3.2-7.5 7.3 0 5.4 7.5 13.7 7.5 13.7s7.5-8.3 7.5-13.7c0-4.1-3.3-7.3-7.5-7.3z" fill="#F2C230"/><path d="M16.3 18.2l3.7-3.1 3.7 3.1v3.5h-2.4v-2.2h-2.6v2.2h-2.4z" fill="#0F3273"/></svg>
-      <span class="brand-text"><span class="brand-city">City of Arab, Alabama</span><span class="brand-name">Zoning &amp; Property Map</span></span>
+      <img class="seal" src="data:image/webp;base64,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" alt="" width="56" height="56">
+      <span class="brand-text"><span class="brand-city">City of Arab, Alabama</span><span class="brand-name">Zoning Map</span></span>
     </button>
     <div class="search" role="search">
       <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search address, owner, PPIN or parcel #" aria-label="Search the map" aria-controls="results" aria-expanded="false" aria-autocomplete="list">
@@ -461,6 +530,7 @@ body.is3d .leaflet-control-container, body.is3d .coords, body.is3d #tPin, body.i
       <button class="tbtn gold" id="adminBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg><span class="lbl">Staff</span></button>
     </div>
   </header>
+  <div class="pband" aria-hidden="true"></div>
 
   <main class="stage" id="stage">
     <div id="map" aria-label="Map of Arab, Alabama"></div>
@@ -472,7 +542,7 @@ body.is3d .leaflet-control-container, body.is3d .coords, body.is3d #tPin, body.i
       <div class="panel-tabs" role="tablist" id="ptabs">
         <button class="ptab" role="tab" data-tab="property" aria-selected="true">Property</button>
         <button class="ptab" role="tab" data-tab="layers" aria-selected="false">Layers</button>
-        <button class="ptab" role="tab" data-tab="annex" aria-selected="false">Annexations <span class="cnt" id="annexCnt" hidden>0</span></button>
+        <button class="ptab" role="tab" data-tab="annex" id="annexTab" aria-selected="false" hidden>Annexations <span class="cnt" id="annexCnt" hidden>0</span></button>
       </div>
       <div class="pbody" id="pbody"></div>
     </aside>
@@ -524,27 +594,31 @@ const CONFIG = {
   // Staff sign-in + shared storage (Supabase). Paste the project's publishable key to turn logins on.
   SUPABASE_URL: "https://yighcuismepfmappcfui.supabase.co",
   SUPABASE_KEY: "sb_publishable_nGh6iXqOO0iKTPo6uOvXSA_x4ZjIEUi",
+  // Staff logins, passwords and 2-step are managed here (same database).
+  PORTAL_URL: "https://arabcityapplications.jadecruz.dev/apply/#staff",
 };
 
-/* ---------------- Zoning districts (Ordinance 2016-3, colors from the current city map) ---------------- */
+/* ---------------- Zoning districts: names and colors from the City of Arab Zoning Map, January 2025
+   (Goodwyn Mills Cawood, for the Arab Planning, Building and Zoning Board) ---------------- */
 const ZONES = {
-  "AG":  {name:"Agriculture", color:"#81A02A", desc:"Low-density homes alongside farm uses until more intensive development is warranted."},
-  "R-1": {name:"Low Density Residential", color:"#FFF0D1", desc:"Single-family homes; keeps commercial and industrial uses out of neighborhoods."},
+  "AG":  {name:"Agricultural", color:"#819F2B", desc:"Low-density homes alongside farm uses until more intensive development is warranted."},
+  "R-1": {name:"Low Density Residential", color:"#FDEFD0", desc:"Single-family homes; keeps commercial and industrial uses out of neighborhoods."},
   "R-2": {name:"Medium Density Residential", color:"#F5F57A", desc:"Single-family homes, duplexes and small townhome groups."},
   "R-3": {name:"High Density Residential", color:"#E69800", desc:"Apartments, townhomes, tri- and quadplexes plus some civic uses."},
-  "MHP": {name:"Manufactured Home Park", color:"#F57DB7", desc:"Locations for manufactured home parks with leased or rented spaces."},
+  "MHP": {name:"Mobile Home Park Zone", color:"#F57DB7", desc:"Locations for mobile and manufactured home parks with leased or rented spaces."},
   "UM":  {name:"Urban Mix", color:"#00A884", desc:"Mixed residential and commercial uses between busy corridors and neighborhoods."},
-  "O-I": {name:"Office-Institutional", color:"#96D8FC", desc:"Offices, schools, healthcare, child care and places of worship."},
+  "O-I": {name:"Office/Institutional", color:"#4ED6FC", desc:"Offices, schools, healthcare, child care and places of worship."},
   "NC":  {name:"Neighborhood Commercial", color:"#FECDC6", desc:"Small, walkable retail and services near neighborhoods."},
-  "GB":  {name:"General Business", color:"#FF8266", desc:"Higher-intensity retail, restaurants and shopping centers along arterials."},
+  "GB":  {name:"General Business District", color:"#FD6C22", desc:"Higher-intensity retail, restaurants and shopping centers along arterials."},
   "HD":  {name:"Historic Downtown", color:"#004DA8", desc:"Preserves historic downtown buildings with compatible shops and homes.", dark:true},
-  "M-1": {name:"Light Industrial", color:"#CEDCFD", desc:"Light industry and commercial uses that need separation from homes."},
+  "M-1": {name:"Light Industrial", color:"#CCDAFD", desc:"Light industry and commercial uses that need separation from homes."},
   "M-2": {name:"General Industrial", color:"#AA79CE", desc:"Intensive industry with rail, airport or highway access."},
-  "SD":  {name:"Special District", color:"#FFFFFF", desc:"Master-planned developments with mixed uses and shared open space.", hatch:true},
-  "POS": {name:"Public / Open Space", color:"#DDEBD1", desc:"Parks, greenways and public open space."},
+  "OSP": {name:"Park/Open Space", color:"#B7C7A0", desc:"Parks, greenways and public open space."},
+  "SD":  {name:"Special Development", color:"#FFFFFF", desc:"Master-planned developments with mixed uses and shared open space.", hatch:true},
   "X":   {name:"Not zoned", color:"#FFFFFF", desc:"Right-of-way or land without a zoning designation."},
 };
-const ZONE_ALIAS = {"NB":"NC","OSP":"POS","OS":"POS"};
+const ZONE_ALIAS = {"NB":"NC","POS":"OSP","OS":"OSP","R1":"R-1","R2":"R-2","R3":"R-3","OI":"O-I","M1":"M-1","M2":"M-2"};
+const ZONING_SOURCE = "City of Arab Zoning Map, January 2025";
 const zoneOf = z => { z = String(z||"").trim().toUpperCase(); z = ZONE_ALIAS[z] || z; return ZONES[z] ? z : "X"; };
 
 /* ---------------- Annexation / property status ---------------- */
@@ -554,7 +628,7 @@ const STATUSES = [
   {key:"pc_scheduled", label:"Planning Commission hearing", short:"Hearing", step:3, color:"#C98A00"},
   {key:"approved",     label:"Recommended by Planning Commission", short:"PC recommended", step:4, color:"#1F8A5B"},
   {key:"council",      label:"City Council vote",     short:"Council",   step:5, color:"#7A4FB5"},
-  {key:"annexed",      label:"Approved by City Council", short:"Annexed", step:6, color:"#0F3273"},
+  {key:"annexed",      label:"Approved by City Council", short:"Annexed", step:6, color:"#212C46"},
   {key:"denied",       label:"Denied",                short:"Denied",    step:0, color:"#B8322A"},
   {key:"withdrawn",    label:"Withdrawn",             short:"Withdrawn", step:0, color:"#8490AA"},
 ];
@@ -631,7 +705,7 @@ function sampleZone(c,r){
   if(c===-2&&r===0) return "O-I";
   if(c===1&&r===-1) return "NC";
   if(c===1&&r===-2) return "R-3";
-  if(c===2&&r===1) return "POS";
+  if(c===2&&r===1) return "OSP";
   if(c===-3&&r===-3) return "M-1";
   if(c===2&&r===-3) return "MHP";
   if(c===-3&&r===1) return "SD";
@@ -642,7 +716,7 @@ function buildSampleParcels(){
   const rand=rng(7), feats=[]; let n=0;
   for(let c=-3;c<=2;c++) for(let r=-3;r<=2;r++){
     const zone=sampleZone(c,r), x0=c*BX+10, x1=c*BX+BX-10, y0=r*BY+10, y1=r*BY+BY-10;
-    const per = zone==="POS"||zone==="AG"||zone==="M-1"||zone==="MHP"||zone==="SD" ? 1 : (zone==="GB"||zone==="HD"||zone==="O-I"||zone==="UM"||zone==="NC"||zone==="R-3") ? 3 : 4;
+    const per = zone==="OSP"||zone==="AG"||zone==="M-1"||zone==="MHP"||zone==="SD" ? 1 : (zone==="GB"||zone==="HD"||zone==="O-I"||zone==="UM"||zone==="NC"||zone==="R-3") ? 3 : 4;
     const halves = per===1 ? 1 : 2;
     for(let h=0;h<halves;h++){
       const ya = halves===1? y0 : (h===0? y0 : (y0+y1)/2), yb = halves===1? y1 : (h===0? (y0+y1)/2 : y1);
@@ -698,27 +772,45 @@ function sampleProperties(){
 /* =====================================================================
    STAFF SIGN-IN (Supabase, shared with the permit checker project)
    ===================================================================== */
-const RANK={viewer:1,staff:2,admin:3};
-const ROLE_LABEL={admin:"Administrator",staff:"Staff",viewer:"Viewer"};
+const ROLE_LABEL={admin:"Administrator",staff:"Building Department",clerk:"City Clerk",citizen:"Resident"};
 async function sbRpc(fn,args){
   const r=await fetch(CONFIG.SUPABASE_URL.replace(/\/$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",headers:{"apikey":CONFIG.SUPABASE_KEY,"Authorization":"Bearer "+CONFIG.SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify(args||{})});
   const txt=await r.text(); let j=null; try{ j=txt?JSON.parse(txt):null; }catch(e){}
   if(!r.ok){ let msg=(j&&(j.message||j.hint))||("Server error "+r.status); if(msg==="unauthorized") msg="Your session has expired. Sign in again."; if(msg==="forbidden") msg="You don't have permission to do that."; if(/session has expired/i.test(msg) && Auth.user){ Auth.clear(); toast("Your session expired. Sign in again."); } throw new Error(msg); }
   return j;
 }
+async function sha256hex(s){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+/* Staff sign-in uses the Arab City Staff Portal logins (bf_* functions, same database as the
+   Building Department forms). Passwords are sent as their SHA-256, exactly like the portal does. */
 const Auth = {
-  token: lsGet("arabmap.token",null), user:null, ready:false,
+  token: lsGet("arabmap.token",null), user:null, ready:false, mfa:null,
   enabled(){ return !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY); },
-  can(min){ return !!this.user && (RANK[this.user.role]||0) >= RANK[min]; },
-  async restore(){ this.ready=true; if(!this.enabled()||!this.token) return; if(isPhone()){ this.user=null; return; } try{ this.user=await sbRpc("zm_me",{p_token:this.token}); }catch(e){ this.clear(); } },
-  async login(name,pw){ if(isPhone()) throw new Error("Staff sign-in works on a computer or iPad."); const r=await sbRpc("pm_staff_login",{p_username:name,p_password:pw}); if(!r||!r.ok) throw new Error(r&&r.error==="locked"?"Too many tries. Wait 15 minutes and try again.":"That username and password don't match."); this.token=r.token; this.user={username:r.username,role:r.role,full_name:r.full_name}; lsSet("arabmap.token",r.token); },
-  async logout(){ if(this.token){ try{ await sbRpc("pm_staff_logout",{p_token:this.token}); }catch(e){} } this.clear(); },
-  clear(){ this.token=null; this.user=null; lsSet("arabmap.token",null); updateStaffBtn(); },
+  name(){ const u=this.user; return u ? (u.name||u.email.split("@")[0]) : ""; },
+  async restore(){ this.ready=true; if(!this.enabled()||!this.token) return; if(isPhone()){ this.user=null; return; } try{ this.user=await sbRpc("zm_me",{p_token:this.token}); if(!this.user) this.clear(); }catch(e){ this.clear(); } },
+  async login(email,pw,remember){ if(isPhone()) throw new Error("Staff sign-in works on a computer or iPad.");
+    const r=await sbRpc("bf_sign_in",{p_email:String(email||"").trim(),p_pass:await sha256hex(pw||""),p_remember:!!remember});
+    if(r&&r.error) throw new Error(r.error);
+    if(r&&r.mfa){ this.mfa={challenge:r.challenge}; return "mfa"; }
+    return this._finish(r); },
+  async code(c){ const r=await sbRpc("bf_sign_in_code",{p_challenge:this.mfa&&this.mfa.challenge,p_code:String(c||"")});
+    if(r&&r.error){ if(r.restart) this.mfa=null; const e=new Error(r.error); e.restart=!!r.restart; throw e; }
+    this.mfa=null; return this._finish(r); },
+  async _finish(r){
+    if(r.limited||r.mustChangePw){ try{ await sbRpc("bf_sign_out",{p_token:r.token}); }catch(e){}
+      const e=new Error(r.mustChangePw?"Your login has a temporary password. Sign in to the Staff Portal once to choose your own, then come back here.":"Your login needs 2-step verification set up first. Sign in to the Staff Portal to set it up, then come back here."); e.portal=true; throw e; }
+    const me=await sbRpc("zm_me",{p_token:r.token});
+    if(!me){ try{ await sbRpc("bf_sign_out",{p_token:r.token}); }catch(e){} throw new Error("That login doesn't have staff access to the map. Ask an administrator to give you staff access in the Staff Portal."); }
+    this.token=r.token; this.user=me; lsSet("arabmap.token",r.token); return "ok"; },
+  async logout(){ if(this.token){ try{ await sbRpc("bf_sign_out",{p_token:this.token}); }catch(e){} } this.clear(); },
+  clear(){ this.token=null; this.user=null; this.mfa=null; lsSet("arabmap.token",null); updateStaffBtn(); },
 };
-const canEdit = () => Auth.enabled() ? Auth.can("staff") : Admin.unlocked;
-const canAdmin = () => Auth.enabled() ? Auth.can("admin") : Admin.unlocked;
-function updateStaffBtn(){ const l=$("#adminBtn .lbl"); if(l) l.textContent = Admin.unlocked ? (Auth.user ? (Auth.user.full_name||Auth.user.username.split("@")[0]) : "Dashboard") : "Staff"; }
-function tempPassword(){ const w="abcdefghjkmnpqrstuvwxyz", d="23456789"; const a=new Uint32Array(12); crypto.getRandomValues(a); let s=""; for(let i=0;i<12;i++){ s+= i===4||i===8 ? "-" : (i%4===3 ? d[a[i]%d.length] : w[a[i]%w.length]); } return s; }
+const isStaff = () => Auth.enabled() ? !!(Auth.user && Auth.user.map && Auth.user.map.view) : Admin.unlocked;
+const canEdit = () => Auth.enabled() ? !!(Auth.user && Auth.user.map && Auth.user.map.edit) : Admin.unlocked;
+const canAdmin = () => Auth.enabled() ? !!(Auth.user && Auth.user.map && Auth.user.map.admin) : Admin.unlocked;
+function updateStaffBtn(){ const l=$("#adminBtn .lbl"); if(l) l.textContent = Admin.unlocked ? (Auth.user ? Auth.name() : "Dashboard") : "Staff"; staffUI(); }
+/* Annexations and tracked properties are a staff feature: hidden from the public (the server also returns none). */
+function staffUI(){ const on=isStaff(), t=$("#annexTab"); if(t) t.hidden=!on;
+  try{ if(!on && typeof State!=="undefined" && State.tab==="annex") openTab("property"); if(typeof renderPropLayer==="function" && typeof Store!=="undefined") renderPropLayer(); }catch(e){} }
 
 /* =====================================================================
    DATA STORE — Google Sheet (live site) · preview database · this browser
@@ -865,12 +957,12 @@ const cleanV = v => { v=String(v??"").trim(); return (/^(null|none|0)$/i.test(v)
 const P = f => { const p=f.properties||{}; const g=k=>p[k]??p[k.toLowerCase()]??""; return {
   zone:zoneOf(g("ZONE")||g("ZONING")), ppin:cleanV(g("PROPPIN")||g("PPIN")), parcel:cleanV(g("PARCELNUMB")||g("PARCEL")||g("PIN")),
   owner:cleanV(g("OWNER")), address:cleanV(String(g("PROPADDR")||g("ADDRESS")||"").replace(/^0\s+/,"")), mail:cleanV(g("MAILADDR")||[g("MAILADD1"),g("MAILADD2"),g("MAILADD3")].filter(Boolean).join(", ")),
-  value:g("PROPVALUE"), acres:g("ACREAGE")||g("CALCACRES")||g("DEEDEDARE"), sqft:g("AREA"), limit:String(g("CITYLIMIT")||""), county:String(g("COUNTY")||""), sample:!!p.SAMPLE }; };
+  value:g("PROPVALUE"), acres:g("ACREAGE")||g("CALCACRES")||g("DEEDEDARE"), sqft:g("AREA"), limit:String(g("CITYLIMIT")||""), county:String(g("COUNTY")||""), sd:String(g("SD_OVERLAY")||"").toUpperCase()==="Y", sample:!!p.SAMPLE }; };
 function parcelStyle(f){
   const z=f._z || (f._z=P(f).zone), zd=ZONES[z], on = State.layers.zoning && State.zoneOn[z];
   const sel = State.selected && State.selected.kind==="parcel" && State.selected.feature===f;
   return {renderer:parcelRenderer, pane:"parcelPane",
-    color: sel ? "#F2C230" : (State.layers.parcels ? (State.tilesOk===false?"#6E7A94":"#3A4660") : "transparent"),
+    color: sel ? "#C0A869" : (State.layers.parcels ? (State.tilesOk===false?"#6E7A94":"#3A4660") : "transparent"),
     weight: sel ? 3.5 : (map.getZoom()>=17 ? 1 : .6), opacity: sel?1:.85,
     fillColor: zd.color, fillOpacity: on ? (z==="X" ? 0.04 : State.opacity) : 0};
 }
@@ -878,7 +970,15 @@ function buildParcelLayer(){
   if(parcelLayer) map.removeLayer(parcelLayer);
   parcelLayer = L.geoJSON(parcelData,{style:parcelStyle, renderer:parcelRenderer, pane:"parcelPane",
     onEachFeature:(f,l)=>{ l.on("click",e=>{ if(State.mode && State.mode!=="pick") return; e.originalEvent._handled=true; if(State.mode==="pick"){ Admin.captureParcel(f); return; } selectParcel(f,false); }); }}).addTo(map);
-  buildLabels(); buildIndex();
+  buildSdLayer(); buildLabels(); buildIndex();
+}
+/* Special Development (SD) areas: hatched over the base zoning on the 2025 map; drawn here as a dark dashed outline */
+let sdLayer=null;
+function buildSdLayer(){
+  if(sdLayer){ map.removeLayer(sdLayer); sdLayer=null; }
+  const fs=(parcelData&&parcelData.features||[]).filter(f=>P(f).sd || P(f).zone==="SD"); if(!fs.length) return;
+  sdLayer=L.geoJSON({type:"FeatureCollection",features:fs},{pane:"parcelPane",interactive:false,style:{color:"#2b2b2b",weight:1.6,dashArray:"5 3",fillColor:"#2b2b2b",fillOpacity:.12}});
+  if(State.layers.zoning) sdLayer.addTo(map);
 }
 function buildLabels(){
   labelLayer.clearLayers();
@@ -893,11 +993,11 @@ labelLayer.addTo(map);
 const selHalo=L.layerGroup().addTo(map);
 function drawSelHalo(){ selHalo.clearLayers(); const s=State.selected; if(!s||s.kind!=="parcel") return;
   L.geoJSON(s.feature,{pane:"propPane",interactive:false,style:{color:"#fff",weight:8,opacity:.95,fill:false}}).addTo(selHalo);
-  L.geoJSON(s.feature,{pane:"propPane",interactive:false,style:{color:"#0F3273",weight:3.5,opacity:1,fillColor:"#F2C230",fillOpacity:.18}}).addTo(selHalo); }
+  L.geoJSON(s.feature,{pane:"propPane",interactive:false,style:{color:"#212C46",weight:3.5,opacity:1,fillColor:"#C0A869",fillOpacity:.18}}).addTo(selHalo); }
 function restyleParcels(){ if(parcelLayer) parcelLayer.setStyle(parcelStyle); drawSelHalo(); }
 function buildLimits(){
   if(limitsLayer) map.removeLayer(limitsLayer);
-  limitsLayer = L.geoJSON(limitsData,{pane:"limitsPane",interactive:false,style:{color:"#0F3273",weight:3,dashArray:"10 6",fill:false,opacity:.9}});
+  limitsLayer = L.geoJSON(limitsData,{pane:"limitsPane",interactive:false,style:{color:"#212C46",weight:3,dashArray:"10 6",fill:false,opacity:.9}});
   if(State.layers.limits) limitsLayer.addTo(map);
 }
 function buildGas(){
@@ -928,7 +1028,7 @@ async function loadMapData(){
 const propLayer = L.layerGroup().addTo(map);
 function renderPropLayer(){
   propLayer.clearLayers();
-  if(!State.layers.annex) return;
+  if(!State.layers.annex || !isStaff()) return;
   visibleRows().forEach(r=>{
     const g=geomOf(r); if(!g) return; const s=statusOf(r.status);
     const sel = State.selected && State.selected.kind==="prop" && State.selected.id===r.id;
@@ -936,7 +1036,7 @@ function renderPropLayer(){
     if(g.type==="Point"){
       lyr = L.circleMarker([g.coordinates[1],g.coordinates[0]],{pane:"propPane",radius:sel?11:8,color:"#fff",weight:2.5,fillColor:s.color,fillOpacity:1});
     } else {
-      lyr = L.geoJSON(g,{pane:"propPane",style:{color:sel?"#F2C230":s.color,weight:sel?4:2.5,dashArray:r.status==="annexed"?null:"7 5",fillColor:s.color,fillOpacity:.22}});
+      lyr = L.geoJSON(g,{pane:"propPane",style:{color:sel?"#C0A869":s.color,weight:sel?4:2.5,dashArray:r.status==="annexed"?null:"7 5",fillColor:s.color,fillOpacity:.22}});
     }
     lyr.on("click",e=>{ if(State.mode && State.mode!=="pick") return; if(e.originalEvent) e.originalEvent._handled=true; selectProp(r.id,false); L.DomEvent.stop(e); });
     lyr.bindTooltip('<div style="background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 9px;box-shadow:var(--shadow);font:12px var(--sans)"><b>'+esc(r.name||r.address||"Property")+'</b><br><span style="color:'+s.color+';font-weight:600">'+esc(s.label)+'</span></div>',{sticky:true,direction:"top",offset:[0,-8],opacity:1});
@@ -1086,7 +1186,7 @@ function renderPanel(){
   if(!s){
     const qi=(ic,t,d,act)=>'<button type="button" data-qa="'+act+'"><span class="qi">'+ic+'</span><span><b>'+t+'</b><small>'+d+'</small></span></button>';
     const zkeys=Object.keys(ZONES).filter(z=>z!=="X");
-    el.innerHTML='<div class="empty-state">'+ICON.parcel+'<h2 class="ph">Find a property</h2><p class="sub">Tap any parcel on the map to see its zoning, owner, acreage and any pending annexation.</p>'+
+    el.innerHTML='<div class="empty-state">'+ICON.parcel+'<h2 class="ph">Find a property</h2><p class="sub">Tap any parcel on the map to see its zoning, owner and acreage'+(isStaff()?', and any annexation on file':'')+'.</p>'+
       '<div class="qa">'+qi(ICON.search,"Search by address or owner","Also works with a PPIN or parcel number","search")+qi(ICON.ruler,"Measure a lot","Frontage in feet, area in acres","measure")+qi(ICON.layers,"Change what the map shows","Aerial photos, flood zones, city limits","layers")+'</div>'+
       '<div class="zkey"><h3 class="eyebrow">What the colors mean</h3><ul>'+zkeys.map(z=>'<li><i class="sw" style="background:'+ZONES[z].color+(ZONES[z].hatch?';background-image:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,0,0,.25) 3px 4px)':'')+'"></i><code>'+esc(z)+'</code><span class="n">'+esc(ZONES[z].name)+'</span></li>').join("")+'</ul><p class="more"><a href="#" data-qa="layers">Hide or show districts in Layers</a></p></div>'+
       (State.sample.parcels?'<p class="note warn" style="margin-top:16px;text-align:left"><b>Sample parcels.</b> The owners, addresses and values shown are placeholders until the city\'s parcel file is loaded.</p>':'')+'</div>';
@@ -1096,7 +1196,7 @@ function renderPanel(){
   if(s.kind==="parcel"){
     const p=P(s.feature), c=L.geoJSON(s.feature).getBounds().getCenter(), row=matchRowForParcel(p);
     el.innerHTML = '<button class="pclose" type="button" data-clear aria-label="Close this parcel">'+ICON.close+'</button><p class="eyebrow">Parcel'+(p.sample?' · sample':'')+'</p><h2 class="ph">'+esc(p.address||(p.zone==="X"&&!p.owner?"Street or right-of-way":"No address on file"))+'</h2><p class="sub">'+esc(p.owner||(p.zone==="X"?"Public right-of-way":"Owner not listed"))+'</p>'+
-      zoneBadge(p.zone)+
+      zoneBadge(p.zone)+(p.sd&&p.zone!=="SD"?'<p class="note info" style="margin-top:10px"><b>Special Development (SD) overlay.</b> This parcel is inside a Special Development area on the 2025 zoning map. Check with the Building Department before you plan work here.</p>':'')+
       (row?'<div class="section"><h3>'+esc(KINDS[row.kind]||"Property")+' on file</h3><div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center">'+pillHTML(row.status)+'<span class="mono" style="font-size:12px;color:var(--ink-soft)">'+esc(row.application_no||"")+'</span></div>'+trackerHTML(row)+'<button class="btn sm" style="margin-top:10px" data-open-prop="'+esc(row.id)+'">View details</button></div></div>':'')+
       '<div class="section"><h3>Parcel record</h3><dl class="kv">'+
         '<dt>PPIN</dt><dd class="mono">'+esc(p.ppin||"—")+'</dd>'+
@@ -1105,6 +1205,7 @@ function renderPanel(){
         (p.sqft?'<dt>Area</dt><dd class="mono">'+fmtNum(p.sqft,0)+' sq ft</dd>':'')+
         '<dt>Assessed value</dt><dd class="mono">'+(+p.value>0?fmtMoney(p.value):"—")+'</dd>'+
         '<dt>City limits</dt><dd>'+(p.limit? (p.limit.toUpperCase()==="IN"?"Inside":"Outside"):"—")+'</dd>'+
+        '<dt>Zoning source</dt><dd>'+esc(ZONING_SOURCE)+'</dd>'+
         '<dt>Mailing address</dt><dd>'+esc(p.mail||"—")+'</dd>'+
         '<dt>Coordinates</dt><dd class="mono">'+c.lat.toFixed(5)+', '+c.lng.toFixed(5)+'</dd>'+
       '</dl></div>'+
@@ -1155,8 +1256,8 @@ function renderLayersTab(el){
       L1("zoning","Zoning districts","Color each parcel by its district",State.layers.zoning)+
       L1("parcels","Parcel lines","Property boundaries"+(State.sample.parcels?" (sample)":""),State.layers.parcels)+
       L1("labels","House numbers","Shown when zoomed in close",State.layers.labels)+
-      L1("annex","Annexations & tracked properties","Requests the Building Department is tracking",State.layers.annex)+
-      L1("limits","City limits","Arab corporate boundary"+(State.sample.limits?" (sample)":""),State.layers.limits)+
+      (isStaff()?L1("annex","Annexations & tracked properties","Staff only · requests the Building Department is tracking",State.layers.annex):"")+
+      L1("limits","City limits","Corporate limits from the January 2025 zoning map"+(State.sample.limits?" (sample)":""),State.layers.limits)+
       L1("flood","FEMA flood zones","Special flood hazard areas (A, AE, X)"+(tl?" · live site only":""),State.layers.flood,tl)+
       L1("gas","Gas lines","City gas utility"+(State.sample.gas?" (sample)":""),State.layers.gas)+
     '</div>'+
@@ -1171,6 +1272,7 @@ function renderLayersTab(el){
 function setLayer(id,on){
   State.layers[id]=on; lsSet("arabmap.layers",State.layers);
   if(id==="zoning"||id==="parcels") restyleParcels();
+  if(id==="zoning" && sdLayer){ on? sdLayer.addTo(map) : map.removeLayer(sdLayer); }
   if(id==="labels") buildLabels();
   if(id==="annex") renderPropLayer();
   if(id==="limits") on? limitsLayer.addTo(map) : map.removeLayer(limitsLayer);
@@ -1297,87 +1399,57 @@ const Admin = {
   render(){
     const el=$("#admin");
     if(Auth.enabled() && !Auth.user){ this.rLogin(el); return; }
-    if(Auth.enabled() && Auth.user.must_change){ this.rSetPassword(el,true); return; }
     if(!this.unlocked){
       el.innerHTML='<div class="admin-in"><div class="gate"><p class="eyebrow">Building Department</p><h2>Staff dashboard</h2><p class="sub">Staff sign-in will go here once logins are set up. Until then this preview opens without a password, so don\'t share the staff link publicly yet.</p><div class="btnrow"><button class="btn primary" id="gOpen">Open dashboard</button><button class="btn" id="gBack">Back to map</button></div></div></div>';
       $("#gOpen").onclick=()=>this.unlock(); $("#gBack").onclick=()=>this.close(); return;
     }
     const tabs=[["overview","Overview"],["properties","Properties"]];
     if(canAdmin()) tabs.push(["parcels","Map layers"]);
-    if(Auth.enabled()){ if(canAdmin()) tabs.push(["users","Staff logins"]); tabs.push(["account","My account"]); }
+    if(Auth.enabled()) tabs.push(["account","My account"]);
     if(canAdmin()) tabs.push(["feed","Google Sheet feed"]);
     if(!tabs.some(t=>t[0]===this.tab)) this.tab="overview";
-    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1>'+(Auth.user?'<p class="sub" style="margin:4px 0 0">Signed in as <b>'+esc(Auth.user.username)+'</b> · '+esc(ROLE_LABEL[Auth.user.role]||Auth.user.role)+'</p>':'')+'</div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button>'+(canEdit()?'<button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button>':'')+'<button class="btn ghost" id="aLock">Sign out</button></div></div>'+
+    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1>'+(Auth.user?'<p class="sub" style="margin:4px 0 0">Signed in as <b>'+esc(Auth.user.email)+'</b> · '+esc(Auth.user.title||ROLE_LABEL[Auth.user.role]||Auth.user.role)+'</p>':'')+'</div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button>'+(canEdit()?'<button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button>':'')+'<button class="btn ghost" id="aLock">Sign out</button></div></div>'+
       '<nav class="anav" role="tablist">'+tabs.map(([k,l])=>'<button role="tab" data-at="'+k+'" aria-selected="'+(this.tab===k)+'">'+l+'</button>').join("")+'</nav><div id="abody"></div></div>';
     $("#aMap").onclick=()=>this.close(); const aa=$("#aAdd"); if(aa) aa.onclick=()=>this.startAdd({}); $("#aLock").onclick=()=>this.lock();
     $$("[data-at]",el).forEach(b=>b.onclick=()=>{ this.tab=b.dataset.at; this.render(); });
     const body=$("#abody");
-    ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),users:()=>this.rUsers(body),account:()=>this.rSetPassword(body,false)})[this.tab]();
+    ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),account:()=>this.rAccount(body)})[this.tab]();
   },
   rLogin(el){
     if(isPhone()){ el.innerHTML='<div class="admin-in"><div class="gate"><p class="eyebrow">Building Department</p><h2>Use a computer or iPad</h2><p class="sub">Staff sign-in isn\'t available on phones. Open this map on a computer or iPad to sign in. Everything else on the map works here.</p><div class="btnrow" style="margin-top:14px"><button class="btn primary" id="gBack" type="button">Back to map</button></div></div></div>'; $("#gBack").onclick=()=>this.close(); return; }
-    el.innerHTML='<div class="admin-in"><form class="gate" id="lgForm" autocomplete="on"><p class="eyebrow">Building Department</p><h2>Staff sign-in</h2><p class="sub">Use your permit checker login. Changes you make here are saved for everyone.</p>'+
-      '<div class="field" style="margin-bottom:10px"><label for="lgEmail">Username</label><input id="lgEmail" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>'+
-      '<div class="field" style="margin-bottom:6px"><label for="lgPw">Password</label><input id="lgPw" type="password" autocomplete="current-password" required></div>'+
-      '<p class="note warn" id="lgErr" hidden style="margin:8px 0 0"></p>'+
+    const portal='<a href="'+esc(CONFIG.PORTAL_URL)+'" target="_blank" rel="noopener">Staff Portal</a>';
+    if(Auth.mfa){
+      el.innerHTML='<div class="admin-in"><form class="gate" id="cdForm" autocomplete="off"><p class="eyebrow">Building Department</p><h2>Enter your 6-digit code</h2><p class="sub">Open your authenticator app and enter the code for Arab City Staff Portal. You can also use one of your recovery codes.</p>'+
+        '<div class="field" style="margin-bottom:6px"><label for="cdCode">Code</label><input id="cdCode" inputmode="numeric" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" required maxlength="11" style="font:600 20px var(--mono);letter-spacing:.2em"></div>'+
+        '<p class="note warn" id="cdErr" hidden style="margin:8px 0 0"></p>'+
+        '<div class="btnrow" style="margin-top:14px"><button class="btn primary" id="cdGo" type="submit">Verify</button><button class="btn" id="cdBack" type="button">Start over</button></div></form></div>';
+      setTimeout(()=>{ const c=$("#cdCode"); if(c) c.focus(); },50);
+      $("#cdBack").onclick=()=>{ Auth.mfa=null; this.render(); };
+      $("#cdForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#cdGo"), er=$("#cdErr"); b.disabled=true; b.textContent="Checking…"; er.hidden=true;
+        try{ await Auth.code($("#cdCode").value); this.unlock(); toast("Signed in"); }
+        catch(e){ if(e.restart){ this.render(); const er2=$("#lgErr"); if(er2){ er2.textContent=e.message; er2.hidden=false; } return; } er.textContent=e.message; er.hidden=false; b.disabled=false; b.textContent="Verify"; const c=$("#cdCode"); c.value=""; c.focus(); } };
+      return;
+    }
+    el.innerHTML='<div class="admin-in"><form class="gate" id="lgForm" autocomplete="on"><p class="eyebrow">Building Department</p><h2>Staff sign-in</h2><p class="sub">Use your Arab City Staff Portal email and password. Changes you make here are saved for everyone.</p>'+
+      '<div class="field" style="margin-bottom:10px"><label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>'+
+      '<div class="field" style="margin-bottom:8px"><label for="lgPw">Password</label><input id="lgPw" type="password" autocomplete="current-password" required></div>'+
+      '<label class="chk"><input type="checkbox" id="lgRem"><span>Keep me signed in for 7 days (only on a computer that is yours)</span></label>'+
+      '<p class="note warn" id="lgErr" hidden style="margin:10px 0 0"></p>'+
       '<div class="btnrow" style="margin-top:14px"><button class="btn primary" id="lgGo" type="submit">Sign in</button><button class="btn" id="gBack" type="button">Back to map</button></div>'+
-      '<p class="sub" style="margin:14px 0 0;font-size:12px">Forgot your password? Ask an administrator to reset it.</p></form></div>';
+      '<p class="sub" style="margin:14px 0 0;font-size:12.5px">Same login as the '+portal+'. Forgot your password or new here? Ask an administrator.</p></form></div>';
     $("#gBack").onclick=()=>this.close();
     setTimeout(()=>{ const e=$("#lgEmail"); if(e) e.focus(); },50);
     $("#lgForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#lgGo"), er=$("#lgErr"); b.disabled=true; b.textContent="Signing in…"; er.hidden=true;
-      try{ await Auth.login($("#lgEmail").value,$("#lgPw").value); this.unlock(); toast("Signed in"); }
-      catch(e){ er.textContent=e.message; er.hidden=false; b.disabled=false; b.textContent="Sign in"; } };
+      try{ const st=await Auth.login($("#lgEmail").value,$("#lgPw").value,$("#lgRem").checked); if(st==="mfa"){ this.render(); return; } this.unlock(); toast("Signed in"); }
+      catch(e){ er.innerHTML=esc(e.message)+(e.portal?' <a href="'+esc(CONFIG.PORTAL_URL)+'" target="_blank" rel="noopener">Open the Staff Portal</a>':''); er.hidden=false; b.disabled=false; b.textContent="Sign in"; } };
   },
-  rSetPassword(el,forced){
-    const html='<form class="'+(forced?'gate':'box')+'" id="pwForm" style="'+(forced?'':'max-width:480px')+'"><p class="eyebrow">'+(forced?'Welcome':'My account')+'</p><h2 style="font:700 20px var(--serif);margin:0 0 6px">'+(forced?'Choose your own password':'Change password')+'</h2>'+
-      (forced?'<p class="sub">You signed in with a temporary password. Set a new one to continue.</p>':'<p class="sub">Signed in as '+esc(Auth.user.username)+'. This also changes your permit checker password.</p>')+
-      '<div class="field" style="margin-bottom:10px"><label for="pwOld">'+(forced?'Temporary password':'Current password')+'</label><input id="pwOld" type="password" autocomplete="current-password" required></div>'+
-      '<div class="field" style="margin-bottom:10px"><label for="pwNew">New password</label><input id="pwNew" type="password" autocomplete="new-password" minlength="10" required><span class="hint">At least 10 characters</span></div>'+
-      '<div class="field"><label for="pwNew2">Type it again</label><input id="pwNew2" type="password" autocomplete="new-password" required></div>'+
-      '<p class="note warn" id="pwErr" hidden style="margin:10px 0 0"></p><div class="btnrow" style="margin-top:14px"><button class="btn primary" type="submit" id="pwGo">Save password</button>'+(forced?'<button class="btn ghost" type="button" id="pwOut">Sign out</button>':'')+'</div></form>';
-    el.innerHTML = forced ? '<div class="admin-in">'+html+'</div>' : html;
-    const out=$("#pwOut"); if(out) out.onclick=()=>this.lock();
-    $("#pwForm").onsubmit=async ev=>{ ev.preventDefault(); const er=$("#pwErr"); er.hidden=true;
-      if($("#pwNew").value!==$("#pwNew2").value){ er.textContent="The new passwords don't match."; er.hidden=false; return; }
-      try{ const r=await sbRpc("pm_staff_change_password",{p_token:Auth.token,p_old:$("#pwOld").value,p_new:$("#pwNew").value}); if(r&&r.ok===false) throw new Error(r.error||"Couldn't change the password."); Auth.user.must_change=false; toast("Password saved"); this.render(); }
-      catch(e){ er.textContent=e.message; er.hidden=false; } };
-  },
-  async rUsers(b){
-    const pmc=async(fn,args)=>{ const r=await sbRpc(fn,Object.assign({p_token:Auth.token},args)); if(r&&r.ok===false) throw new Error(r.error||"That didn't work."); return r; };
-    b.innerHTML='<p class="sub">Loading logins…</p>';
-    let users=[]; try{ users=await sbRpc("pm_staff_users_list",{p_token:Auth.token})||[]; }catch(e){ b.innerHTML='<p class="note warn">'+esc(e.message)+'</p>'; return; }
-    const me=Auth.user, isAdmin=me.role==="admin";
-    const roles=Object.keys(ROLE_LABEL).filter(r=>isAdmin || r!=="admin");
-    const manageable=u=> u.username!==me.username && (isAdmin || u.role!=="admin");
-    const roleSel=(id,val)=>'<select id="'+id+'">'+Object.keys(ROLE_LABEL).filter(r=>roles.includes(r)||r===val).map(r=>'<option value="'+r+'"'+(r===val?' selected':'')+'>'+ROLE_LABEL[r]+'</option>').join("")+'</select>';
-    b.innerHTML='<p class="note info" style="margin-bottom:12px">These are the same logins as the permit checker. Adding, changing or turning off someone here changes their access on both sites.</p>'+
-      '<div class="grid2" style="margin-top:0;grid-template-columns:1fr"><div class="box"><h3>Add a login</h3><form id="nuForm" class="fgrid">'+
-      '<div class="field"><label for="nuEmail">Username</label><input id="nuEmail" autocapitalize="off" spellcheck="false" required placeholder="name@collinsalexander.com"><span class="hint">3–64 characters: letters, numbers and . _ @ + -</span></div>'+
-      '<div class="field"><label for="nuName">Full name</label><input id="nuName"></div>'+
-      '<div class="field"><label for="nuRole">Access</label>'+roleSel("nuRole","staff")+'<span class="hint">Administrator: everything · Staff: add and edit properties · Viewer: look only</span></div>'+
-      '<div class="field"><label for="nuPw">Starting password</label><div style="display:flex;gap:6px"><input id="nuPw" value="'+tempPassword()+'" minlength="10" required style="flex:1"><button class="btn" type="button" id="nuGen">New</button></div><span class="hint">Share it privately; they can change it under My account</span></div>'+
-      '<div class="btnrow full"><button class="btn primary" type="submit">Create login</button></div></form><p class="note info" id="nuDone" hidden style="margin-top:10px"></p></div>'+
-      '<div class="box"><h3>Staff logins</h3>'+
-      '<div class="tablewrap"><table class="t"><thead><tr><th>Login</th><th>Access</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead><tbody>'+
-      users.map(u=>{ const m=manageable(u); return '<tr><td class="first"><b>'+esc(u.full_name||u.username)+'</b><div style="font-size:12px;color:var(--ink-soft)">'+esc(u.username)+(u.username===me.username?' · you':'')+'</div></td>'+
-        '<td data-l="Access">'+(m?roleSel("ur-"+u.id,u.role):esc(ROLE_LABEL[u.role]||u.role))+'</td>'+
-        '<td data-l="Status">'+(u.active?'<span class="pill" style="color:var(--ok);background:var(--ok-bg)"><i></i>Active</span>':'<span class="pill" style="color:var(--ink-faint);background:var(--surface-2)"><i></i>Turned off</span>')+'</td>'+
-        '<td data-l="Last sign-in" style="font-size:12px;color:var(--ink-soft)">'+(u.last_login_at?esc(ago(u.last_login_at)):'Never')+'</td>'+
-        '<td class="act">'+(m?'<button class="btn sm" data-reset="'+esc(u.id)+'">Reset password</button><button class="btn sm ghost" data-toggle="'+esc(u.id)+'">'+(u.active?'Turn off':'Turn on')+'</button><button class="btn sm ghost danger" data-deluser="'+esc(u.id)+'" aria-label="Delete login">✕</button>':'')+'</td></tr>'; }).join("")+
-      '</tbody></table></div><p class="note info" id="urDone" hidden style="margin-top:10px"></p></div></div>';
-    const byId=id=>users.find(u=>String(u.id)===String(id));
-    $("#nuGen",b).onclick=()=>{ $("#nuPw",b).value=tempPassword(); };
-    $("#nuForm",b).onsubmit=async ev=>{ ev.preventDefault(); const pw=$("#nuPw",b).value, em=$("#nuEmail",b).value.trim().toLowerCase();
-      try{ await pmc("pm_staff_user_add",{p_username:em,p_full_name:$("#nuName",b).value,p_role:$("#nuRole",b).value,p_password:pw}); await this.rUsers(b);
-        const d=$("#nuDone",b); d.innerHTML='Login created for <b>'+esc(em)+'</b>. Starting password: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw">Copy</button><br>Share it privately. It works on the map and the permit checker.'; d.hidden=false; $("#cpPw",b).onclick=()=>copyText(pw,"Password copied"); }
-      catch(e){ toast(e.message,5000); } };
-    $$("select[id^=ur-]",b).forEach(sel=>sel.onchange=async()=>{ const u=byId(sel.id.slice(3)); try{ await pmc("pm_staff_user_update",{p_id:u.id,p_full_name:u.full_name||"",p_role:sel.value,p_active:u.active}); toast("Access updated"); await this.rUsers(b); }catch(e){ toast(e.message,5000); sel.value=u.role; } });
-    $$("[data-toggle]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.toggle); try{ await pmc("pm_staff_user_update",{p_id:u.id,p_full_name:u.full_name||"",p_role:u.role,p_active:!u.active}); toast(u.active?"Login turned off":"Login turned on"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
-    $$("[data-reset]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.reset); const pw=tempPassword();
-      try{ await pmc("pm_staff_user_reset_password",{p_id:u.id,p_new:pw}); await this.rUsers(b); const d=$("#urDone",b); d.innerHTML='New password for <b>'+esc(u.username)+'</b>: <code class="mono">'+esc(pw)+'</code> <button class="btn sm" type="button" id="cpPw2">Copy</button><br>Share it privately; they can change it under My account.'; d.hidden=false; $("#cpPw2",b).onclick=()=>copyText(pw,"Password copied"); }
-      catch(e){ toast(e.message,5000); } });
-    $$("[data-deluser]",b).forEach(x=>x.onclick=async()=>{ const u=byId(x.dataset.deluser); if(x.dataset.sure!=="1"){ x.dataset.sure="1"; x.textContent="Delete?"; x.classList.remove("ghost"); setTimeout(()=>{ if(x.isConnected){ x.dataset.sure=""; x.textContent="✕"; x.classList.add("ghost"); } },4000); return; }
-      try{ await pmc("pm_staff_user_delete",{p_id:u.id}); toast("Login deleted"); await this.rUsers(b); }catch(e){ toast(e.message,5000); } });
+  rAccount(b){
+    const u=Auth.user||{}, m=u.map||{};
+    const can=[m.view?'See annexations and tracked properties':'',m.edit?'Add, edit and delete annexations':'',m.admin?'Replace, remove and restore map layers':''].filter(Boolean);
+    b.innerHTML='<div class="grid2" style="margin-top:0"><div class="box"><h3>Signed in</h3><dl class="kv"><dt>Name</dt><dd>'+esc(u.name||"—")+'</dd><dt>Email</dt><dd>'+esc(u.email||"")+'</dd><dt>Access</dt><dd>'+esc(u.title||ROLE_LABEL[u.role]||u.role||"")+'</dd></dl>'+
+      '<h3 style="margin-top:16px">On this map you can</h3><ul class="plain">'+can.map(c=>'<li>'+esc(c)+'</li>').join("")+'</ul></div>'+
+      '<div class="box"><h3>Password, 2-step and staff logins</h3><p class="sub" style="margin:0 0 12px">This map uses your Arab City Staff Portal login. Change your password, set up 2-step verification, or (administrators) add and remove staff logins in the Staff Portal. Changes apply here right away.</p>'+
+      '<a class="btn primary" href="'+esc(CONFIG.PORTAL_URL)+'" target="_blank" rel="noopener">'+ICON.link+'Open the Staff Portal</a></div></div>';
   },
   rOverview(b){
     const rows=Store.rows, ann=rows.filter(r=>r.kind==="annexation");
@@ -1507,11 +1579,11 @@ const Admin = {
     if(State.mode==="point"){ this.form.geometry=JSON.stringify({type:"Point",coordinates:[+ll.lng.toFixed(7),+ll.lat.toFixed(7)]}); const f=parcelAt(ll); if(f) this.fillFromParcel(f,false); this.cancelGeo(false); }
     else if(State.mode==="draw"){ this.drawPts.push(ll); this.drawTemp(); }
   },
-  drawTemp(){ this.geoLayer.clearLayers(); if(this.drawPts.length) L.polyline(this.drawPts.length>2?[...this.drawPts,this.drawPts[0]]:this.drawPts,{color:"#F2C230",weight:3,dashArray:"6 4",pane:"toolPane",interactive:false}).addTo(this.geoLayer); this.drawPts.forEach(p=>L.circleMarker(p,{radius:5,color:"#0F3273",weight:2,fillColor:"#fff",fillOpacity:1,pane:"toolPane",interactive:false}).addTo(this.geoLayer)); },
+  drawTemp(){ this.geoLayer.clearLayers(); if(this.drawPts.length) L.polyline(this.drawPts.length>2?[...this.drawPts,this.drawPts[0]]:this.drawPts,{color:"#C0A869",weight:3,dashArray:"6 4",pane:"toolPane",interactive:false}).addTo(this.geoLayer); this.drawPts.forEach(p=>L.circleMarker(p,{radius:5,color:"#212C46",weight:2,fillColor:"#fff",fillOpacity:1,pane:"toolPane",interactive:false}).addTo(this.geoLayer)); },
   finishDraw(){ if(this.drawPts.length<3){ toast("Add at least 3 corners"); return; } this.syncFormFromDom(); const ring=this.drawPts.map(p=>[+p.lng.toFixed(7),+p.lat.toFixed(7)]); ring.push(ring[0]); this.form.geometry=JSON.stringify({type:"Polygon",coordinates:[ring]}); if(!this.form.acreage) this.form.acreage=(geoArea(this.drawPts)/4046.86).toFixed(2); this.cancelGeo(false); },
   captureParcel(f,silent){ if(!silent) this.syncFormFromDom(); this.form.geometry=JSON.stringify(f.geometry); this.fillFromParcel(f,true); if(!silent){ this.cancelGeo(false); toast("Parcel boundary and record copied"); } },
   fillFromParcel(f,withAcres){ const p=P(f); const F=this.form; F.address=F.address||p.address; F.ppin=F.ppin||p.ppin; F.parcel_number=F.parcel_number||p.parcel; F.owner=F.owner||p.owner; F.current_zone=F.current_zone||(p.zone!=="X"?p.zone:""); if(withAcres && !F.acreage && p.acres) F.acreage=String(p.acres); if(!F.name) F.name=p.address||""; },
-  showGeo(){ this.geoLayer.clearLayers(); if(!this.form) return; const g=geomOf(this.form); if(!g) return; if(g.type==="Point") L.circleMarker([g.coordinates[1],g.coordinates[0]],{radius:10,color:"#fff",weight:3,fillColor:"#F2C230",fillOpacity:1,pane:"toolPane",interactive:false}).addTo(this.geoLayer); else L.geoJSON(g,{pane:"toolPane",interactive:false,style:{color:"#F2C230",weight:4,fillColor:"#F2C230",fillOpacity:.2}}).addTo(this.geoLayer); },
+  showGeo(){ this.geoLayer.clearLayers(); if(!this.form) return; const g=geomOf(this.form); if(!g) return; if(g.type==="Point") L.circleMarker([g.coordinates[1],g.coordinates[0]],{radius:10,color:"#fff",weight:3,fillColor:"#C0A869",fillOpacity:1,pane:"toolPane",interactive:false}).addTo(this.geoLayer); else L.geoJSON(g,{pane:"toolPane",interactive:false,style:{color:"#C0A869",weight:4,fillColor:"#C0A869",fillOpacity:.2}}).addTo(this.geoLayer); },
   formHTML(){
     const F=this.form, g=geomOf(F), m=State.mode;
     const sel=(id,opts,val)=>'<select id="'+id+'">'+opts.map(([v,l])=>'<option value="'+esc(v)+'"'+(String(val)===String(v)?' selected':'')+'>'+esc(l)+'</option>').join("")+'</select>';
@@ -1629,8 +1701,8 @@ const View3D = {
     const before=m.getLayer("bldg")?"bldg":undefined;
     m.addLayer({id:"z-fill",type:"fill",source:"parcels",filter:["!=",["get","_z"],"X"],paint:{"fill-color":this.zoneExpr(),"fill-opacity":Math.min(.85,State.opacity+.1)}},before);
     m.addLayer({id:"z-line",type:"line",source:"parcels",minzoom:14,paint:{"line-color":"#ffffff","line-width":["interpolate",["linear"],["zoom"],14,.3,18,1.4],"line-opacity":.8}},before);
-    m.addLayer({id:"z-sel",type:"line",source:"parcels",filter:["==",["get","_i"],-1],paint:{"line-color":"#F2C230","line-width":4}},before);
-    m.addLayer({id:"limits",type:"line",source:"limits",paint:{"line-color":"#F2C230","line-width":3,"line-dasharray":[3,2]}},before);
+    m.addLayer({id:"z-sel",type:"line",source:"parcels",filter:["==",["get","_i"],-1],paint:{"line-color":"#C0A869","line-width":4}},before);
+    m.addLayer({id:"limits",type:"line",source:"limits",paint:{"line-color":"#C0A869","line-width":3,"line-dasharray":[3,2]}},before);
     m.addLayer({id:"a-fill",type:"fill-extrusion",source:"annex",filter:["==",["geometry-type"],"Polygon"],paint:{"fill-extrusion-color":["get","color"],"fill-extrusion-height":28,"fill-extrusion-opacity":.55}});
     m.addLayer({id:"a-pt",type:"circle",source:"annex",filter:["==",["geometry-type"],"Point"],paint:{"circle-radius":9,"circle-color":["get","color"],"circle-stroke-color":"#fff","circle-stroke-width":2.5}});
   },

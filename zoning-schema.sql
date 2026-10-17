@@ -1,17 +1,22 @@
 -- =====================================================================
--- City of Arab — Zoning & Property Map: shared storage
--- Sign-in uses the PERMIT CHECKER's staff logins (pm_staff_users /
--- pm_staff_sessions) in the same Supabase project, so one username and
--- password works on both sites. Run the permit checker's schema.sql
--- first (it already is, on the live project). Safe to re-run.
+-- City of Arab — Zoning Map (arabcityzoning.jadecruz.dev): shared storage
+-- v2 (2026-10-17): sign-in uses the Arab City Staff Portal logins
+-- (bf_accounts / bf_sessions, the same logins as
+-- arabcityapplications.jadecruz.dev), including its lockout, 2-step
+-- verification and "choose your own password" rules.
+-- Run in the Supabase SQL Editor (project yighcuismepfmappcfui) after the
+-- Staff Portal's bf_*.sql files. Safe to re-run. Nothing is deleted:
+-- the zm_properties / zm_layers / zm_log tables are kept as they are.
 --
--- Access on the map follows the permit checker's access level:
---   admin   → everything: properties, map layers, staff logins
---   staff   → add / edit / delete properties
---   viewer  → sign in and see staff-only details
+-- Who can do what on the map (Staff Portal roles):
+--   public (not signed in)      zoning map only; annexations are hidden
+--   any active staff login      see annexations and tracked properties
+--     (Building Department, City Clerk, Administrator)
+--   Building Department + admin add / edit / delete annexations
+--   Administrator               also replace / remove / restore map layers
+-- Logins, passwords and 2-step are managed in the Staff Portal.
 -- =====================================================================
-
-create extension if not exists pgcrypto;
+set search_path = public, extensions;
 
 create table if not exists zm_properties (
   id         text primary key,
@@ -19,14 +24,12 @@ create table if not exists zm_properties (
   updated_at timestamptz not null default now(),
   updated_by text
 );
-
 create table if not exists zm_layers (
   kind       text primary key check (kind in ('parcels','limits','gas')),
   geojson    jsonb,              -- null = removed from the map
   updated_at timestamptz not null default now(),
   updated_by text
 );
-
 create table if not exists zm_log (
   id      bigserial primary key,
   at      timestamptz not null default now(),
@@ -34,59 +37,50 @@ create table if not exists zm_log (
   action  text,
   detail  jsonb
 );
-
 alter table zm_properties enable row level security;
 alter table zm_layers     enable row level security;
 alter table zm_log        enable row level security;
 revoke all on zm_properties, zm_layers, zm_log from anon, authenticated;
 
--- Remove the separate map logins from the first draft of this file, if they were ever created.
-drop function if exists zm_bootstrap(text,text);
-drop function if exists zm_login(text,text);
-drop function if exists zm_logout(uuid);
-drop function if exists zm_change_password(uuid,text,text);
-drop function if exists zm_list_users(uuid);
-drop function if exists zm_save_user(uuid,text,text,text,boolean,text);
-drop function if exists zm_reset_password(uuid,uuid,text);
-drop function if exists zm_delete_user(uuid,uuid);
-drop function if exists zm_me(uuid);
-drop table if exists zm_sessions, zm_users cascade;   -- cascade also removes zm_auth / zm_user_json
-drop function if exists zm_rank(text);
-
 -- ---------- helpers (not callable from the website) ----------
--- Checks a permit-checker session and access level (1 viewer, 2 staff, 3 admin); returns the username.
+-- any active staff login (Building Department, City Clerk or Administrator)
+create or replace function zm_is_staff(a bf_accounts) returns boolean
+language sql immutable as $$
+  select a.id is not null and coalesce(a.active, true)
+     and (a.role in ('staff','clerk','admin') or coalesce(array_length(a.perms, 1), 0) > 0);
+$$;
+-- 1 = any staff (view), 2 = Building Department (edit), 3 = Administrator; returns the email
 create or replace function zm_actor(p_token uuid, p_min int) returns text
 language plpgsql security definer set search_path = public, extensions as $$
-declare uid uuid := pm_require(p_token, p_min); n text;
+declare a bf_accounts := bf_session_account(p_token);
 begin
-  select username into n from pm_staff_users where id = uid;
-  return n;
+  if a.id is null then raise exception 'unauthorized'; end if;
+  if (p_min >= 3 and not bf_is_admin(a)) or (p_min = 2 and not bf_is_staff(a)) or (p_min = 1 and not zm_is_staff(a)) then
+    raise exception 'forbidden';
+  end if;
+  return a.email;
 end $$;
-revoke all on function zm_actor(uuid,int) from public, anon, authenticated;
+revoke all on function zm_is_staff(bf_accounts), zm_actor(uuid,int) from public, anon, authenticated;
 
 -- ---------- who am I (restores a session on page load) ----------
+drop function if exists zm_me(uuid);
 create or replace function zm_me(p_token uuid) returns jsonb
 language plpgsql security definer set search_path = public, extensions as $$
-declare uid uuid := pm_auth(p_token); u pm_staff_users%rowtype;
+declare a bf_accounts := bf_session_account(p_token);
 begin
-  select * into u from pm_staff_users where id = uid;
-  return jsonb_build_object('id',u.id,'username',u.username,'full_name',u.full_name,'role',u.role);
+  if a.id is null or not zm_is_staff(a) then return null; end if;
+  return bf_account_json(a) || jsonb_build_object('map', jsonb_build_object(
+    'view', true, 'edit', bf_is_staff(a), 'admin', bf_is_admin(a)));
 end $$;
 
--- ---------- properties / annexations ----------
+-- ---------- properties / annexations: staff only ----------
 create or replace function zm_list_properties(p_token uuid default null)
 returns jsonb language plpgsql security definer set search_path = public, extensions as $$
-declare staff boolean := false;
+declare a bf_accounts := bf_session_account(p_token);
 begin
-  if p_token is not null then
-    begin perform pm_auth(p_token); staff := true; exception when others then staff := false; end;
-  end if;
-  return coalesce((select jsonb_agg(
-            case when staff then p.data || jsonb_build_object('id',p.id,'updated_at',p.updated_at,'updated_by',p.updated_by)
-                 else (p.data - 'owner' - 'updated_by') || jsonb_build_object('id',p.id,'updated_at',p.updated_at) end
-            order by p.updated_at desc)
-          from zm_properties p
-          where staff or upper(coalesce(p.data->>'public','Y')) <> 'N'), '[]'::jsonb);
+  if a.id is null or not zm_is_staff(a) then return '[]'::jsonb; end if;   -- the public sees no annexations
+  return coalesce((select jsonb_agg(p.data || jsonb_build_object('id',p.id,'updated_at',p.updated_at,'updated_by',p.updated_by)
+                                    order by p.updated_at desc) from zm_properties p), '[]'::jsonb);
 end $$;
 
 create or replace function zm_upsert_property(p_token uuid, p_row jsonb)
@@ -110,9 +104,8 @@ end $$;
 
 -- ---------- map layers (shared overrides of the files in /data) ----------
 create or replace function zm_get_layers() returns jsonb language sql security definer set search_path = public as $$
-  select coalesce(jsonb_object_agg(kind, jsonb_build_object('geojson',geojson,'updated_at',updated_at,'updated_by',updated_by)),'{}'::jsonb) from zm_layers $$;
+  select coalesce(jsonb_object_agg(kind, jsonb_build_object('geojson',geojson,'updated_at',updated_at)),'{}'::jsonb) from zm_layers $$;
 
--- p_mode: 'set' (use p_geojson), 'remove' (hide the layer), 'restore' (go back to the file in /data)
 create or replace function zm_set_layer(p_token uuid, p_kind text, p_mode text, p_geojson jsonb default null)
 returns void language plpgsql security definer set search_path = public, extensions as $$
 declare who text := zm_actor(p_token, 3);
@@ -128,16 +121,9 @@ begin
 end $$;
 
 -- ---------- what the website may call ----------
--- (Sign-in, password changes and staff logins use the permit checker's existing pm_staff_* functions.)
+-- (Sign-in uses the Staff Portal's bf_sign_in / bf_sign_in_code / bf_me / bf_sign_out.)
+revoke all on function zm_me(uuid), zm_list_properties(uuid), zm_upsert_property(uuid,jsonb), zm_delete_property(uuid,text),
+  zm_get_layers(), zm_set_layer(uuid,text,text,jsonb) from public;
 grant execute on function zm_me(uuid), zm_list_properties(uuid), zm_upsert_property(uuid,jsonb), zm_delete_property(uuid,text),
   zm_get_layers(), zm_set_layer(uuid,text,text,jsonb)
 to anon, authenticated;
-
--- =====================================================================
--- OPTIONAL: give yourself an email login (the permit checker's 'admin'
--- login also works). Replace the placeholder, run it once, then clear it.
---
---   select pm_create_staff('jade.cruz@collinsalexander.com', 'PASTE-YOUR-PASSWORD-HERE', 'admin');
---
--- Or sign in with your existing admin login and add it from Staff logins.
--- =====================================================================

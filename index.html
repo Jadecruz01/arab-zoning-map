@@ -1623,7 +1623,7 @@ const Admin = {
     ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),account:()=>this.rAccount(body)})[this.tab]();
   },
   rLogin(el){
-    const hero='<h2><em>Zoning Map</em></h2><p>Staff sign-in for annexations and map layers. Use the same login as the Arab City Staff Portal.</p>';
+    const hero='<h2><em>Zoning Map</em></h2><p>Staff sign-in for annexations and map layers. Use your login from the Applications &amp; Fees page.</p>';
     const back='<button type="button" class="lbtn" id="gBack">Back to map</button>';
     if(isPhone()){ el.innerHTML=lbPage(hero,'<div class="pin"><h1>Use a computer or iPad</h1><p>Staff sign-in isn\'t available on phones. Open this map on a computer or iPad to sign in. Everything else on the map works here.</p><button type="button" class="lbtn primary" id="gBack">Back to map</button></div>'); $("#gBack").onclick=()=>this.close(); return; }
     if(Auth.mfa){

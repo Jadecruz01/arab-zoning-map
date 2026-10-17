@@ -505,6 +505,123 @@ ul.plain{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13.5px}
   .results{top:calc(96px + env(safe-area-inset-top,0px))}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* ---- staff sign-in: same design as the Staff Portal (arabcityapplications.jadecruz.dev), map artwork ---- */
+.admin.lgmode{position:fixed;inset:0;z-index:5000;background:#212c46;overflow:auto}
+.loginbg{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;background:#212c46;display:flex;align-items:center;justify-content:center;padding:32px 16px 64px;font-family:var(--sans)}
+.lb-art{position:absolute;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 78% 30%,#2c3a5e 0%,#212c46 45%,#161d31 100%)}
+.lb-grid{position:absolute;inset:-120px;background-image:linear-gradient(rgba(192,168,105,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(192,168,105,.09) 1px,transparent 1px),linear-gradient(rgba(192,168,105,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(192,168,105,.035) 1px,transparent 1px);background-size:120px 120px,120px 120px,24px 24px,24px 24px;animation:lbDrift 60s linear infinite}
+@keyframes lbDrift{to{transform:translate3d(120px,120px,0)}}
+.lb-plan{position:absolute;right:-1%;bottom:2%;width:min(980px,78vw);height:auto;opacity:.9}
+.lb-plan .ln{fill:none;stroke:#c0a869;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--l,1600);stroke-dashoffset:var(--l,1600);animation:lbDraw 3.2s cubic-bezier(.6,.05,.3,1) forwards;animation-delay:var(--d,0s)}
+.lb-plan .ln.thin{stroke-width:1.2;stroke:rgba(192,168,105,.65)}
+.lb-plan .ln.white{stroke:rgba(255,255,255,.55)}
+.lb-plan .ln.hair{stroke-width:.9;stroke:rgba(255,255,255,.22)}
+.lb-plan .water{fill:rgba(120,160,220,.07);opacity:0;animation:lbFade 2s ease forwards;animation-delay:var(--d,0s)}
+.lb-plan .lim{fill:none;stroke:rgba(255,255,255,.6);stroke-width:1.6;stroke-dasharray:10 6;opacity:0;animation:lbFade 1.6s ease forwards;animation-delay:var(--d,0s)}
+.lb-plan .tb{fill:rgba(192,168,105,.16);font:600 7.5px/1 var(--sans);letter-spacing:.22em}
+.lb-plan .dim{fill:rgba(192,168,105,.75);font:600 13px/1 var(--sans);letter-spacing:.08em;opacity:0;animation:lbFade 1s ease forwards;animation-delay:var(--d,0s)}
+.lb-plan .dim.st{fill:rgba(255,255,255,.4);font-size:11px;letter-spacing:.18em}
+.lb-plan .glow{fill:#c0a869;opacity:0;animation:lbWin 6s ease-in-out infinite;animation-delay:var(--d,4s)}
+.lb-plan .pin{animation:lbPin 2.4s ease-in-out infinite alternate;animation-delay:3s;transform-box:fill-box}
+.lb-plan .pulse{fill:none;stroke:#c0a869;stroke-width:1.5;opacity:0;transform-origin:center;transform-box:fill-box;animation:lbPulse 2.4s ease-out infinite;animation-delay:var(--d,3.2s)}
+.lb-plan .needle{transform-origin:center;transform-box:fill-box;animation:lbNeedle 9s ease-in-out infinite alternate}
+.lb-ring{position:absolute;border-radius:50%;border:2px solid rgba(192,168,105,.14);animation:lbSpin 90s linear infinite}
+@keyframes lbDraw{to{stroke-dashoffset:0}}
+@keyframes lbFade{to{opacity:1}}
+@keyframes lbWin{0%,100%{opacity:0}45%,60%{opacity:.55}}
+@keyframes lbPin{from{transform:translateY(0)}to{transform:translateY(-16px)}}
+@keyframes lbPulse{0%{opacity:.7;transform:scale(.4)}100%{opacity:0;transform:scale(1.8)}}
+@keyframes lbNeedle{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+@keyframes lbSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.lb-grid,.lb-ring,.lb-plan .pin,.lb-plan .pulse,.lb-plan .needle,.lb-plan .glow{animation:none}.lb-plan .ln{animation:none;stroke-dashoffset:0}.lb-plan .dim,.lb-plan .lim,.lb-plan .water{animation:none;opacity:1}}
+@media (max-width:860px){.lb-plan{width:150vw;right:-40vw;opacity:.45}}
+.lb-shade{position:absolute;inset:0;background:linear-gradient(110deg,rgba(24,32,52,.94) 0%,rgba(24,32,52,.78) 38%,rgba(24,32,52,.35) 72%,rgba(24,32,52,.55) 100%),radial-gradient(120% 90% at 70% 40%,transparent 40%,rgba(5,14,40,.55) 100%)}
+.lb-wrap{position:relative;z-index:1;width:100%;max-width:1040px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:56px;align-items:center}
+.lb-hero{color:#fff}
+.lb-hero .lb-logo{display:block;width:112px;height:112px;margin:0 0 22px;border-radius:50%;box-shadow:0 10px 30px rgba(0,0,0,.35);background:transparent}
+.lb-kicker{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#c0a869;padding-bottom:10px;border-bottom:2px solid #c0a869}
+.lb-hero h2{font:800 clamp(34px,4.6vw,54px)/1.04 var(--serif);margin:18px 0 14px;letter-spacing:-.01em;text-shadow:0 2px 24px rgba(0,0,0,.35);color:#fff}
+.lb-hero h2 em{font-style:normal;color:#c0a869}
+.lb-hero p{margin:0;max-width:34ch;font-size:17px;line-height:1.5;color:rgba(255,255,255,.85)}
+.loginbg .pin{margin:0;max-width:none;background:color-mix(in srgb,var(--surface) 97%,transparent);border-radius:14px;padding:28px;display:grid;gap:12px;text-align:center;color:var(--ink);border-top:4px solid #c0a869;box-shadow:0 30px 80px rgba(3,10,30,.55),0 2px 0 rgba(255,255,255,.4) inset;backdrop-filter:blur(6px)}
+.loginbg .pin h1{font:800 22px/1.3 var(--serif);margin:0;color:var(--ink)}
+.loginbg .pin p{margin:0;color:var(--ink-faint);font-size:14px;line-height:1.5}
+.loginbg .fld{display:flex;flex-direction:column;gap:5px;min-width:0;text-align:left}
+.loginbg .fld label{font-weight:600;font-size:14px;color:var(--ink)}
+.loginbg .fld input{border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--surface);color:var(--ink);width:100%;min-width:0;font:16px var(--sans);height:auto}
+.loginbg .fld input:focus{outline:2px solid var(--navy);outline-offset:0;border-color:transparent}
+.loginbg .opt{display:flex;gap:8px;align-items:flex-start;font-size:14px;text-align:left;cursor:pointer;color:var(--ink)}
+.loginbg .opt input{margin-top:3px}
+.loginbg .formerr{color:#b42318;font-weight:600;font-size:14px}
+.loginbg .formerr:empty{display:none}
+.loginbg .lbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;background:transparent;color:var(--ink);border-radius:6px;padding:10px 14px;font:600 14px var(--sans);cursor:pointer;text-decoration:none}
+.loginbg .lbtn.primary{background:var(--navy);border-color:var(--navy);color:#fff;padding:12px 14px}
+.loginbg .lbtn.primary:hover{background:var(--navy-2);border-color:var(--navy-2)}
+.loginbg .lbtn.out{border-color:var(--line);background:var(--surface)}
+.loginbg .lbtn[disabled]{opacity:.5;cursor:not-allowed}
+.loginbg .pwhelp{display:grid;gap:10px}
+.loginbg .pwhelp[hidden]{display:none}
+.loginbg .pwhelp-msg{display:flex;gap:8px;align-items:flex-start;text-align:left;font-size:13.5px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink)}
+.lb-ver{position:absolute;left:18px;bottom:20px;z-index:1;font-size:12px;color:rgba(255,255,255,.6)}
+@media (max-width:860px){.lb-wrap{grid-template-columns:1fr;gap:22px;max-width:420px}.lb-hero{text-align:center}.lb-hero .lb-logo{width:72px;height:72px;margin:0 auto 14px}.lb-hero h2{font-size:30px;margin:12px 0 6px}.lb-hero p{display:none}.loginbg{align-items:flex-start;padding-top:28px}.lb-shade{background:linear-gradient(180deg,rgba(24,32,52,.6) 0%,rgba(24,32,52,.85) 60%,rgba(24,32,52,.95) 100%)}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .loginbg .pin{border-top-color:#c0a869}}
+
+/* ---- staff dashboard: Staff Portal workspace layout (navy top bar + side menu) ---- */
+.admin.wsmode{position:fixed;inset:0;z-index:5000;background:var(--surface);overflow:hidden;display:flex;flex-direction:column}
+.jt-top{background:var(--navy);color:#fff;display:flex;align-items:center;gap:18px;padding:0 18px;height:60px;flex:none;border-bottom:3px solid var(--gold);position:relative;z-index:20}
+.jt-top .sp{flex:1}
+.jt-brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;min-width:0}
+.jt-brand img{width:40px;height:40px;border-radius:50%;flex:none}
+.jt-brand .bname{display:grid;font:800 19px/1.1 var(--serif);white-space:nowrap}
+.jt-brand .bname small{font:600 12px/1.3 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#e9e3d4}
+.wsw{display:inline-flex;margin-left:14px;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+.wsw button{border:0;background:transparent;color:#fff;font:600 13px var(--sans);padding:6px 12px;border-radius:999px;cursor:pointer;opacity:.8}
+.wsw button.on{background:#fff;color:var(--navy);opacity:1}
+.pm{position:relative;display:flex;align-items:center}
+.pm-btn{display:flex;align-items:center;gap:10px;background:none;border:0;color:#e9e3d4;cursor:pointer;font:500 14px var(--sans);padding:4px 6px;border-radius:999px}
+.pm-btn:hover,.pm-btn[aria-expanded=true]{background:rgba(255,255,255,.08)}
+.pm-car{font-size:11px;opacity:.8}
+.avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--gold);background:var(--navy-2);color:#fef6e9;display:grid;place-items:center;font:800 10px var(--serif);flex:none}
+.pm-menu{position:absolute;right:0;top:calc(100% + 8px);width:300px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(6,10,40,.22);padding:8px;z-index:40;display:grid}
+.pm-menu[hidden]{display:none}
+.pm-who{display:flex;gap:12px;align-items:center;padding:10px 10px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.pm-who>div{display:grid;min-width:0}
+.pm-who b{font-size:15px}
+.pm-who span{font-size:12.5px;color:var(--ink-faint);overflow-wrap:anywhere}
+.pm-who .pm-role{color:var(--gold-ink);font-weight:600}
+.pm-menu [role=menuitem]{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:10px;font:500 14px var(--sans);color:var(--ink);cursor:pointer;text-decoration:none}
+.pm-menu [role=menuitem]:hover,.pm-menu [role=menuitem]:focus-visible{background:var(--sel);outline:none}
+.pm-menu [role=menuitem] svg{width:18px;height:18px;color:var(--ink-soft)}
+.pm-sep{height:1px;background:var(--line);margin:6px 4px}
+.pm-out{color:#b42318!important}
+.ws{flex:1;min-height:0;display:grid;grid-template-columns:285px minmax(0,1fr)}
+.ws-side{background:var(--surface);border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:10px;overflow:auto}
+.ws-side .create{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--navy);border:0;border-radius:4px;padding:11px;font:700 14px var(--sans);letter-spacing:.02em;cursor:pointer}
+.ws-side .create svg{width:16px;height:16px}
+.ws-side h4{margin:8px 6px 0;font-size:14px;color:var(--ink-soft);font-weight:600}
+.ws-meter{background:#e6efe9;border-radius:8px;padding:12px 14px;font-size:13.5px;color:var(--ink)}
+.ws-meter .row{display:flex;justify-content:space-between;gap:8px;font-weight:700}
+.ws-meter .row span{font-weight:600}
+.ws-meter p{margin:8px 0 0;color:var(--ink-soft);font-size:13px;line-height:1.45}
+.ws-meter .dotx{display:inline-block;width:8px;height:8px;border-radius:50%;background:#2f8f5b;margin-right:6px;vertical-align:1px}
+.navi{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:var(--ink-soft);text-decoration:none;font:500 14px var(--sans);background:none;border:0;width:100%;text-align:left;cursor:pointer}
+.navi svg{width:18px;height:18px;flex:none}
+.navi:hover{background:var(--surface-2)}
+.navi.on{background:#ece2c6;color:var(--navy);font-weight:600}
+.navi.stat{cursor:default;justify-content:space-between}
+.navi.stat:hover{background:none}
+.navi .num{font-variant-numeric:tabular-nums}
+.ws-main{background:var(--surface);min-width:0;overflow:auto;display:flex;flex-direction:column}
+.ws-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ws-bar h1{font:800 20px/1.2 var(--serif);margin:0;color:var(--ink)}
+.ws-bar .sub{margin:2px 0 0;font-size:13px;color:var(--ink-faint)}
+.ws-body{padding:18px 22px 40px}
+.ws-body .stats{margin-top:0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .navi.on{background:#3a3626;color:#f4efe4}:root:not([data-theme="light"]) .ws-meter{background:#1f3329}}
+:root[data-theme="dark"] .navi.on{background:#3a3626;color:#f4efe4}
+:root[data-theme="dark"] .ws-meter{background:#1f3329}
+@media (max-width:860px){.ws{grid-template-columns:1fr;grid-template-rows:auto 1fr}.ws-side{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:6px}.ws-side h4,.ws-side .ws-meter,.ws-side .navi.stat,.ws-side .create{display:none}.ws-side .navi{width:auto;white-space:nowrap}.jt-brand .bname small,.pm-name{display:none}.wsw{margin-left:0}.ws-body{padding:14px 12px 32px}}
 </style>
 
 </head>
@@ -1388,6 +1505,54 @@ $("#panel").addEventListener("click",e=>{ if(e.target.closest("[data-clear]")) c
 /* =====================================================================
    STAFF DASHBOARD
    ===================================================================== */
+
+/* ---- staff sign-in artwork: a zoning map sheet drawing itself (same style as the Staff Portal's blueprint) ---- */
+function lbArt(){
+  const L=(d,l,dl,c)=>'<path class="ln '+(c||'')+'" d="'+d+'" style="--l:'+l+';--d:'+dl+'s"/>';
+  const T=(x,y,t,dl,c,extra)=>'<text class="dim '+(c||'')+'" x="'+x+'" y="'+y+'" text-anchor="middle" style="--d:'+dl+'s"'+(extra||'')+'>'+t+'</text>';
+  return '<div class="lb-art" aria-hidden="true"><div class="lb-grid"></div>'+
+   '<div class="lb-ring" style="width:620px;height:620px;right:-180px;top:-220px"></div><div class="lb-ring" style="width:380px;height:380px;right:120px;top:-120px;border-style:dashed;animation-direction:reverse"></div>'+
+   '<svg class="lb-plan" viewBox="0 0 1100 660" focusable="false">'+
+    // lake shoreline (top right)
+    '<path class="water" style="--d:.2s" d="M760 20C800 70 860 60 900 100S980 170 1060 150L1100 140V0H740Z"/>'+
+    L('M740 0C770 40 790 62 830 70S890 92 910 118S980 168 1060 150L1100 140', 520, .1, 'white')+
+    // terrain contours (left)
+    L('M60 470C90 400 190 380 250 410S330 500 280 545S110 560 60 470Z', 640, .3, 'hair')+
+    L('M95 470C115 425 185 412 230 432S285 492 255 520S130 530 95 470Z', 480, .5, 'hair')+
+    L('M135 468C150 445 190 440 212 452S240 485 222 500S150 500 135 468Z', 300, .7, 'hair')+
+    // main road + street grid
+    L('M40 600C260 560 420 470 560 420S860 330 1080 300', 1150, .2)+
+    L('M420 160V600M560 140V600M700 120V600M840 110V560', 1900, .6)+
+    L('M360 240H900M360 340H940M380 520H700', 1500, .9)+
+    // parcels inside the blocks
+    L('M420 200H560M490 160V240M630 140V240M560 190H700M770 120V240M700 180H840', 820, 1.4, 'thin')+
+    L('M490 240V340M420 290H560M630 240V340M700 290H840M770 240V340', 700, 1.6, 'thin')+
+    L('M490 380V520M630 380V470M700 470H840M770 340V470M560 470H700', 760, 1.8, 'thin')+
+    // zoning districts lighting up
+    '<rect class="glow" x="424" y="164" width="62" height="32" style="--d:3.4s"/><rect class="glow" x="634" y="244" width="62" height="42" style="--d:4.6s"/>'+
+    '<rect class="glow" x="704" y="344" width="62" height="122" style="--d:5.8s"/><rect class="glow" x="494" y="384" width="62" height="82" style="--d:7s"/>'+
+    // city limit (dashed)
+    '<path class="lim" style="--d:2.4s" d="M330 130L880 90L960 330L900 580L360 600L300 360Z"/>'+
+    // location pin on a parcel
+    '<circle class="pulse" cx="735" cy="300" r="22"/>'+
+    '<g class="pin">'+L('M735 300C735 300 710 270 710 252A25 25 0 0 1 760 252C760 270 735 300 735 300Z', 170, 2.2, 'white')+L('M727 252a8 8 0 1 0 16 0a8 8 0 1 0 -16 0', 52, 2.6, 'thin')+'</g>'+
+    // north arrow
+    '<g class="needle">'+L('M1020 250L1006 300L1020 290L1034 300Z', 150, 2.0, 'white')+'</g>'+L('M1020 275m-34 0a34 34 0 1 0 68 0a34 34 0 1 0 -68 0', 214, 1.9, 'thin')+
+    T(1020,230,'N',2.6)+
+    // street names
+    T(470,575,'MAIN ST',2.8,'st',' transform="rotate(-17 470 575)"')+ T(1000,385,'',2.8,'st')+
+    // scale bar
+    L('M720 625H920M720 617v16M820 621v8M920 617v16', 240, 2.2, 'thin')+
+    T(720,650,'0',2.8)+T(820,650,'500',2.9)+T(920,650,'1000 FT',3)+
+    '<text class="tb" x="1078" y="655" text-anchor="end">SHEET Z-1 · CITY OF ARAB ZONING · 2025</text>'+
+   '</svg></div>';
+}
+function lbPage(hero, formHtml){
+  const logo=($("header img.seal")||{}).src||"";
+  return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+(logo?'<img class="lb-logo" src="'+esc(logo)+'" alt="City of Arab, Alabama">':'')+hero+'</div>'+formHtml+'</div>'+
+   '<div class="lb-ver">Zoning data · January 2025</div></div>';
+}
 const Admin = {
   _preview: (()=>{ try{ return sessionStorage.getItem("arabmap.staff")==="1"; }catch(e){ return false; } })(),
   get unlocked(){ return Auth.enabled() ? !!Auth.user : this._preview; },
@@ -1397,51 +1562,94 @@ const Admin = {
   unlock(){ if(!Auth.enabled()){ this._preview=true; try{ sessionStorage.setItem("arabmap.staff","1"); }catch(e){} } updateStaffBtn(); Store.mode==="sheet" && Store.pullSheet().catch(()=>{}); Store.mode==="cloud" && Store.pullCloud().catch(()=>{}); buildIndex(); renderPropLayer(); renderPanel(); this.render(); },
   async lock(){ if(Auth.enabled()) await Auth.logout(); this._preview=false; try{ sessionStorage.removeItem("arabmap.staff"); }catch(e){} updateStaffBtn(); this.close(); Store.mode==="cloud" && Store.pullCloud().catch(()=>{}); renderPropLayer(); buildIndex(); renderPanel(); },
   render(){
-    const el=$("#admin");
-    if(Auth.enabled() && !Auth.user){ this.rLogin(el); return; }
+    const el=$("#admin"); el.classList.remove("lgmode","wsmode");
+    if(Auth.enabled() && !Auth.user){ el.classList.add("lgmode"); el.scrollTop=0; this.rLogin(el); return; }
     if(!this.unlocked){
       el.innerHTML='<div class="admin-in"><div class="gate"><p class="eyebrow">Building Department</p><h2>Staff dashboard</h2><p class="sub">Staff sign-in will go here once logins are set up. Until then this preview opens without a password, so don\'t share the staff link publicly yet.</p><div class="btnrow"><button class="btn primary" id="gOpen">Open dashboard</button><button class="btn" id="gBack">Back to map</button></div></div></div>';
       $("#gOpen").onclick=()=>this.unlock(); $("#gBack").onclick=()=>this.close(); return;
     }
-    const tabs=[["overview","Overview"],["properties","Properties"]];
+    const SV=d=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+    const NI={overview:SV('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+      properties:SV('<path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/>'),
+      parcels:SV('<path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/>'),
+      account:SV('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
+      feed:SV('<path d="M4 4h16v16H4z"/><path d="M4 10h16M10 4v16"/>'),
+      map:SV('<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>'),
+      portal:SV('<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
+      out:SV('<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H4"/>'),
+      plus:SV('<path d="M12 5v14M5 12h14"/>')};
+    const tabs=[["overview","Overview"],["properties","Annexations & properties"]];
     if(canAdmin()) tabs.push(["parcels","Map layers"]);
     if(Auth.enabled()) tabs.push(["account","My account"]);
     if(canAdmin()) tabs.push(["feed","Google Sheet feed"]);
     if(!tabs.some(t=>t[0]===this.tab)) this.tab="overview";
-    el.innerHTML='<div class="admin-in"><div class="ahead"><div><p class="eyebrow">Building Department · '+esc(Store.label())+(Store.lastSync?' · synced '+esc(ago(Store.lastSync)):'')+'</p><h1>Map dashboard</h1>'+(Auth.user?'<p class="sub" style="margin:4px 0 0">Signed in as <b>'+esc(Auth.user.email)+'</b> · '+esc(Auth.user.title||ROLE_LABEL[Auth.user.role]||Auth.user.role)+'</p>':'')+'</div><div class="btnrow"><button class="btn" id="aMap">'+ICON.map+'Back to map</button>'+(canEdit()?'<button class="btn gold" id="aAdd">'+ICON.plus+'Add property</button>':'')+'<button class="btn ghost" id="aLock">Sign out</button></div></div>'+
-      '<nav class="anav" role="tablist">'+tabs.map(([k,l])=>'<button role="tab" data-at="'+k+'" aria-selected="'+(this.tab===k)+'">'+l+'</button>').join("")+'</nav><div id="abody"></div></div>';
-    $("#aMap").onclick=()=>this.close(); const aa=$("#aAdd"); if(aa) aa.onclick=()=>this.startAdd({}); $("#aLock").onclick=()=>this.lock();
+    const u=Auth.user||{}, who=u.name||u.email||"Staff", ini=esc(String(who).split(/[\s@.]+/).filter(Boolean).map(w=>w[0]).join("").slice(0,2).toUpperCase());
+    const role=u.title||ROLE_LABEL[u.role]||u.role||"";
+    const logo=($("header img.seal")||{}).src||"";
+    const rows=Store.rows, ann=rows.filter(r=>r.kind==="annexation"), open=ann.filter(isOpen);
+    const tabTitle=(tabs.find(t=>t[0]===this.tab)||tabs[0])[1];
+    el.classList.add("wsmode");
+    el.innerHTML='<header class="jt-top"><a class="jt-brand" href="#" id="aBrand">'+(logo?'<img src="'+esc(logo)+'" alt="">':'')+'<span class="bname">Zoning Map<small>Arab City Staff Portal</small></span></a>'+
+      '<nav class="wsw" aria-label="Workspace"><button type="button" id="aMap">Map</button><button type="button" class="on">Dashboard</button></nav><span class="sp"></span>'+
+      (Auth.user?'<div class="pm"><button type="button" class="pm-btn" id="pmBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="pmMenu"><span class="pm-name">'+esc(who)+'</span><span class="avatar" aria-hidden="true">'+ini+'</span><span class="pm-car" aria-hidden="true">▾</span></button>'+
+        '<div class="pm-menu" id="pmMenu" role="menu" aria-label="Account" hidden><div class="pm-who"><span class="avatar" aria-hidden="true">'+ini+'</span><div><b>'+esc(u.name||"")+'</b><span>'+esc(u.email||"")+'</span><span class="pm-role">'+esc(role)+'</span></div></div>'+
+        '<button type="button" role="menuitem" data-go="account">'+NI.account+'My account</button>'+
+        '<a role="menuitem" href="'+esc(CONFIG.PORTAL_URL)+'" target="_blank" rel="noopener">'+NI.portal+'Open the Staff Portal</a><div class="pm-sep"></div>'+
+        '<button type="button" role="menuitem" class="pm-out" id="aLock">'+NI.out+'Sign out</button></div></div>'
+       :'<button type="button" class="pm-btn" id="aLock">'+NI.out+'Lock</button>')+'</header>'+
+      '<div class="ws"><aside class="ws-side">'+
+        (canEdit()?'<button type="button" class="create" id="aAdd">'+NI.plus+'ADD PROPERTY</button>':'')+
+        '<div class="ws-meter"><div class="row">Data <span><i class="dotx"></i>'+esc(Store.label())+'</span></div><p>'+(Store.lastSync?'Synced '+esc(ago(Store.lastSync))+'. ':'')+'Changes save for all staff.</p></div>'+
+        '<h4>My Workspace</h4>'+tabs.map(([k,l])=>'<button type="button" class="navi'+(this.tab===k?' on':'')+'" data-at="'+k+'"'+(this.tab===k?' aria-current="page"':'')+'>'+(NI[k]||"")+esc(l)+'</button>').join("")+
+        '<button type="button" class="navi" id="aMap2">'+NI.map+'Back to map</button>'+
+        '<h4>Totals</h4><div class="navi stat"><span>Tracked properties</span><b class="num">'+rows.length+'</b></div>'+
+        '<div class="navi stat"><span>Annexations</span><b class="num">'+ann.length+'</b></div>'+
+        '<div class="navi stat"><span>In progress</span><b class="num">'+open.length+'</b></div>'+
+      '</aside><main class="ws-main"><div class="ws-bar"><div><h1>'+esc(tabTitle)+'</h1>'+(Auth.user?'<p class="sub">Signed in as <b>'+esc(u.email||"")+'</b>'+(role?' · '+esc(role):'')+'</p>':'')+'</div></div>'+
+      '<div class="ws-body" id="abody"></div></main></div>';
+    $("#aMap").onclick=()=>this.close(); $("#aMap2").onclick=()=>this.close(); $("#aBrand").onclick=e=>{ e.preventDefault(); this.close(); };
+    const aa=$("#aAdd"); if(aa) aa.onclick=()=>this.startAdd({}); $("#aLock").onclick=()=>this.lock();
     $$("[data-at]",el).forEach(b=>b.onclick=()=>{ this.tab=b.dataset.at; this.render(); });
+    const pb=$("#pmBtn"), pmn=$("#pmMenu");
+    if(pb){ pb.onclick=e=>{ e.stopPropagation(); const o=pmn.hidden; pmn.hidden=!o; pb.setAttribute("aria-expanded",String(o)); };
+      el.addEventListener("click",e=>{ if(!pmn.hidden && !e.target.closest(".pm")){ pmn.hidden=true; pb.setAttribute("aria-expanded","false"); } });
+      pmn.addEventListener("keydown",e=>{ if(e.key==="Escape"){ pmn.hidden=true; pb.setAttribute("aria-expanded","false"); pb.focus(); } });
+      $$("[data-go]",pmn).forEach(b=>b.onclick=()=>{ this.tab=b.dataset.go; this.render(); }); }
     const body=$("#abody");
     ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),account:()=>this.rAccount(body)})[this.tab]();
   },
   rLogin(el){
-    if(isPhone()){ el.innerHTML='<div class="admin-in"><div class="gate"><p class="eyebrow">Building Department</p><h2>Use a computer or iPad</h2><p class="sub">Staff sign-in isn\'t available on phones. Open this map on a computer or iPad to sign in. Everything else on the map works here.</p><div class="btnrow" style="margin-top:14px"><button class="btn primary" id="gBack" type="button">Back to map</button></div></div></div>'; $("#gBack").onclick=()=>this.close(); return; }
-    const portal='<a href="'+esc(CONFIG.PORTAL_URL)+'" target="_blank" rel="noopener">Staff Portal</a>';
+    const hero='<h2><em>Zoning Map</em></h2><p>Staff sign-in for annexations and map layers. Use the same login as the Arab City Staff Portal.</p>';
+    const back='<button type="button" class="lbtn" id="gBack">Back to map</button>';
+    if(isPhone()){ el.innerHTML=lbPage(hero,'<div class="pin"><h1>Use a computer or iPad</h1><p>Staff sign-in isn\'t available on phones. Open this map on a computer or iPad to sign in. Everything else on the map works here.</p><button type="button" class="lbtn primary" id="gBack">Back to map</button></div>'); $("#gBack").onclick=()=>this.close(); return; }
     if(Auth.mfa){
-      el.innerHTML='<div class="admin-in"><form class="gate" id="cdForm" autocomplete="off"><p class="eyebrow">Building Department</p><h2>Enter your 6-digit code</h2><p class="sub">Open your authenticator app and enter the code for Arab City Staff Portal. You can also use one of your recovery codes.</p>'+
-        '<div class="field" style="margin-bottom:6px"><label for="cdCode">Code</label><input id="cdCode" inputmode="numeric" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" required maxlength="11" style="font:600 20px var(--mono);letter-spacing:.2em"></div>'+
-        '<p class="note warn" id="cdErr" hidden style="margin:8px 0 0"></p>'+
-        '<div class="btnrow" style="margin-top:14px"><button class="btn primary" id="cdGo" type="submit">Verify</button><button class="btn" id="cdBack" type="button">Start over</button></div></form></div>';
+      el.innerHTML=lbPage(hero,'<form class="pin" id="cdForm" autocomplete="off"><h1>2-step verification</h1>'+
+        '<p>Open the authenticator app on your phone and enter the 6-digit code for <b style="color:var(--ink)">Arab City Staff Portal</b>.</p>'+
+        '<div class="fld"><label for="cdCode">Code</label><input id="cdCode" type="text" inputmode="numeric" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" required maxlength="11" style="font:600 20px var(--mono);letter-spacing:.2em"></div>'+
+        '<span class="formerr" id="cdErr" role="alert"></span><button class="lbtn primary" id="cdGo" type="submit">Verify</button>'+
+        '<p style="font-size:13px">Lost your phone? Type one of your recovery codes in the box instead, or ask an administrator to reset your 2-step verification.</p>'+
+        '<button type="button" class="lbtn" id="cdBack">Back to sign in</button></form>');
       setTimeout(()=>{ const c=$("#cdCode"); if(c) c.focus(); },50);
       $("#cdBack").onclick=()=>{ Auth.mfa=null; this.render(); };
-      $("#cdForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#cdGo"), er=$("#cdErr"); b.disabled=true; b.textContent="Checking…"; er.hidden=true;
+      $("#cdForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#cdGo"), er=$("#cdErr"); b.disabled=true; b.textContent="Checking…"; er.textContent="";
         try{ await Auth.code($("#cdCode").value); this.unlock(); toast("Signed in"); }
-        catch(e){ if(e.restart){ this.render(); const er2=$("#lgErr"); if(er2){ er2.textContent=e.message; er2.hidden=false; } return; } er.textContent=e.message; er.hidden=false; b.disabled=false; b.textContent="Verify"; const c=$("#cdCode"); c.value=""; c.focus(); } };
+        catch(e){ if(e.restart){ this.render(); const er2=$("#lgErr"); if(er2) er2.textContent=e.message; return; } er.textContent=e.message; b.disabled=false; b.textContent="Verify"; const c=$("#cdCode"); c.value=""; c.focus(); } };
       return;
     }
-    el.innerHTML='<div class="admin-in"><form class="gate" id="lgForm" autocomplete="on"><p class="eyebrow">Building Department</p><h2>Staff sign-in</h2><p class="sub">Use your Arab City Staff Portal email and password. Changes you make here are saved for everyone.</p>'+
-      '<div class="field" style="margin-bottom:10px"><label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>'+
-      '<div class="field" style="margin-bottom:8px"><label for="lgPw">Password</label><input id="lgPw" type="password" autocomplete="current-password" required></div>'+
-      '<label class="chk"><input type="checkbox" id="lgRem"><span>Keep me signed in for 7 days (only on a computer that is yours)</span></label>'+
-      '<p class="note warn" id="lgErr" hidden style="margin:10px 0 0"></p>'+
-      '<div class="btnrow" style="margin-top:14px"><button class="btn primary" id="lgGo" type="submit">Sign in</button><button class="btn" id="gBack" type="button">Back to map</button></div>'+
-      '<p class="sub" style="margin:14px 0 0;font-size:12.5px">Same login as the '+portal+'. Forgot your password or new here? Ask an administrator.</p></form></div>';
+    const mail='mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Zoning Map staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my staff login for the Zoning Map / Staff Portal (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.');
+    el.innerHTML=lbPage(hero,'<form class="pin" id="lgForm" autocomplete="on"><h1>Staff sign in</h1>'+
+      '<div class="fld"><label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>'+
+      '<div class="fld"><label for="lgPw">Password</label><input id="lgPw" type="password" autocomplete="current-password" required></div>'+
+      '<label class="opt"><input type="checkbox" id="lgRem"> <span>Keep me signed in for 7 days <span style="color:var(--ink-faint)">(only on a computer that is yours)</span></span></label>'+
+      '<span class="formerr" id="lgErr" role="alert"></span><button class="lbtn primary" id="lgGo" type="submit">Sign in</button>'+
+      '<div class="pwhelp" id="pwHelp" hidden><div class="pwhelp-msg" role="alert"><span><b>Trouble signing in?</b> Contact the web administrator to reset your password.</span></div>'+
+      '<a class="lbtn out" href="'+esc(mail)+'">Contact the web administrator</a></div>'+
+      back+'</form>');
     $("#gBack").onclick=()=>this.close();
     setTimeout(()=>{ const e=$("#lgEmail"); if(e) e.focus(); },50);
-    $("#lgForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#lgGo"), er=$("#lgErr"); b.disabled=true; b.textContent="Signing in…"; er.hidden=true;
+    $("#lgForm").onsubmit=async ev=>{ ev.preventDefault(); const b=$("#lgGo"), er=$("#lgErr"); b.disabled=true; b.textContent="Signing in…"; er.textContent="";
       try{ const st=await Auth.login($("#lgEmail").value,$("#lgPw").value,$("#lgRem").checked); if(st==="mfa"){ this.render(); return; } this.unlock(); toast("Signed in"); }
-      catch(e){ er.innerHTML=esc(e.message)+(e.portal?' <a href="'+esc(CONFIG.PORTAL_URL)+'" target="_blank" rel="noopener">Open the Staff Portal</a>':''); er.hidden=false; b.disabled=false; b.textContent="Sign in"; } };
+      catch(e){ er.innerHTML=esc(e.message)+(e.portal?' <a href="'+esc(CONFIG.PORTAL_URL)+'" target="_blank" rel="noopener" style="color:inherit">Open the Staff Portal</a>':''); $("#pwHelp").hidden=false; b.disabled=false; b.textContent="Sign in"; } };
   },
   rAccount(b){
     const u=Auth.user||{}, m=u.map||{};

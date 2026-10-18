@@ -1,5 +1,7 @@
 -- =====================================================================
 -- City of Arab — Zoning Map (arabcityzoning.jadecruz.dev): shared storage
+-- v3 (2026-10-18): only Building Department logins (and Administrators)
+-- get the staff dashboard. City Clerk logins can browse the public map only.
 -- v2 (2026-10-17): sign-in uses the Arab City Staff Portal logins
 -- (bf_accounts / bf_sessions, the same logins as
 -- arabcityapplications.jadecruz.dev), including its lockout, 2-step
@@ -10,9 +12,9 @@
 --
 -- Who can do what on the map (Staff Portal roles):
 --   public (not signed in)      zoning map only; annexations are hidden
---   any active staff login      see annexations and tracked properties
---     (Building Department, City Clerk, Administrator)
---   Building Department + admin add / edit / delete annexations
+--   City Clerk login            same as the public: browse only, sign-in is refused
+--   Building Department + admin see, add, edit and delete annexations
+--     (Building Department = role 'staff', or any login with the 'building' add-on)
 --   Administrator               also replace / remove / restore map layers
 -- Logins, passwords and 2-step are managed in the Staff Portal.
 -- =====================================================================
@@ -43,13 +45,13 @@ alter table zm_log        enable row level security;
 revoke all on zm_properties, zm_layers, zm_log from anon, authenticated;
 
 -- ---------- helpers (not callable from the website) ----------
--- any active staff login (Building Department, City Clerk or Administrator)
+-- staff dashboard access: Building Department or Administrator only
+-- (City Clerk logins without the 'building' add-on are refused)
 create or replace function zm_is_staff(a bf_accounts) returns boolean
 language sql immutable as $$
-  select a.id is not null and coalesce(a.active, true)
-     and (a.role in ('staff','clerk','admin') or coalesce(array_length(a.perms, 1), 0) > 0);
+  select bf_is_staff(a);
 $$;
--- 1 = any staff (view), 2 = Building Department (edit), 3 = Administrator; returns the email
+-- 1 = view, 2 = edit (both Building Department), 3 = Administrator; returns the email
 create or replace function zm_actor(p_token uuid, p_min int) returns text
 language plpgsql security definer set search_path = public, extensions as $$
 declare a bf_accounts := bf_session_account(p_token);

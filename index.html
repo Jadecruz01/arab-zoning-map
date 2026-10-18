@@ -917,7 +917,7 @@ const Auth = {
     if(r.limited||r.mustChangePw){ try{ await sbRpc("bf_sign_out",{p_token:r.token}); }catch(e){}
       const e=new Error(r.mustChangePw?"Your login has a temporary password. Sign in to the Staff Portal once to choose your own, then come back here.":"Your login needs 2-step verification set up first. Sign in to the Staff Portal to set it up, then come back here."); e.portal=true; throw e; }
     const me=await sbRpc("zm_me",{p_token:r.token});
-    if(!me){ try{ await sbRpc("bf_sign_out",{p_token:r.token}); }catch(e){} throw new Error("That login doesn't have staff access to the map. Ask an administrator to give you staff access in the Staff Portal."); }
+    if(!me){ try{ await sbRpc("bf_sign_out",{p_token:r.token}); }catch(e){} throw new Error("You're not authorized to use the staff dashboard on this map. Only Building Department staff can sign in here. City Clerk staff can browse the map without signing in."); }
     this.token=r.token; this.user=me; lsSet("arabmap.token",r.token); return "ok"; },
   async logout(){ if(this.token){ try{ await sbRpc("bf_sign_out",{p_token:this.token}); }catch(e){} } this.clear(); },
   clear(){ this.token=null; this.user=null; this.mfa=null; lsSet("arabmap.token",null); updateStaffBtn(); },
@@ -1620,7 +1620,7 @@ const Admin = {
     ({overview:()=>this.rOverview(body),properties:()=>this.rProps(body),parcels:()=>this.rParcels(body),feed:()=>this.rFeed(body),account:()=>this.rAccount(body)})[this.tab]();
   },
   rLogin(el){
-    const hero='<h2><em>Zoning Map</em></h2><p>Staff sign-in for annexations and map layers. Use your login from the Applications &amp; Fees page.</p>';
+    const hero='<h2><em>Zoning Map</em></h2><p>Building Department sign-in for annexations and map layers. Use your login from the Applications &amp; Fees page. City Clerk staff can browse the map without signing in.</p>';
     const back='<button type="button" class="lbtn" id="gBack">Back to map</button>';
     if(isPhone()){ el.innerHTML=lbPage(hero,'<div class="pin"><h1>Use a computer or iPad</h1><p>Staff sign-in isn\'t available on phones. Open this map on a computer or iPad to sign in. Everything else on the map works here.</p><button type="button" class="lbtn primary" id="gBack">Back to map</button></div>'); $("#gBack").onclick=()=>this.close(); return; }
     if(Auth.mfa){
